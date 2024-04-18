@@ -1,0 +1,14 @@
+spring.application.name: fingerprint_backend
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/fingerprint_db?serverTimezone=Asia/Seoul
+    username: kyumin
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
