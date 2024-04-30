@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -11,4 +12,6 @@ public class MemberEntity {
     private String studentNumber;
 
     private String name;
+    @Column(unique = true)
+    private String email;
 }
