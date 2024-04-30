@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend.entity;
 
+import com.example.fingerprint_backend.types.MemberLanguage;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,4 +15,6 @@ public class MemberEntity {
     private String name;
     @Column(unique = true)
     private String email;
+    private String kakao;
+    private MemberLanguage language;
 }

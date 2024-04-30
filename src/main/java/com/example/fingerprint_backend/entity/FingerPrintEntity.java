@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 public class FingerPrintEntity {
     @Id
     private Integer indexNum;
-    private String fingerPrintImage;
+    private String fingerPrintImage1;
+    private String fingerPrintImage2;
     private String studentNumber;
 }
