@@ -25,6 +25,12 @@ public class GoogleController {
         System.out.println("credential = " + credential);
         GoogleLoginUserInfoDto userInfoDto = googleService.googleDecode(credential);
 
+//        토큰 유효기간 검증
+        if (!googleService.expCheck(userInfoDto.getExp())) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponse(false, "로그인 실패: 토큰의 유효기간이 지났습니다.", null));
+        }
+
 //        영진 전문대 이메일 여부 확인
         if (!userInfoDto.getEmail().endsWith("@g.yju.ac.kr")) {
             return ResponseEntity.status(HttpStatus.OK)
@@ -48,6 +54,12 @@ public class GoogleController {
         String email = googleRegisterDto.getEmail();
         String name = googleRegisterDto.getName();
         GoogleLoginUserInfoDto userInfoDto = googleService.googleDecode(credential);
+
+//        토큰 유효기간 검증
+        if (!googleService.expCheck(userInfoDto.getExp())) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponse(false, "회원가입 실패: 토큰의 유효기간이 지났습니다.", null));
+        }
 
 //        토큰의 정보와 이메일, 이름 정보가 일치하지 않는 경우
         if (!userInfoDto.getName().equals(name) || !userInfoDto.getEmail().equals(email)) {

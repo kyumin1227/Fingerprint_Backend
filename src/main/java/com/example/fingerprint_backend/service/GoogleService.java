@@ -10,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -34,9 +37,14 @@ public class GoogleService {
         GoogleLoginUserInfoDto userInfoDto = new GoogleLoginUserInfoDto();
         userInfoDto.setName(jsonObject.getString("name"));
         userInfoDto.setEmail(jsonObject.getString("email"));
+        userInfoDto.setPicture(jsonObject.getString("picture"));
+        userInfoDto.setExp(jsonObject.optLong("exp"));
+
 
         System.out.println("userInfoDto.getEmail() = " + userInfoDto.getEmail());
         System.out.println("userInfoDto.getName() = " + userInfoDto.getName());
+        System.out.println("userInfoDto.getPicture() = " + userInfoDto.getPicture());
+        System.out.println("userInfoDto.getExp() = " + userInfoDto.getExp());
 
         return userInfoDto;
     }
@@ -59,5 +67,18 @@ public class GoogleService {
         MemberEntity save = memberRepository.save(member);
 
         return save;
+    }
+
+//    토큰의 유효기간 확인 후 사용 가능 토큰이면 true 불가능이면 false 반환
+    public Boolean expCheck(Long exp) {
+
+        ZonedDateTime givenDateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(exp), ZoneId.systemDefault());
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
+
+        if (givenDateTime.isBefore(now)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

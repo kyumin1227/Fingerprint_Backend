@@ -7,4 +7,6 @@ import lombok.Setter;
 public class GoogleLoginUserInfoDto {
     private String email;
     private String name;
+    private String picture;
+    private Long exp;
 }
