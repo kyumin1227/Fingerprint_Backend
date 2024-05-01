@@ -1,12 +1,16 @@
 package com.example.fingerprint_backend.service;
 
 import com.example.fingerprint_backend.dto.GoogleLoginUserInfoDto;
+import com.example.fingerprint_backend.dto.GoogleRegisterDto;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.repository.MemberRepository;
+import com.example.fingerprint_backend.types.MemberLanguage;
+import com.example.fingerprint_backend.types.MemberRole;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -47,5 +51,13 @@ public class GoogleService {
             return true;
         }
 
+    }
+
+//    회원가입
+    public MemberEntity register(GoogleRegisterDto info) {
+        MemberEntity member = new MemberEntity(info.getStudentNum(), info.getName(), info.getEmail(), info.getKakao(), MemberLanguage.KOREA, MemberRole.Student , LocalDateTime.now());
+        MemberEntity save = memberRepository.save(member);
+
+        return save;
     }
 }
