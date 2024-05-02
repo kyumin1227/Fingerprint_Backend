@@ -42,7 +42,7 @@ public class GoogleController {
         }
 
 //        회원이 아닌 경우
-        if (!googleService.isUser(userInfoDto)) {
+        if (!googleService.isUserByEmail(userInfoDto)) {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ApiResponse(false, "가입 필요: 학번 및 카카오톡 아이디 등록이 필요합니다.", userInfoDto));
         }
@@ -57,6 +57,8 @@ public class GoogleController {
         String credential = googleRegisterDto.getCredential();
         String email = googleRegisterDto.getEmail();
         String name = googleRegisterDto.getName();
+        String studentNum = googleRegisterDto.getStudentNum();
+        String kakao = googleRegisterDto.getKakao();
 
 //        최초 회원가입 시 토큰 진위여부 검증
         if (!googleService.googleTokenCheck(credential)) {
@@ -72,8 +74,18 @@ public class GoogleController {
         }
 
 //        이미 가입된 이메일일 경우
-        if (googleService.isUser(userInfoDto)) {
+        if (googleService.isUserByEmail(userInfoDto)) {
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "회원가입 실패: 이미 가입된 이메일입니다.", null));
+        }
+
+//        이미 가입된 학번인 경우
+        if (googleService.isUserByStdNum(studentNum)) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "회원가입 실패: 이미 가입된 학번입니다.", null));
+        }
+
+//        이미 가입된 카카오톡 계정인 경우
+        if (googleService.isUserByKakao(kakao)) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "회원가입 실패: 이미 가입된 카카오톡 계정입니다.", null));
         }
 
         MemberEntity registered = googleService.register(googleRegisterDto);

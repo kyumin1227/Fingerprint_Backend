@@ -57,7 +57,7 @@ public class GoogleService {
     }
 
 //    가입이 되어있는 유저인지 확인 (회원 = true, 비회원 = false)
-    public Boolean isUser(GoogleLoginUserInfoDto userInfoDto) {
+    public Boolean isUserByEmail(GoogleLoginUserInfoDto userInfoDto) {
         Optional<MemberEntity> user = memberRepository.findByEmail(userInfoDto.getEmail());
 
         if (user.isEmpty()) {
@@ -65,7 +65,28 @@ public class GoogleService {
         } else {
             return true;
         }
+    }
 
+//    가입이 되어있는 유저인지 확인 (회원 = true, 비회원 = false)
+    public Boolean isUserByStdNum(String studentNum) {
+        Optional<MemberEntity> user = memberRepository.findByStudentNumber(studentNum);
+
+        if (user.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+//    가입이 되어있는 유저인지 확인 (회원 = true, 비회원 = false)
+    public Boolean isUserByKakao(String kakao) {
+        Optional<MemberEntity> user = memberRepository.findByKakao(kakao);
+
+        if (user.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 //    회원가입
