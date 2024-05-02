@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 @RestController
 @RequiredArgsConstructor
 public class GoogleController {
@@ -20,16 +23,17 @@ public class GoogleController {
     final private GoogleService googleService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(@RequestBody GoogleLoginDto googleLoginDto) {
+    public ResponseEntity<ApiResponse> login(@RequestBody GoogleLoginDto googleLoginDto) throws GeneralSecurityException, IOException {
         String credential = googleLoginDto.getCredential();
         System.out.println("credential = " + credential);
-        GoogleLoginUserInfoDto userInfoDto = googleService.googleDecode(credential);
 
-//        토큰 유효기간 검증
-        if (!googleService.expCheck(userInfoDto.getExp())) {
+//        최초 로그인 시 토큰 진위여부 검증
+        if (!googleService.googleTokenCheck(credential)) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse(false, "로그인 실패: 토큰의 유효기간이 지났습니다.", null));
+                    .body(new ApiResponse(false, "로그인 실패: 올바르지 않은 토큰입니다.", null));
         }
+
+        GoogleLoginUserInfoDto userInfoDto = googleService.googleDecode(credential);
 
 //        영진 전문대 이메일 여부 확인
         if (!userInfoDto.getEmail().endsWith("@g.yju.ac.kr")) {
@@ -49,17 +53,18 @@ public class GoogleController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> register(@RequestBody GoogleRegisterDto googleRegisterDto) {
+    public ResponseEntity<ApiResponse> register(@RequestBody GoogleRegisterDto googleRegisterDto) throws GeneralSecurityException, IOException {
         String credential = googleRegisterDto.getCredential();
         String email = googleRegisterDto.getEmail();
         String name = googleRegisterDto.getName();
-        GoogleLoginUserInfoDto userInfoDto = googleService.googleDecode(credential);
 
-//        토큰 유효기간 검증
-        if (!googleService.expCheck(userInfoDto.getExp())) {
+//        최초 회원가입 시 토큰 진위여부 검증
+        if (!googleService.googleTokenCheck(credential)) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse(false, "회원가입 실패: 토큰의 유효기간이 지났습니다.", null));
+                    .body(new ApiResponse(false, "회원가입 실패: 올바르지 않은 토큰입니다.", null));
         }
+
+        GoogleLoginUserInfoDto userInfoDto = googleService.googleDecode(credential);
 
 //        토큰의 정보와 이메일, 이름 정보가 일치하지 않는 경우
         if (!userInfoDto.getName().equals(name) || !userInfoDto.getEmail().equals(email)) {

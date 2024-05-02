@@ -5,6 +5,9 @@ spring:
     username: kyumin
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
+    google:
+      clientId: 441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com
+
   jpa:
     show-sql: true
     hibernate:

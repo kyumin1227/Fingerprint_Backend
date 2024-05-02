@@ -6,16 +6,24 @@ import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.types.MemberLanguage;
 import com.example.fingerprint_backend.types.MemberRole;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Optional;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.json.jackson2.JacksonFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +47,6 @@ public class GoogleService {
         userInfoDto.setEmail(jsonObject.getString("email"));
         userInfoDto.setPicture(jsonObject.getString("picture"));
         userInfoDto.setExp(jsonObject.optLong("exp"));
-
 
         System.out.println("userInfoDto.getEmail() = " + userInfoDto.getEmail());
         System.out.println("userInfoDto.getName() = " + userInfoDto.getName());
@@ -80,5 +87,24 @@ public class GoogleService {
         } else {
             return true;
         }
+    }
+
+//    토큰 검증 및 데이터 추출
+    public boolean googleTokenCheck(String credential) throws GeneralSecurityException, IOException {
+
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+                // Client ID를 여기에 설정하세요. 여러 클라이언트 ID를 사용할 경우, 리스트로 추가.
+                .setAudience(Collections.singletonList("441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com"))
+                .build();
+
+        GoogleIdToken idToken = verifier.verify(credential);
+
+        if (idToken != null) {
+            return true;
+        } else {
+            // 유효하지 않은 토큰
+            return false;
+        }
+
     }
 }
