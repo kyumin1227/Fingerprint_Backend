@@ -35,6 +35,16 @@ class FingerprintBackendApplicationTests {
 			}
 
 			@Override
+			public Optional<MemberEntity> findByStudentNumber(String studentNumber) {
+				return Optional.empty();
+			}
+
+			@Override
+			public Optional<MemberEntity> findByKakao(String kakao) {
+				return Optional.empty();
+			}
+
+			@Override
 			public void flush() {
 
 			}

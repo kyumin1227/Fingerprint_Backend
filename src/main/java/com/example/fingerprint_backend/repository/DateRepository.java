@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.Optional;
 
-public interface DateRepository extends JpaRepository<DateEntity, Integer> {
+public interface DateRepository extends JpaRepository<DateEntity, LocalDate> {
 
-    Optional<DateEntity> findByDate(LocalDate date);
 }
