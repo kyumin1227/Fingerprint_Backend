@@ -9,4 +9,6 @@ public class GoogleLoginUserInfoDto {
     private String name;
     private String picture;
     private Long exp;
+    private String studentNumber;
+    private String kakao;
 }

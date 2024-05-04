@@ -4,6 +4,7 @@ import com.example.fingerprint_backend.types.MemberLanguage;
 import com.example.fingerprint_backend.types.MemberRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class MemberEntity {
     @Id
     private String studentNumber;

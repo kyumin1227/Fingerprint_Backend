@@ -47,9 +47,11 @@ public class GoogleController {
                     .body(new ApiResponse(false, "가입 필요: 학번 및 카카오톡 아이디 등록이 필요합니다.", userInfoDto));
         }
 
+        GoogleLoginUserInfoDto successUserInfo = googleService.getStdNumAndKakao(userInfoDto);
+
 //        로그인 성공
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(true, "로그인: 사용자 인증 성공", userInfoDto));
+                .body(new ApiResponse(true, "로그인: 사용자 인증 성공", successUserInfo));
     }
 
     @PostMapping("/register")

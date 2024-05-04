@@ -128,4 +128,13 @@ public class GoogleService {
         }
 
     }
+
+    public GoogleLoginUserInfoDto getStdNumAndKakao(GoogleLoginUserInfoDto loginUserInfo) {
+
+        Optional<MemberEntity> byEmail = memberRepository.findByEmail(loginUserInfo.getEmail());
+        loginUserInfo.setStudentNumber(byEmail.get().getStudentNumber());
+        loginUserInfo.setKakao(byEmail.get().getKakao());
+
+        return loginUserInfo;
+    }
 }
