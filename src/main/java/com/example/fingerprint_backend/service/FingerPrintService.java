@@ -61,6 +61,18 @@ public class FingerPrintService {
         return saved;
     }
 
+    public Boolean delete(String stdNum) {
+        Optional<FingerPrintEntity> byId = fingerPrintRepository.findById(stdNum);
+
+        if (byId.isEmpty()) {
+            return false;
+        }
+
+        fingerPrintRepository.delete(byId.get());
+
+        return true;
+    }
+
     public List<FingerPrintEntity> getAllFingerprint() {
 
         List<FingerPrintEntity> all = fingerPrintRepository.findAll();

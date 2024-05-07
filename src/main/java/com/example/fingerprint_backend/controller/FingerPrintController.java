@@ -26,15 +26,16 @@ public class FingerPrintController {
 //        해당 학번의 유저가 가입되어 있는지 조회
         Boolean exist = fingerPrintService.isMemberExist(stdNum);
 
+//        (스테이터스 코드 204 반환)
         if (!exist) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "가입 되지 않은 학번입니다.", null));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse(false, "가입 되지 않은 학번입니다.", null));
         }
 
 //        해당 학번의 지문이 등록되어 있는지 조회
         Boolean fingerPrintExist = fingerPrintService.isFingerPrintExist(stdNum);
 
         if (fingerPrintExist) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "이미 지문 정보가 등록된 학번입니다.", null));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "이미 지문 정보가 \n등록된 학번입니다.", null));
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 등록이 가능한 학번입니다.", null));
@@ -65,6 +66,18 @@ public class FingerPrintController {
         FingerPrintEntity fingerPrintEntity = fingerPrintService.create(createFingerPrintDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 등록: 지문이 등록되었습니다.", fingerPrintEntity));
+    }
+
+    @DeleteMapping("/fingerprint/students/{stdNum}")
+    public ResponseEntity<ApiResponse> delete(@PathVariable String stdNum) {
+
+        Boolean delete = fingerPrintService.delete(stdNum);
+
+        if (!delete) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "지문 데이터 삭제 실패", null));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 데이터 삭제 완료", null));
     }
 
     @PostMapping("/fingerprint/logs")
