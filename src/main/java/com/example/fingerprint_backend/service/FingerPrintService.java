@@ -68,7 +68,7 @@ public class FingerPrintService {
             return false;
         }
 
-        fingerPrintRepository.delete(byId.get());
+        fingerPrintRepository.deleteById(stdNum);
 
         return true;
     }

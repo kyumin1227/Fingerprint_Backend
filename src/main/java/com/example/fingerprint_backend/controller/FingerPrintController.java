@@ -65,7 +65,11 @@ public class FingerPrintController {
 
         FingerPrintEntity fingerPrintEntity = fingerPrintService.create(createFingerPrintDto);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 등록: 지문이 등록되었습니다.", fingerPrintEntity));
+        if (fingerPrintEntity.getStudentNumber().equals(createFingerPrintDto.getStd_num())) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 등록에 성공하였습니다.", fingerPrintEntity));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body((new ApiResponse(false, "지문 등록에 실패하였습니다. \n다시 시도해주세요.", null)));
     }
 
     @DeleteMapping("/fingerprint/students/{stdNum}")
