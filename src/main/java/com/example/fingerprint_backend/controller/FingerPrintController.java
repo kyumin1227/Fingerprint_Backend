@@ -20,7 +20,7 @@ public class FingerPrintController {
 
     private final FingerPrintService fingerPrintService;
 
-    @GetMapping("fingerprint/students/{stdNum}")
+    @GetMapping("/api/fingerprint/students/{stdNum}")
     public ResponseEntity<ApiResponse> check(@PathVariable String stdNum) {
 
 //        해당 학번의 유저가 가입되어 있는지 조회
@@ -41,7 +41,7 @@ public class FingerPrintController {
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 등록이 가능한 학번입니다.", null));
     }
 
-    @GetMapping("fingerprint/students")
+    @GetMapping("/api/fingerprint/students")
     public ResponseEntity<ApiResponse> getAllFingerprint(@RequestHeader HttpHeaders headers) {
 
 //        String key = headers.getFirst("key");
@@ -56,7 +56,7 @@ public class FingerPrintController {
 
     }
 
-    @PostMapping("/fingerprint/students")
+    @PostMapping("/api/fingerprint/students")
     public ResponseEntity<ApiResponse> create(@RequestBody CreateFingerPrintDto createFingerPrintDto) {
 
         System.out.println("createFingerPrintDto.getFingerprint1() = " + createFingerPrintDto.getFingerprint1());
@@ -72,7 +72,7 @@ public class FingerPrintController {
         return ResponseEntity.status(HttpStatus.OK).body((new ApiResponse(false, "지문 등록에 실패하였습니다. \n다시 시도해주세요.", null)));
     }
 
-    @DeleteMapping("/fingerprint/students/{stdNum}")
+    @DeleteMapping("/api/fingerprint/students/{stdNum}")
     public ResponseEntity<ApiResponse> delete(@PathVariable String stdNum) {
 
         Boolean delete = fingerPrintService.delete(stdNum);
@@ -84,7 +84,7 @@ public class FingerPrintController {
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 데이터 삭제 완료", null));
     }
 
-    @PostMapping("/fingerprint/logs")
+    @PostMapping("/api/fingerprint/logs")
     public ResponseEntity<ApiResponse> createLog(@RequestBody CreateLogDto createLogDto) {
 
         System.out.println("createLogDto.getStd_num() = " + createLogDto.getStd_num());

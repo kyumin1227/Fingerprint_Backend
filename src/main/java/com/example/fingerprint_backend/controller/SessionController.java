@@ -22,7 +22,7 @@ public class SessionController {
     private final SessionService sessionService;
     private final GoogleService googleService;
 
-    @GetMapping("/sessions")
+    @GetMapping("/api/sessions")
     public ResponseEntity<ApiResponse> getDates(@RequestParam(name = "stdNum") String stdNum) {
 
         ArrayList<LocalDate> dateList = sessionService.getDateList();
@@ -32,7 +32,7 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "Fasd", dateInfo));
     }
 
-    @PostMapping("/sessions/{date}")
+    @PostMapping("/api/sessions/{date}")
     public ResponseEntity<ApiResponse> apply(@PathVariable String date, @RequestBody ApplyDto applyDto) throws GeneralSecurityException, IOException {
 
         LocalDate localDate = LocalDate.of(Integer.parseInt(date.substring(0, 4)), Integer.parseInt(date.substring(4, 6)), Integer.parseInt(date.substring(6)));

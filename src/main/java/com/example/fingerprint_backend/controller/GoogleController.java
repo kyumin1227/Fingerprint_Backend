@@ -22,7 +22,7 @@ public class GoogleController {
 
     final private GoogleService googleService;
 
-    @PostMapping("/login")
+    @PostMapping("/api/login")
     public ResponseEntity<ApiResponse> login(@RequestBody GoogleLoginDto googleLoginDto) throws GeneralSecurityException, IOException {
         String credential = googleLoginDto.getCredential();
         System.out.println("credential = " + credential);
@@ -54,7 +54,7 @@ public class GoogleController {
                 .body(new ApiResponse(true, "로그인: 사용자 인증 성공", successUserInfo));
     }
 
-    @PostMapping("/register")
+    @PostMapping("/api/register")
     public ResponseEntity<ApiResponse> register(@RequestBody GoogleRegisterDto googleRegisterDto) throws GeneralSecurityException, IOException {
         String credential = googleRegisterDto.getCredential();
         String email = googleRegisterDto.getEmail();
