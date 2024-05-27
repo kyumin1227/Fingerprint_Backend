@@ -134,6 +134,7 @@ public class GoogleService {
         Optional<MemberEntity> byEmail = memberRepository.findByEmail(loginUserInfo.getEmail());
         loginUserInfo.setStudentNumber(byEmail.get().getStudentNumber());
         loginUserInfo.setKakao(byEmail.get().getKakao());
+        loginUserInfo.setRole(byEmail.get().getRole());
 
         return loginUserInfo;
     }
