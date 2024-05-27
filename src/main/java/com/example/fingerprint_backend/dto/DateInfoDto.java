@@ -14,4 +14,5 @@ public class DateInfoDto {
     private Boolean sign;
     private Integer people;
     private Boolean isHoliday;
+    private Boolean isAble;
 }

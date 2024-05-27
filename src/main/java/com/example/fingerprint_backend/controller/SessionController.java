@@ -5,6 +5,7 @@ import com.example.fingerprint_backend.dto.ApplyDto;
 import com.example.fingerprint_backend.dto.DateInfoDto;
 import com.example.fingerprint_backend.service.GoogleService;
 import com.example.fingerprint_backend.service.SessionService;
+import com.example.fingerprint_backend.types.MemberRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,13 +49,13 @@ public class SessionController {
 
 //        이미 신청이 되어있는 상태 (sign = true)
         if (applyDto.getSign()) {
-            if (sessionService.cancel(localDate, applyDto.getStudentNum())) {
-                return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "신청 성공: 신청이 완료되었습니다.", null));
+            if (sessionService.cancel(localDate, applyDto.getStudentNum(), applyDto.getRole())) {
+                return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "취소 성공: 취소가 완료되었습니다.", null));
             } else {
                 return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "신청 실패: 새로고침 후 다시 시도해주세요.", null));
             }
         } else {
-            if (sessionService.apply(localDate, applyDto.getStudentNum())) {
+            if (sessionService.apply(localDate, applyDto.getStudentNum(), applyDto.getRole())) {
                 return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "신청 성공: 신청이 완료되었습니다.", null));
             } else {
                 return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "신청 실패: 새로고침 후 다시 시도해주세요.", null));

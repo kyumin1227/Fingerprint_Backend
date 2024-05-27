@@ -5,14 +5,18 @@ import com.example.fingerprint_backend.entity.DateEntity;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.repository.DateRepository;
 import com.example.fingerprint_backend.repository.MemberRepository;
+import com.example.fingerprint_backend.types.MemberRole;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +49,18 @@ public class SessionService {
             Optional<DateEntity> dateInfo = dateRepository.findById(date);
             DateInfoDto dateInfoDto;
             if (dateInfo.isEmpty()) {
-                dateInfoDto = new DateInfoDto(date, false, 0, false);
+                DayOfWeek dayOfWeek = date.getDayOfWeek();
+                if (dayOfWeek.equals(DayOfWeek.SATURDAY) || dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                    DateEntity dateEntity = new DateEntity(date, true, false, null);
+                    dateRepository.save(dateEntity);
+                    dateInfoDto = new DateInfoDto(date, false, 0, true, false);
+                } else {
+                    DateEntity dateEntity = new DateEntity(date, false, false, null);
+                    dateRepository.save(dateEntity);
+                    dateInfoDto = new DateInfoDto(date, false, 0, false, false);
+                }
             } else {
-                dateInfoDto = new DateInfoDto(date, dateInfo.get().getMembers().contains(stdNum), dateInfo.get().getMembers().size(), dateInfo.get().getIsHoliday());
+                dateInfoDto = new DateInfoDto(date, dateInfo.get().getMembers().contains(stdNum), dateInfo.get().getMembers().size(), dateInfo.get().getIsHoliday(), dateInfo.get().getIsAble());
             }
             dateInfoArrayList.add(dateInfoDto);
         }
@@ -56,7 +69,7 @@ public class SessionService {
     }
 
     @Transactional
-    public Boolean apply(LocalDate date, String stdNum) {
+    public Boolean apply(LocalDate date, String stdNum, MemberRole role) {
         Optional<DateEntity> targetDate = dateRepository.findById(date);
         Optional<MemberEntity> targetMember = memberRepository.findByStudentNumber(stdNum);
 
@@ -67,21 +80,22 @@ public class SessionService {
         }
 
         if (targetDate.isEmpty()) {
-            DateEntity saveDate = new DateEntity();
-            saveDate.setIsHoliday(false);
-            saveDate.setDate(date);
-            saveDate.getMembers().add(stdNum);
-            dateRepository.save(saveDate);
-        } else {
-            targetDate.get().getMembers().add(stdNum);
-            dateRepository.save(targetDate.get());
+            return false;
         }
+
+        targetDate.get().getMembers().add(stdNum);
+//        열쇠 담당이 신청할 경우 isAble을 true로 변경
+        if (role.equals(MemberRole.Admin) || role.equals(MemberRole.Key)) {
+            targetDate.get().setIsAble(true);
+        }
+
+        dateRepository.save(targetDate.get());
 
         return true;
     }
 
     @Transactional
-    public Boolean cancel(LocalDate date, String stdNum) {
+    public Boolean cancel(LocalDate date, String stdNum, MemberRole role) {
         Optional<DateEntity> targetDate = dateRepository.findById(date);
         Optional<MemberEntity> targetMember = memberRepository.findByStudentNumber(stdNum);
 
@@ -91,10 +105,26 @@ public class SessionService {
 
         if (targetDate.isEmpty()) {
             return false;
-        } else {
-            targetDate.get().getMembers().remove(stdNum);
-            dateRepository.save(targetDate.get());
         }
+
+        targetDate.get().getMembers().remove(stdNum);
+//        열쇠 담당이 취소할 경우 다른 열쇠 담당이 있는지 확인
+        if (role.equals(MemberRole.Admin) || role.equals(MemberRole.Key)) {
+            Set<String> members = targetDate.get().getMembers();
+            boolean keyExist = false;
+            for (String memberNum : members) {
+                Optional<MemberEntity> byStudentNumber = memberRepository.findByStudentNumber(memberNum);
+                MemberRole memberRole = byStudentNumber.get().getRole();
+                if (memberRole.equals(MemberRole.Key) || memberRole.equals(MemberRole.Admin)) {
+                    keyExist = true;
+                    break;
+                }
+            }
+            targetDate.get().setIsAble(keyExist);
+        }
+
+        dateRepository.save(targetDate.get());
+
 
         return true;
     }
