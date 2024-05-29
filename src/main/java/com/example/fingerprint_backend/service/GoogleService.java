@@ -9,6 +9,7 @@ import com.example.fingerprint_backend.types.MemberRole;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -30,6 +31,9 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 public class GoogleService {
 
     final private MemberRepository memberRepository;
+
+    @Value("${GOOGLE_CLIENT_ID}")
+    private String googleClientId;
 
 //    credential 키를 받아서 정보를 추출 후 dto에 이름과 이메일을 담아 반환
     public GoogleLoginUserInfoDto googleDecode(String credential) {
@@ -115,7 +119,8 @@ public class GoogleService {
 
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 // Client ID를 여기에 설정하세요. 여러 클라이언트 ID를 사용할 경우, 리스트로 추가.
-                .setAudience(Collections.singletonList("441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com"))
+//                .setAudience(Collections.singletonList("441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com"))
+                .setAudience(Collections.singletonList(googleClientId))
                 .build();
 
         GoogleIdToken idToken = verifier.verify(credential);
