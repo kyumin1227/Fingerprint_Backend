@@ -16,6 +16,12 @@ public class FingerprintBackendApplication {
 		System.setProperty("GOOGLE_CLIENT_ID", dotenv.get("GOOGLE_CLIENT_ID"));
 		System.setProperty("DB_USER", dotenv.get("DB_USER"));
 		System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+		System.setProperty("DB_URL", dotenv.get("DB_URL"));
+	 	System.setProperty("ROLE_ADMIN", dotenv.get("ROLE_ADMIN"));
+		System.setProperty("ROLE_PROFESSOR", dotenv.get("ROLE_PROFESSOR"));
+		System.setProperty("ROLE_ASSISTANT", dotenv.get("ROLE_ASSISTANT"));
+		System.setProperty("ROLE_KEY", dotenv.get("ROLE_KEY"));
+		System.setProperty("ROLE_STUDENT", dotenv.get("ROLE_STUDENT"));
 
 		SpringApplication.run(FingerprintBackendApplication.class, args);
 	}

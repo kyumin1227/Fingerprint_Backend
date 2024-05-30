@@ -4,6 +4,7 @@ import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.types.MemberRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,6 +15,17 @@ public class RoleService {
 
     private final MemberRepository memberRepository;
 
+    @Value("${ROLE_ADMIN}")
+    private String adminKey;
+    @Value("${ROLE_PROFESSOR}")
+    private String professorKey;
+    @Value("${ROLE_ASSISTANT}")
+    private String assistantKey;
+    @Value("${ROLE_KEY}")
+    private String keyKey;
+    @Value("${ROLE_STUDENT}")
+    private String studentKey;
+
     /**
      * RoleCode를 검증하여 해당 코드에 맞는 Role을 반환
      * @param roleCode
@@ -21,14 +33,19 @@ public class RoleService {
      */
     public MemberRole checkRoleCode(String roleCode) {
 
-        return switch (roleCode) {
-            case "0" -> MemberRole.Admin;
-            case "1" -> MemberRole.Professor;
-            case "2" -> MemberRole.Assistant;
-            case "3" -> MemberRole.Key;
-            case "4" -> MemberRole.Student;
-            default -> MemberRole.None;
-        };
+        if (adminKey.equals(roleCode)) {
+            return MemberRole.Admin;
+        } else if (professorKey.equals(roleCode)) {
+            return MemberRole.Professor;
+        } else if (assistantKey.equals(roleCode)) {
+            return MemberRole.Assistant;
+        } else if (keyKey.equals(roleCode)) {
+            return MemberRole.Key;
+        } else if (studentKey.equals(roleCode)) {
+            return MemberRole.Student;
+        } else {
+            return MemberRole.None;
+        }
 
     }
 
