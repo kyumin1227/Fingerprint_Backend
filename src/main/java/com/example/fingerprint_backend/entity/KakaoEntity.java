@@ -6,7 +6,7 @@ import jakarta.persistence.Id;
 @Entity
 public class KakaoEntity {
     @Id
-    private String studentNum;
+    private String studentNumber;
 
     private Boolean kakaoAgree;
     private String uuid;

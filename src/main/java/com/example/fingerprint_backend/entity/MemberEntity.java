@@ -27,5 +27,6 @@ public class MemberEntity {
     private MemberLanguage language;
     @Enumerated(EnumType.STRING)
     private MemberRole role;
+    private Boolean signKakao;
     private LocalDateTime registerTime; // 가입 일자
 }

@@ -95,7 +95,7 @@ public class GoogleService {
 
 //    회원가입
     public MemberEntity register(GoogleRegisterDto info) {
-        MemberEntity member = new MemberEntity(info.getStudentNum(), info.getName(), info.getEmail(), info.getKakao(), MemberLanguage.KOREA, MemberRole.Student , LocalDateTime.now());
+        MemberEntity member = new MemberEntity(info.getStudentNum(), info.getName(), info.getEmail(), info.getKakao(), MemberLanguage.KOREA, MemberRole.Student, false, LocalDateTime.now());
         MemberEntity save = memberRepository.save(member);
 
         return save;
