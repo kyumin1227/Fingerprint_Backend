@@ -119,7 +119,6 @@ public class GoogleService {
 
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 // Client ID를 여기에 설정하세요. 여러 클라이언트 ID를 사용할 경우, 리스트로 추가.
-//                .setAudience(Collections.singletonList("441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com"))
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
 
