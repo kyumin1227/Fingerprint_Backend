@@ -13,9 +13,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -99,5 +102,69 @@ public class KakaoService {
         String profileId = jsonObject.get("id").toString();
 
         return profileId;
+    }
+
+    /**
+     * 리프레쉬 토큰을 통해 액세스 토큰을 재발급 받는 메소드
+     * @param refreshToken
+     * @return
+     */
+    public String getAccessToken(String refreshToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://kauth.kakao.com/oauth/token";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "refresh_token");
+        body.add("client_id", kakaoClientId);
+        body.add("refresh_token", refreshToken);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+
+        System.out.println("response.getBody() = " + response.getBody());
+
+        JSONObject jsonObject = new JSONObject(response.getBody());
+        String accessToken = jsonObject.get("access_token").toString();
+
+        return accessToken;
+    }
+
+    public Boolean sendKakaoMessage(String accessToken, String message, String uuid) {
+
+        String url = "https://kapi.kakao.com/v1/api/talk/friends/message/default/send";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        JSONObject templateObject = new JSONObject();
+        templateObject.put("object_type", "text");
+        templateObject.put("text", message);
+        templateObject.put("link", new JSONObject().put("web_url", "https://gsc-fingerprint.org"));
+
+        // URL 인코딩을 합니다.
+        String encodedReceiverUuids = URLEncoder.encode("[\"" + uuid + "\"]", StandardCharsets.UTF_8);
+        String encodedTemplateObject = URLEncoder.encode(templateObject.toString(), StandardCharsets.UTF_8);
+
+        // Form 데이터를 생성합니다.
+        String formData = "receiver_uuids=" + encodedReceiverUuids + "&template_object=" + encodedTemplateObject;
+
+        System.out.println("formData = " + formData);
+
+        HttpEntity<String> request = new HttpEntity<>(formData, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+        System.out.println("response.getBody() = " + response.getBody());
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            return false;
+        }
+        return true;
     }
 }
