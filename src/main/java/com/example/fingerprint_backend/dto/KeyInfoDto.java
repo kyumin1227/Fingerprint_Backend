@@ -16,5 +16,6 @@ public class KeyInfoDto {
     private LocalTime startTime;
     private LocalTime endTime;
     private String amendStudentNumber;
+    private Boolean isHoliday;
 
 }

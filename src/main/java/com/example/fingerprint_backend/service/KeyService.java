@@ -7,6 +7,7 @@ import jakarta.servlet.http.PushBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -26,6 +27,7 @@ public class KeyService {
     public KeyEntity getKeyInfo(String date) {
 
         LocalDate targetDate = LocalDate.parse(date);
+        DayOfWeek dayOfWeek = targetDate.getDayOfWeek();
 
         System.out.println("targetDate = " + targetDate);
 
@@ -34,7 +36,7 @@ public class KeyService {
         if (byId.isEmpty()) {
             LocalTime start = LocalTime.parse("09:00");
             LocalTime end = LocalTime.parse("21:00");
-            KeyEntity newKeyInfo = new KeyEntity(targetDate, null, null, start, end, null, null);
+            KeyEntity newKeyInfo = new KeyEntity(targetDate, null, null, start, end, null, null, dayOfWeek.equals(DayOfWeek.SATURDAY) || dayOfWeek.equals(DayOfWeek.SUNDAY));
 
             KeyEntity save = keyRepository.save(newKeyInfo);
             return save;
@@ -60,6 +62,7 @@ public class KeyService {
         targetKeyEntity.setSubManager(keyInfoDto.getSubManager());
         targetKeyEntity.setAmendDate(LocalDateTime.now());
         targetKeyEntity.setAmendStudentNumber(keyInfoDto.getAmendStudentNumber());
+        targetKeyEntity.setIsHoliday(keyInfoDto.getIsHoliday());
 
         KeyEntity save = keyRepository.save(targetKeyEntity);
 

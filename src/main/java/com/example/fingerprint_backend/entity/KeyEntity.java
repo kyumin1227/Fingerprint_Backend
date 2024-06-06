@@ -22,4 +22,5 @@ public class KeyEntity {
     private LocalTime endTime;
     private LocalDateTime amendDate;
     private String amendStudentNumber;
+    private Boolean isHoliday;
 }
