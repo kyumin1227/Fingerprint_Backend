@@ -2,8 +2,10 @@ package com.example.fingerprint_backend.service;
 
 import com.example.fingerprint_backend.dto.DateInfoDto;
 import com.example.fingerprint_backend.entity.DateEntity;
+import com.example.fingerprint_backend.entity.KeyEntity;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.repository.DateRepository;
+import com.example.fingerprint_backend.repository.KeyRepository;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.types.MemberRole;
 import jakarta.transaction.Transactional;
@@ -24,6 +26,7 @@ public class SessionService {
 
     private final DateRepository dateRepository;
     private final MemberRepository memberRepository;
+    private final KeyRepository keyRepository;
 
 //    오늘 날짜로부터 일주일의 날짜를 받아오는 서비스
     public ArrayList<LocalDate> getDateList() {
@@ -47,20 +50,15 @@ public class SessionService {
 
         for (LocalDate date : dateArrayList) {
             Optional<DateEntity> dateInfo = dateRepository.findById(date);
+            Optional<KeyEntity> keyInfo = keyRepository.findById(date);
+            Boolean isHoliday = keyInfo.isEmpty() ? false : keyInfo.get().getIsHoliday();
             DateInfoDto dateInfoDto;
             if (dateInfo.isEmpty()) {
-                DayOfWeek dayOfWeek = date.getDayOfWeek();
-                if (dayOfWeek.equals(DayOfWeek.SATURDAY) || dayOfWeek.equals(DayOfWeek.SUNDAY)) {
-                    DateEntity dateEntity = new DateEntity(date, true, false, null);
-                    dateRepository.save(dateEntity);
-                    dateInfoDto = new DateInfoDto(date, false, 0, true, false);
-                } else {
-                    DateEntity dateEntity = new DateEntity(date, false, false, null);
-                    dateRepository.save(dateEntity);
-                    dateInfoDto = new DateInfoDto(date, false, 0, false, false);
-                }
+                DateEntity dateEntity = new DateEntity(date, false, null);
+                dateRepository.save(dateEntity);
+                dateInfoDto = new DateInfoDto(date, false, 0, isHoliday, false);
             } else {
-                dateInfoDto = new DateInfoDto(date, dateInfo.get().getMembers().contains(stdNum), dateInfo.get().getMembers().size(), dateInfo.get().getIsHoliday(), dateInfo.get().getIsAble());
+                dateInfoDto = new DateInfoDto(date, dateInfo.get().getMembers().contains(stdNum), dateInfo.get().getMembers().size(), isHoliday, dateInfo.get().getIsAble());
             }
             dateInfoArrayList.add(dateInfoDto);
         }
