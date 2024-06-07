@@ -16,7 +16,6 @@ public class DateEntity {
 
     @Id
     private LocalDate date;
-    private Boolean isHoliday;
     private Boolean isAble;
     @ElementCollection
     @CollectionTable(name = "date_student_numbers", joinColumns = @JoinColumn(name = "date_id"))
