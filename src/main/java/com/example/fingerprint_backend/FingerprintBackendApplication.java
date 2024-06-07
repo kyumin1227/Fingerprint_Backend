@@ -14,6 +14,9 @@ public class FingerprintBackendApplication {
 
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.load();
+//		Dotenv dotenv = Dotenv.configure()
+//						.directory("/home/ubuntu/spring/Fingerprint_Backend")
+//								.load();
 
 		System.setProperty("GOOGLE_CLIENT_ID", dotenv.get("GOOGLE_CLIENT_ID"));
 		System.setProperty("KAKAO_CLIENT_ID", dotenv.get("KAKAO_CLIENT_ID"));
