@@ -74,6 +74,14 @@ public class KakaoService {
 
         String profileId = getKakaoId(accessToken);
 
+        System.out.println("카카오 엔티티 저장");
+        System.out.println("studentNumber = " + studentNumber);
+        System.out.println("accessToken = " + accessToken);
+        System.out.println("refreshToken = " + refreshToken);
+        System.out.println("scope = " + scope);
+        System.out.println("profileId = " + profileId);
+        System.out.println("now = " + now);
+
         KakaoEntity kakaoEntity = new KakaoEntity(studentNumber, false, null, accessToken, refreshToken, scope, profileId, now);
 
         KakaoEntity saved = kakaoRepository.save(kakaoEntity);
