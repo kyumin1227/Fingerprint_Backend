@@ -3,7 +3,9 @@ package com.example.fingerprint_backend.service;
 import com.example.fingerprint_backend.dto.KakaoDto;
 import com.example.fingerprint_backend.entity.KakaoEntity;
 import com.example.fingerprint_backend.repository.KakaoRepository;
+import com.google.gson.JsonElement;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,15 +76,12 @@ public class KakaoService {
 
         String profileId = getKakaoId(accessToken);
 
-        System.out.println("카카오 엔티티 저장");
         System.out.println("studentNumber = " + studentNumber);
-        System.out.println("accessToken = " + accessToken);
-        System.out.println("refreshToken = " + refreshToken);
-        System.out.println("scope = " + scope);
         System.out.println("profileId = " + profileId);
-        System.out.println("now = " + now);
 
-        KakaoEntity kakaoEntity = new KakaoEntity(studentNumber, false, null, accessToken, refreshToken, scope, profileId, now);
+        String uuid = getUuid(studentNumber, profileId);
+
+        KakaoEntity kakaoEntity = new KakaoEntity(studentNumber, false, uuid, accessToken, refreshToken, scope, profileId, now);
 
         KakaoEntity saved = kakaoRepository.save(kakaoEntity);
 
@@ -174,5 +173,53 @@ public class KakaoService {
             return false;
         }
         return true;
+    }
+
+    /**
+     * UUID를 가져오는 서비스
+     * @param studentNumber
+     * @param profile_id
+     * @return
+     */
+    public String getUuid(String studentNumber, String profile_id) {
+
+        System.out.println("Call getUuid");
+
+        String url = "https://kapi.kakao.com/v1/api/talk/friends?friend_order=favorite&limit=100&order=asc";
+
+        String accessToken = kakaoRepository.findById("0").get().getAccessToken();
+
+        System.out.println("accessToken = " + accessToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+        JSONObject jsonObject = new JSONObject(response.getBody());
+
+        JSONArray elements = jsonObject.getJSONArray("elements");
+
+        System.out.println("elements = " + elements);
+
+        for (int i = 0; i < elements.length(); i++) {
+            JSONObject element = elements.getJSONObject(i);
+            System.out.println("element = " + element);
+
+            // 친구의 UUID 추출 및 출력
+            String id = element.get("id").toString();
+            System.out.println("id = " + id);
+            System.out.println("profile_id = " + profile_id);
+            if (id.equals(profile_id)) {
+                String uuid = element.getString("uuid");
+                System.out.println("UUID: " + uuid);
+                return uuid;
+            }
+        }
+
+        return "";
+
     }
 }

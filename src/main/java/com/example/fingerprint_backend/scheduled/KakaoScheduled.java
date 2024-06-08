@@ -36,7 +36,7 @@ public class KakaoScheduled {
      * 평일의 신청 내역을 확인하여 결과를 카톡으로 송신
      * 17시 실행
      */
-    @Scheduled(cron = "50 37 21 * * ?")
+    @Scheduled(cron = "00 00 17 * * ?")
     @Transactional
     public void sendKakaoSessionNotHoliday() {
 
@@ -106,7 +106,7 @@ public class KakaoScheduled {
      * 휴일의 신청 내역을 확인하여 결과를 카톡으로 송신
      * 전날 17시 실행
      */
-    @Scheduled(cron = "0 00 17 * * ?")
+    @Scheduled(cron = "0 0 17 * * ?")
     @Transactional
     public void sendKakaoSessionHoliday() {
 
@@ -143,7 +143,7 @@ public class KakaoScheduled {
             return;
         }
 
-        if (!dateInfo.get().getIsAble() || keyInfo.get().getKeyStudent().equals("") || keyInfo.get().getSubManager().equals("")) {
+        if (!dateInfo.get().getIsAble() || keyInfo.get().getKeyStudent() == null || keyInfo.get().getSubManager() == null) {
             for (String stdNum : members) {
                 Optional<KakaoEntity> targetStudentKakao = kakaoRepository.findById(stdNum);
 
@@ -151,7 +151,7 @@ public class KakaoScheduled {
                     continue;
                 }
 
-                kakaoService.sendKakaoMessage(accessToken, "열쇠 담당자 부재로 " + LocalDate.now() + "일 교실 오픈이 취소되었습니다.", targetStudentKakao.get().getUuid());
+                kakaoService.sendKakaoMessage(accessToken, "담당자 부재로 " + LocalDate.now() + "일 교실 오픈이 취소되었습니다.", targetStudentKakao.get().getUuid());
             }
             return;
         }
@@ -163,14 +163,16 @@ public class KakaoScheduled {
                 continue;
             }
 
-            kakaoService.sendKakaoMessage(accessToken, LocalDate.now() + "일 교실 오픈합니다.", targetStudentKakao.get().getUuid());
+            kakaoService.sendKakaoMessage(accessToken, LocalDate.now() + "일\n" + keyInfo.get().getStartTime() + "시 부터 " + keyInfo.get().getEndTime() + "시 까지 교실 오픈합니다.", targetStudentKakao.get().getUuid());
         }
 
-        kakaoService.sendKakaoMessage(accessToken, "열쇠를 수령해주세요", keyInfo.get().getKeyStudent());
+        Optional<KakaoEntity> targetStudentKakao = kakaoRepository.findById(keyInfo.get().getKeyStudent());
+
+        kakaoService.sendKakaoMessage(accessToken, "열쇠를 수령해주세요", targetStudentKakao.get().getUuid());
 
     }
 
-    @Scheduled(cron = "0 35 18 * * ?")
+//    @Scheduled(cron = "0 35 18 * * ?")
     public void checkScheduled() {
         LocalDateTime now = LocalDateTime.now();
         System.out.println("스케줄 작동 = " + now);
