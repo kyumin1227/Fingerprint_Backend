@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -18,15 +19,14 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class KakaoService {
 
     private final KakaoRepository kakaoRepository;
+    private final TaskScheduler taskScheduler;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -79,9 +79,23 @@ public class KakaoService {
         System.out.println("studentNumber = " + studentNumber);
         System.out.println("profileId = " + profileId);
 
-        String uuid = getUuid(studentNumber, profileId);
+        taskScheduler.schedule(() -> {
+            System.out.println("call schedule");
+            System.out.println("profileId = " + profileId);
+            System.out.println("studentNumber = " + studentNumber);
+            String uuid = getUuid(studentNumber, profileId);
+            System.out.println("call in uuid = " + uuid);
 
-        KakaoEntity kakaoEntity = new KakaoEntity(studentNumber, false, uuid, accessToken, refreshToken, scope, profileId, now);
+            // UUID를 업데이트하고 저장
+            Optional<KakaoEntity> byId = kakaoRepository.findById(studentNumber);
+            if (byId.isPresent()) {
+                KakaoEntity kakaoEntity = byId.get();
+                kakaoEntity.setUuid(uuid);
+                kakaoRepository.save(kakaoEntity);
+            }
+        }, new Date(System.currentTimeMillis() + 5 * 60 * 1000));
+
+        KakaoEntity kakaoEntity = new KakaoEntity(studentNumber, false, null, accessToken, refreshToken, scope, profileId, now);
 
         KakaoEntity saved = kakaoRepository.save(kakaoEntity);
 
