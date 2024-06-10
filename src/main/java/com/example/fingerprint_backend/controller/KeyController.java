@@ -2,6 +2,7 @@ package com.example.fingerprint_backend.controller;
 
 import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.dto.KeyInfoDto;
+import com.example.fingerprint_backend.dto.KeyInfoReturnDto;
 import com.example.fingerprint_backend.entity.KeyEntity;
 import com.example.fingerprint_backend.service.KeyService;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,10 @@ public class KeyController {
 
         KeyEntity keyInfo = keyService.getKeyInfo(date);
 
+        KeyInfoReturnDto keyInfoReturnDto = keyService.setName(keyInfo);
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(true, "키 값 가져옴", keyInfo));
+                .body(new ApiResponse(true, "키 값 가져옴", keyInfoReturnDto));
     }
 
     @PostMapping("/api/key")
@@ -36,7 +39,9 @@ public class KeyController {
 
         KeyEntity keyEntity = keyService.setKeyInfo(keyInfoDto);
 
+        KeyInfoReturnDto keyInfoReturnDto = keyService.setName(keyEntity);
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(true, "키 정보 변경", keyEntity));
+                .body(new ApiResponse(true, "키 정보 변경", keyInfoReturnDto));
     }
 }
