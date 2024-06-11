@@ -91,7 +91,7 @@ public class KakaoScheduled {
         for (String stdNum : members) {
             Optional<KakaoEntity> targetStudentKakao = kakaoRepository.findById(stdNum);
 
-            if (targetStudentKakao.isEmpty()) {
+            if (targetStudentKakao.isEmpty() || targetStudentKakao.get().getUuid() == null || targetStudentKakao.get().getUuid().isEmpty()) {
                 continue;
             }
 
