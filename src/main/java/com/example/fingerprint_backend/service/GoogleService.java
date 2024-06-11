@@ -40,7 +40,7 @@ public class GoogleService {
 //        jwt의 body 부분을 decode
         String[] splitParts = credential.split("\\.");
         String base64EncodedBody = splitParts[1];
-        String body = new String(Base64.getDecoder().decode(base64EncodedBody));
+        String body = new String(Base64.getUrlDecoder().decode(base64EncodedBody));
 
         System.out.println("JWT Body: " + body);
 
