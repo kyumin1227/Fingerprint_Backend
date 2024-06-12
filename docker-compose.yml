@@ -3,12 +3,12 @@ version: '3.8'
 services:
   db:
     image: mysql:latest
-    container_name: mysql_container
+    container_name: fingerprint_db
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: fingerprint_db
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: default_user  # SPRING_DATASOURCE_USERNAME
+      MYSQL_PASSWORD: 1234  # SPRING_DATASOURCE_PASSWORD
     volumes:
       - mysql-data:/var/lib/mysql
     ports:
@@ -21,14 +21,19 @@ services:
       retries: 5
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: app_container
+    image: kyumin1227/fingerprint_backend_spring
+    container_name: fingerprint_backend
     environment:
-      SPRING_DATASOURCE_URL: ${DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      GOOGLE_CLIENT_ID: 441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com
+      KAKAO_CLIENT_ID: c347a8b5a07e5dc6aa76a22c3ecf236b
+      ROLE_ADMIN: 0
+      ROLE_PROFESSOR: 1
+      ROLE_ASSISTANT: 2
+      ROLE_KEY: 3
+      ROLE_STUDENT: 4
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/fingerprint_db
+      SPRING_DATASOURCE_USERNAME: default_user
+      SPRING_DATASOURCE_PASSWORD: 1234
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
