@@ -229,6 +229,7 @@ public class KakaoService {
             if (id.equals(profile_id)) {
                 String uuid = element.getString("uuid");
                 System.out.println("UUID: " + uuid);
+                sendKakaoMessage(accessToken, "카카오톡 세팅이 완료되었습니다.", uuid);
                 return uuid;
             }
         }
