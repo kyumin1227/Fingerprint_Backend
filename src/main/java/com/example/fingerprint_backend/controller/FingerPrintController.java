@@ -6,6 +6,7 @@ import com.example.fingerprint_backend.dto.CreateLogDto;
 import com.example.fingerprint_backend.entity.FingerPrintEntity;
 import com.example.fingerprint_backend.entity.LogEntity;
 import com.example.fingerprint_backend.service.FingerPrintService;
+import com.example.fingerprint_backend.service.KakaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -90,6 +91,8 @@ public class FingerPrintController {
         System.out.println("createLogDto.getStd_num() = " + createLogDto.getStd_num());
         System.out.println("createLogDto.getAction() = " + createLogDto.getAction());
         LogEntity savedLog = fingerPrintService.createLog(createLogDto);
+
+
 
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "로그 등록: 로그가 등록되었습니다", savedLog));
     }

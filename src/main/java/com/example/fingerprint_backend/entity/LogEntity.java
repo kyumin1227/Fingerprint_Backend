@@ -2,12 +2,13 @@ package com.example.fingerprint_backend.entity;
 
 import com.example.fingerprint_backend.types.LogAction;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
+@Setter @Getter
 public class LogEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
