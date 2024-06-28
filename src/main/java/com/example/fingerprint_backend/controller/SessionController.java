@@ -3,10 +3,12 @@ package com.example.fingerprint_backend.controller;
 import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.dto.ApplyDto;
 import com.example.fingerprint_backend.dto.DateInfoDto;
+import com.example.fingerprint_backend.dto.UserListDto;
 import com.example.fingerprint_backend.service.GoogleService;
 import com.example.fingerprint_backend.service.SessionService;
 import com.example.fingerprint_backend.types.MemberRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -63,5 +66,18 @@ public class SessionController {
 
         }
 
+    }
+
+    /**
+     * 해당 날짜에 신청한 학생 리스트 반환
+     * @param date
+     * @return
+     */
+    @GetMapping("/api/sessions/userList")
+    public ResponseEntity<ApiResponse> getUserList(@RequestParam(name = "date") String date) {
+
+        List<UserListDto> userList = sessionService.getUserList(date);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "", userList));
     }
 }
