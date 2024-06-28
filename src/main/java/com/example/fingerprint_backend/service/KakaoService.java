@@ -83,7 +83,7 @@ public class KakaoService {
             System.out.println("call schedule");
             System.out.println("profileId = " + profileId);
             System.out.println("studentNumber = " + studentNumber);
-            String uuid = getUuid(studentNumber, profileId);
+            String uuid = getUuidFirst(studentNumber, profileId);
             System.out.println("call in uuid = " + uuid);
 
             // UUID를 업데이트하고 저장
@@ -190,12 +190,12 @@ public class KakaoService {
     }
 
     /**
-     * UUID를 가져오는 서비스
+     * 최초 등록 시 UUID를 가져오는 서비스
      * @param studentNumber
      * @param profile_id
      * @return
      */
-    public String getUuid(String studentNumber, String profile_id) {
+    public String getUuidFirst(String studentNumber, String profile_id) {
 
         System.out.println("Call getUuid");
 
@@ -229,11 +229,39 @@ public class KakaoService {
             if (id.equals(profile_id)) {
                 String uuid = element.getString("uuid");
                 System.out.println("UUID: " + uuid);
+                sendKakaoMessage(accessToken, "카카오톡 세팅이 완료되었습니다.", uuid);
                 return uuid;
             }
         }
 
         return "";
 
+    }
+
+    /**
+     * 학생의 uuid를 가져오는 메소드
+     * @param studentNumber
+     * @return uuid
+     */
+    public String getUuid(String studentNumber) {
+
+        Optional<KakaoEntity> byId = kakaoRepository.findById(studentNumber);
+
+        if (byId.isEmpty()) {
+            return "";
+        }
+
+        return byId.get().getUuid();
+    }
+
+    /**
+     * 관리자의 엑세스 토큰 가져오는 메소드
+     * @return accesstoken(Admin)
+     */
+    public String getAdminAccessToken() {
+
+        String accessToken = kakaoRepository.findById("0").get().getAccessToken();
+
+        return accessToken;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.fingerprint_backend.service;
 
 import com.example.fingerprint_backend.dto.DateInfoDto;
+import com.example.fingerprint_backend.dto.UserListDto;
 import com.example.fingerprint_backend.entity.DateEntity;
 import com.example.fingerprint_backend.entity.KeyEntity;
 import com.example.fingerprint_backend.entity.MemberEntity;
@@ -125,6 +126,40 @@ public class SessionService {
 
 
         return true;
+    }
+
+    public List<UserListDto> getUserList(String date) {
+
+        LocalDate localDate = LocalDate.parse(date);
+        Optional<DateEntity> byId = dateRepository.findById(localDate);
+
+        List<UserListDto> list = new ArrayList<>();
+
+        if (byId.isEmpty()) {
+            return list;
+        }
+
+        Set<String> members = byId.get().getMembers();
+
+        for (String member : members) {
+            UserListDto user = new UserListDto();
+
+            Optional<MemberEntity> byStudentNumber = memberRepository.findByStudentNumber(member);
+
+            if (byStudentNumber.isEmpty()) {
+                continue;
+            }
+
+            String name = byStudentNumber.get().getName();
+
+            user.setStudentNumber(member);
+            user.setName(name);
+
+            list.add(user);
+        }
+
+        return list;
+
     }
 
 }
