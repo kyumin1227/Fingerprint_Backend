@@ -6,7 +6,6 @@ import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.repository.DateRepository;
 import com.example.fingerprint_backend.repository.KakaoRepository;
 import com.example.fingerprint_backend.repository.MemberRepository;
-import com.example.fingerprint_backend.scheduled.KakaoScheduledTest;
 import com.example.fingerprint_backend.service.GoogleService;
 import com.example.fingerprint_backend.service.KakaoService;
 import org.junit.jupiter.api.Test;
