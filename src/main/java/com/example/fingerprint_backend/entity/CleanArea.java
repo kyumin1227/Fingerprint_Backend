@@ -22,10 +22,7 @@ public class CleanArea {
 
 
     public void appendClassroom(Classroom classroom) {
-        if (!classrooms.contains(classroom)) {
-            classrooms.add(classroom);
-            classroom.appendArea(this);
-        }
+        classrooms.add(classroom);
     }
 
     public void removeClassroom(Classroom classroom) {

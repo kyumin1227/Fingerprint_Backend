@@ -29,10 +29,13 @@ public class Classroom {
     private Set<CleanArea> areas = new HashSet<>();
 
 
+    public Classroom(String name) {
+        this.name = name;
+    }
+
     public void appendMember(CleanMember cleanMember) {
         if (!members.contains(cleanMember)) {
             members.add(cleanMember);
-            cleanMember.setClassroom(this);
         }
     }
 
