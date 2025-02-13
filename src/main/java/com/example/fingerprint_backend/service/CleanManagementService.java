@@ -40,6 +40,19 @@ public class CleanManagementService {
     }
 
     /**
+     * 학생을 생성하는 메소드 (기본값으로 ATTENDING, MEMBER 설정)
+     */
+    public CleanMember createMember(String studentNumber, String name, String classroomName) {
+        boolean isExist = cleanMemberRepository.existsCleanMemberByStudentNumber(studentNumber);
+        if (isExist) {
+            throw new IllegalStateException("이미 존재하는 학번입니다.");
+        }
+        Classroom classroom = this.getClassroomByName(classroomName);
+        CleanMember member = new CleanMember(studentNumber, name, classroom, CleanAttendanceStatus.ATTENDING, CleanRole.MEMBER);
+        return cleanMemberRepository.save(member);
+    }
+
+    /**
      * 학생을 생성하는 메소드
      */
     public CleanMember createMember(String studentNumber, String name, String classroomName, CleanAttendanceStatus cleanAttendanceStatus, CleanRole cleanRole) {
@@ -53,7 +66,7 @@ public class CleanManagementService {
     }
 
     public Classroom getClassroomByName(String classroomName) {
-        return classroomRepository.findByName(classroomName).orElseThrow(() -> new IllegalStateException("존재하지 않는 반 이름입니다."));
+        return classroomRepository.findByName(classroomName).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 반 이름입니다."));
     }
 
     /**
@@ -79,7 +92,7 @@ public class CleanManagementService {
      * 학번으로 학생을 가져온다.
      */
     public CleanMember getMemberByStudentNumber(String studentNumber) {
-        return cleanMemberRepository.getCleanMemberByStudentNumber(studentNumber).orElseThrow(() -> new IllegalStateException("존재하지 않는 학번입니다."));
+        return cleanMemberRepository.getCleanMemberByStudentNumber(studentNumber).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 학번입니다."));
     }
 
     /**
@@ -97,7 +110,7 @@ public class CleanManagementService {
      */
     public void setCleanArea(String classroomName, String areaName) {
         Classroom classroom = getClassroomByName(classroomName);
-        CleanArea area = cleanAreaRepository.getByName(areaName).orElseThrow(() -> new IllegalStateException("존재하지 않는 청소 구역 이름입니다."));
+        CleanArea area = cleanAreaRepository.getByName(areaName).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 구역 이름입니다."));
         classroom.appendArea(area);
         classroomRepository.save(classroom);
     }
@@ -106,7 +119,7 @@ public class CleanManagementService {
      * 청소 구역 이름으로 청소 구역을 가져 오는 메소드
      */
     public CleanArea getAreaByName(String areaName) {
-        return cleanAreaRepository.getByName(areaName).orElseThrow(() -> new IllegalStateException("존재하지 않는 청소 구역 이름입니다."));
+        return cleanAreaRepository.getByName(areaName).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 구역 이름입니다."));
     }
 
     /**
@@ -116,5 +129,16 @@ public class CleanManagementService {
         Classroom classroom = getClassroomByName(classroomName);
         CleanMembers members = new CleanMembers(classroom.getMembers());
         return members.getMembersByStatus(status);
+    }
+
+    /**
+     * 학생 리스트에서 랜덤으로 학생을 가져오고 리스트에서 제거하는 메소드
+     */
+    public CleanMember getMemberByRandom(List<CleanMember> members) {
+        int randomNum = (int) (Math.random() * members.size());
+        CleanMember member = members.get(randomNum);
+        members.remove(member);
+
+        return member;
     }
 }
