@@ -1,5 +1,7 @@
 package com.example.fingerprint_backend;
 
+import com.example.fingerprint_backend.entity.Classroom;
+import com.example.fingerprint_backend.entity.CleanArea;
 import com.example.fingerprint_backend.entity.CleanMember;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.types.CleanAttendanceStatus;
@@ -22,7 +24,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @Transactional
 public class ClassroomServiceTest {
 
-    @Autowired private CleanManagementService cleanManagementService;
+    @Autowired
+    private CleanManagementService cleanManagementService;
 
     @BeforeEach
     void setup() {
@@ -37,23 +40,65 @@ public class ClassroomServiceTest {
 
     @DisplayName("같은 이름의 반을 중복 생성.")
     @Test
-    void createError() {
+    void createClassroomError() {
         assertThatCode(() -> cleanManagementService.createClassroom("2027_A")).isInstanceOf(IllegalStateException.class).hasMessage("이미 존재하는 반 이름입니다.");
+    }
+
+    @DisplayName("같은 학번의 학생을 중복 생성.")
+    @Test
+    void createCleanMemberError() {
+        assertThatCode(() -> cleanManagementService.createMember("2423001", "권혁일", "2027_A", CleanAttendanceStatus.ATTENDING, CleanRole.MEMBER)).isInstanceOf(IllegalStateException.class).hasMessage("이미 존재하는 학번입니다.");
+    }
+
+    @DisplayName("청소 구역 생성.")
+    @Test
+    void createCleanArea() {
+        CleanArea cleanArea = cleanManagementService.createArea("창조관 405호");
+
+        assertThat(cleanArea).isNotNull();
+    }
+
+    @DisplayName("같은 이름의 청소 구역 중복 생성")
+    @Test
+    void createCleanAreaError() {
+        CleanArea cleanArea = cleanManagementService.createArea("창조관 405호");
+
+        assertThatCode(() -> cleanManagementService.createArea("창조관 405호")).isInstanceOf(IllegalStateException.class).hasMessage("이미 존재하는 청소 구역 이름입니다.");
     }
 
     @DisplayName("반 이름으로 학생들을 가져온다.")
     @Test
-    void checkClassroom() {
+    void getMembersByClassname() {
         List<CleanMember> cleanMemberList = cleanManagementService.getMembersByClassroomName("2027_A");
 
         assertThat(cleanMemberList.size()).isEqualTo(6);
     }
 
-//    @DisplayName("청소 역할이 Append 인 학생들만 가져온다.")
-//    @Test
-//    void name() {
-//        List<CleanMember> cleanMemberList = cleanService.getMembersByClassroomNameAndCleanMemberStatus("2027_A", "MEMBER");
-//
-//        assertThat(cleanMemberList.size()).isEqualTo(5);
-//    }
+    @DisplayName("반 변경.")
+    @Test
+    void changeClassroom() {
+        cleanManagementService.createClassroom("2027_B");
+        CleanMember member = cleanManagementService.changeClassroom("2423001", "2027_B");
+        Classroom prevClassroom = cleanManagementService.getClassroomByName("2027_A");
+
+        assertThat(member.getClassroom().getName()).isEqualTo("2027_B");
+        assertThat(prevClassroom.getMembers().size()).isEqualTo(5);
+    }
+
+    @DisplayName("청소 구역 설정")
+    @Test
+    void setCleanArea() {
+        CleanArea area = cleanManagementService.createArea("창조관 405호");
+        cleanManagementService.setCleanArea("2027_A", "창조관 405호");
+
+        assertThat(cleanManagementService.getClassroomByName("2027_A").getAreas().contains(area)).isTrue();
+    }
+
+    @DisplayName("청소 역할이 Append 인 학생들만 가져온다.")
+    @Test
+    void name() {
+        List<CleanMember> cleanMemberList = cleanManagementService.getMembersByClassroomNameAndCleanMemberStatus("2027_A", CleanAttendanceStatus.ATTENDING);
+
+        assertThat(cleanMemberList.size()).isEqualTo(5);
+    }
 }

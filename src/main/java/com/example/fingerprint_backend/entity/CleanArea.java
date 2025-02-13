@@ -15,11 +15,16 @@ public class CleanArea {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String name;
 
     @ManyToMany(mappedBy = "areas")
     private Set<Classroom> classrooms = new HashSet<>();
 
+
+    public CleanArea(String name) {
+        this.name = name;
+    }
 
     public void appendClassroom(Classroom classroom) {
         classrooms.add(classroom);
