@@ -16,17 +16,6 @@ public class CleanGroupTest {
     private static CleanGroup cleanGroup;
     private static Classroom classroom;
 
-    @BeforeAll
-    static void setup() {
-        cleanGroup = new CleanGroup(1L, 4, new ArrayList<>());
-        classroom = new Classroom(1L, "2027_A", new ArrayList<>(), new HashSet<>());
-    }
-
-//    @Test
-//    void createCleanGroup() {
-//        CleanService.createCleanGroup
-//    }
-
     @Test
     void setGroupMember() {
         CleanMember member = new CleanMember("2423001", "권혁일", classroom, CleanAttendanceStatus.ATTENDING, CleanRole.MEMBER);
