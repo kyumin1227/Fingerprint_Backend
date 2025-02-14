@@ -22,10 +22,16 @@ public class CleanGroup {
 
 
     public CleanGroup(int memberCount) {
+        if (memberCount <= 0) {
+            throw new IllegalArgumentException("그룹의 최대 인원은 0보다 커야 합니다.");
+        }
         this.memberCount = memberCount;
     }
 
     public CleanGroup(int memberCount, Set<CleanMember> members) {
+        if (memberCount <= 0) {
+            throw new IllegalArgumentException("그룹의 최대 인원은 0보다 커야 합니다.");
+        }
         if (members.size() > memberCount) {
             throw new IllegalArgumentException("멤버 수가 그룹의 최대 인원을 초과합니다.");
         }

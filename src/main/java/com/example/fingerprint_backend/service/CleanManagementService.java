@@ -131,14 +131,4 @@ public class CleanManagementService {
         return members.getMembersByStatus(status);
     }
 
-    /**
-     * 학생 리스트에서 랜덤으로 학생을 가져오고 리스트에서 제거하는 메소드
-     */
-    public CleanMember getMemberByRandom(List<CleanMember> members) {
-        int randomNum = (int) (Math.random() * members.size());
-        CleanMember member = members.get(randomNum);
-        members.remove(member);
-
-        return member;
-    }
 }
