@@ -105,7 +105,7 @@ public class CleanGroupService {
      * <p>
      * TODO: 만약 리스트에 중복된 학생이 있다면 Set 이기 때문에 사라질 가능성 있음.
      */
-    public Set<CleanMember> getMembersByRandom(List<CleanMember> members, int count) {
+    private Set<CleanMember> getMembersByRandom(List<CleanMember> members, int count) {
         if (members.size() < count) {
             throw new IllegalArgumentException("남은 학생 수가 뽑을 학생 수보다 적습니다.");
         }
@@ -123,7 +123,7 @@ public class CleanGroupService {
     /**
      * 랜덤으로 그룹을 생성하는 메소드
      */
-    public CleanGroup createGroupByRandom(List<CleanMember> members, int memberCount) {
+    private CleanGroup createGroupByRandom(List<CleanMember> members, int memberCount) {
         Set<CleanMember> membersByRandom = getMembersByRandom(members, Math.min(memberCount, members.size()));
 
         return createGroup(memberCount, membersByRandom);
@@ -135,8 +135,13 @@ public class CleanGroupService {
      * @return 생성된 그룹들
      */
     public List<CleanGroup> createGroupsByRandom(List<CleanMember> members, double groupMemberCount) {
+        if (members == null || members.isEmpty()) {
+            throw new IllegalArgumentException("리스트가 비어있습니다.");
+        } else if (groupMemberCount < 1) {
+            throw new IllegalArgumentException("그룹의 최대 인원은 1보다 작을 수 없습니다.");
+        }
         int groupCount = (int) Math.ceil(members.size() / groupMemberCount);
-        List<CleanGroup> groups = new ArrayList<>();
+        List<CleanGroup> groups = new ArrayList<>(groupCount);
 
         for (int i = 0; i < groupCount; i++) {
             CleanGroup groupByRandom = createGroupByRandom(members, (int) groupMemberCount);

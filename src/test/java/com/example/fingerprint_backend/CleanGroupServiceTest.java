@@ -122,4 +122,18 @@ public class CleanGroupServiceTest {
         System.out.println("Group 1:");
         groupsByRandom.get(1).getMembers().forEach(member -> System.out.println(member.getName()));
     }
+
+    @DisplayName("랜덤으로 그룹 생성 과정에서 발생하는 에러.")
+    @Test
+    void randomCreateGroupError() {
+        assertThatCode(() -> cleanGroupService.createGroupsByRandom(List.of(), 4))
+                .as("빈 리스트로 그룹 생성 시도")
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("리스트가 비어있습니다.");
+
+        assertThatCode(() -> cleanGroupService.createGroupsByRandom(List.of(member1, member2, member3, member4), 0))
+                .as("그룹 최대 인원이 0인 경우")
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("그룹의 최대 인원은 1보다 작을 수 없습니다.");
+    }
 }
