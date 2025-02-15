@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.service;
 
-import com.example.fingerprint_backend.entity.Classroom;
+import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.entity.CleanArea;
 import com.example.fingerprint_backend.entity.CleanGroup;
 import com.example.fingerprint_backend.entity.CleanSchedule;
@@ -28,9 +28,9 @@ public class CleanScheduleService {
      */
     public CleanSchedule create(LocalDate date, String cleanAreaName, String classroomName) {
         CleanArea area = cleanManagementService.getAreaByName(cleanAreaName);
-        Classroom classroom = cleanManagementService.getClassroomByName(classroomName);
-        CleanSchedule cleanSchedule = cleanScheduleRepository.getCleanScheduleByDateAndCleanAreaAndClassroom(date, area, classroom)
-                .orElseGet(() -> new CleanSchedule(date, area, classroom));
+        SchoolClass schoolClass = cleanManagementService.getClassroomByName(classroomName);
+        CleanSchedule cleanSchedule = cleanScheduleRepository.getCleanScheduleByDateAndCleanAreaAndSchoolClass(date, area, schoolClass)
+                .orElseGet(() -> new CleanSchedule(date, area, schoolClass));
 
         if (cleanSchedule.isCanceled()) {
             cleanSchedule.setCanceled(false);
@@ -44,9 +44,9 @@ public class CleanScheduleService {
      */
     public CleanSchedule getCleanSchedule(LocalDate date, String cleanAreaName, String classroomName) {
         CleanArea area = cleanManagementService.getAreaByName(cleanAreaName);
-        Classroom classroom = cleanManagementService.getClassroomByName(classroomName);
+        SchoolClass schoolClass = cleanManagementService.getClassroomByName(classroomName);
 
-        CleanSchedule cleanSchedule = cleanScheduleRepository.getCleanScheduleByDateAndCleanAreaAndClassroom(date, area, classroom)
+        CleanSchedule cleanSchedule = cleanScheduleRepository.getCleanScheduleByDateAndCleanAreaAndSchoolClass(date, area, schoolClass)
                 .orElseThrow(() -> new IllegalArgumentException("해당 청소 스케쥴이 존재하지 않습니다."));
 
         if (cleanSchedule.isCanceled()) {
@@ -73,7 +73,7 @@ public class CleanScheduleService {
         CleanSchedule cleanSchedule = getCleanSchedule(date, cleanAreaName, classroomName);
         CleanGroup cleanGroup = cleanSchedule.getCleanGroup();
 
-        CleanSchedule newCleanSchedule = cleanScheduleRepository.getCleanScheduleByDateAndCleanAreaAndClassroom(newDate, cleanSchedule.getCleanArea(), cleanSchedule.getClassroom())
+        CleanSchedule newCleanSchedule = cleanScheduleRepository.getCleanScheduleByDateAndCleanAreaAndSchoolClass(newDate, cleanSchedule.getCleanArea(), cleanSchedule.getSchoolClass())
                 .map(s -> {
                     if (s.isCanceled()) {
                         s.setCanceled(false);
@@ -83,7 +83,7 @@ public class CleanScheduleService {
                         throw new IllegalArgumentException("해당 청소 스케쥴이 이미 존재합니다, 스케쥴을 변경할 수 없습니다.");
                     }
                 })
-                .orElseGet(() -> new CleanSchedule(newDate, cleanSchedule.getCleanArea(), cleanSchedule.getClassroom()));
+                .orElseGet(() -> new CleanSchedule(newDate, cleanSchedule.getCleanArea(), cleanSchedule.getSchoolClass()));
 
         cleanSchedule.setCanceled(true);
         cleanSchedule.setCleanGroup(null);

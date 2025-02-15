@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend;
 
-import com.example.fingerprint_backend.entity.Classroom;
+import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.entity.CleanMember;
 import com.example.fingerprint_backend.types.CleanAttendanceStatus;
 import com.example.fingerprint_backend.types.CleanRole;
@@ -17,8 +17,8 @@ public class CleanMemberTest {
 
     @BeforeAll
     static void setup() {
-        Classroom classroom = new Classroom(1L, "2027_A", new ArrayList<>(), new HashSet<>());
-        member = new CleanMember("2423002", "김규민", classroom, CleanAttendanceStatus.ATTENDING, CleanRole.MEMBER);
+        SchoolClass schoolClass = new SchoolClass(1L, "2027_A", new ArrayList<>(), new HashSet<>(), new HashSet<>());
+        member = new CleanMember("2423002", "김규민", schoolClass, CleanAttendanceStatus.ATTENDING, CleanRole.MEMBER);
 
         assertThat(member).isNotNull();
     }
@@ -26,14 +26,14 @@ public class CleanMemberTest {
     @DisplayName("멤버의 반을 변경")
     @Test
     void changeClassroom() {
-        Classroom classroom1 = new Classroom(1L, "2027_A", new ArrayList<>(), new HashSet<>());
-        Classroom classroom2 = new Classroom(2L, "2027_B", new ArrayList<>(), new HashSet<>());
+        SchoolClass schoolClass1 = new SchoolClass(1L, "2027_A", new ArrayList<>(), new HashSet<>(), new HashSet<>());
+        SchoolClass schoolClass2 = new SchoolClass(2L, "2027_B", new ArrayList<>(), new HashSet<>(), new HashSet<>());
 
-        member.setClassroom(classroom1);
-        member.setClassroom(classroom2);
+        member.setSchoolClass(schoolClass1);
+        member.setSchoolClass(schoolClass2);
 
-        assertThat(classroom1.getMembers().size()).as("이전 반의 멤버 삭제 여부 확인").isEqualTo(0);
-        assertThat(classroom2.getMembers().size()).as("현재 반의 멤버 추가 여부 확인").isEqualTo(1);
-        assertThat(member.getClassroom()).as("현재 멤버의 반 확인").isEqualTo(classroom2);
+        assertThat(schoolClass1.getMembers().size()).as("이전 반의 멤버 삭제 여부 확인").isEqualTo(0);
+        assertThat(schoolClass2.getMembers().size()).as("현재 반의 멤버 추가 여부 확인").isEqualTo(1);
+        assertThat(member.getSchoolClass()).as("현재 멤버의 반 확인").isEqualTo(schoolClass2);
     }
 }

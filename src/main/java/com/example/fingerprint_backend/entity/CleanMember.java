@@ -16,49 +16,51 @@ public class CleanMember {
 
     @Id
     private String studentNumber;
-    private String name;
     @ManyToOne
-    private Classroom classroom;
+    private SchoolClass schoolClass;
+    @ManyToOne
+    private CleanArea cleanArea;
+    private String name;
     @Enumerated(EnumType.STRING)
-    private CleanAttendanceStatus cleanAttendanceStatus;
-    @Enumerated(EnumType.STRING)
-    private CleanRole cleanRole;
+    private CleanRole cleanRole = CleanRole.MEMBER;
+    private String profileImage;
+    private Integer cleaningCount = 0;
 
 
-    public CleanMember(String studentNumber, String name, Classroom classroom, CleanAttendanceStatus cleanAttendanceStatus, CleanRole cleanRole) {
-        if (classroom == null) {
+    public CleanMember(String studentNumber, String name, SchoolClass schoolClass, CleanAttendanceStatus cleanAttendanceStatus, CleanRole cleanRole) {
+        if (schoolClass == null) {
             throw new IllegalStateException("Classroom은 null일 수 없습니다.");
         }
         this.studentNumber = studentNumber;
         this.name = name;
-        this.classroom = classroom;
+        this.schoolClass = schoolClass;
         this.cleanAttendanceStatus = cleanAttendanceStatus;
         this.cleanRole = cleanRole;
-        classroom.appendMember(this);
+        schoolClass.appendMember(this);
     }
 
     /**
      * 멤버에 반을 추가하면 반에도 자동으로 멤버를 추가 하는 메소드
      * CleanMemberにClassroomを追加したら自動にClassroomにもCleanMemberを追加すろメソッド
      */
-    public void setClassroom(Classroom classroom) {
-        if (this.classroom.equals(classroom)) {
+    public void setSchoolClass(SchoolClass schoolClass) {
+        if (this.schoolClass.equals(schoolClass)) {
             return;
         }
-        this.classroom.removeMember(this);
-        classroom.appendMember(this);
-        this.classroom = classroom;
+        this.schoolClass.removeMember(this);
+        schoolClass.appendMember(this);
+        this.schoolClass = schoolClass;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         CleanMember that = (CleanMember) o;
-        return Objects.equals(studentNumber, that.studentNumber) && Objects.equals(name, that.name) && Objects.equals(classroom, that.classroom) && cleanAttendanceStatus == that.cleanAttendanceStatus && cleanRole == that.cleanRole;
+        return Objects.equals(studentNumber, that.studentNumber) && Objects.equals(name, that.name) && Objects.equals(schoolClass, that.schoolClass) && cleanAttendanceStatus == that.cleanAttendanceStatus && cleanRole == that.cleanRole;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(studentNumber, name, classroom, cleanAttendanceStatus, cleanRole);
+        return Objects.hash(studentNumber, name, schoolClass, cleanAttendanceStatus, cleanRole);
     }
 }

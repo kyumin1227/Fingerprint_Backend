@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend;
 
-import com.example.fingerprint_backend.entity.Classroom;
+import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.entity.CleanArea;
 import com.example.fingerprint_backend.entity.CleanMember;
 import com.example.fingerprint_backend.service.CleanManagementService;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @SpringBootTest
 @ContextConfiguration(initializers = DotenvTestInitializer.class)
 @Transactional
-public class ClassroomServiceTest {
+public class SchoolClassServiceTest {
 
     @Autowired
     private CleanManagementService cleanManagementService;
@@ -79,10 +79,10 @@ public class ClassroomServiceTest {
     void changeClassroom() {
         cleanManagementService.createClassroom("2027_B");
         CleanMember member = cleanManagementService.changeClassroom("2423001", "2027_B");
-        Classroom prevClassroom = cleanManagementService.getClassroomByName("2027_A");
+        SchoolClass prevSchoolClass = cleanManagementService.getClassroomByName("2027_A");
 
-        assertThat(member.getClassroom().getName()).isEqualTo("2027_B");
-        assertThat(prevClassroom.getMembers().size()).isEqualTo(5);
+        assertThat(member.getSchoolClass().getName()).isEqualTo("2027_B");
+        assertThat(prevSchoolClass.getMembers().size()).isEqualTo(5);
     }
 
     @DisplayName("청소 구역 설정")

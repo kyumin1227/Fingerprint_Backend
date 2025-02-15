@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -15,25 +16,37 @@ public class CleanArea {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
+    private SchoolClass schoolClass;
     @Column(unique = true)
     private String name;
+    @ElementCollection(targetClass = DayOfWeek.class)
+    @CollectionTable(name = "clean_area_days", joinColumns = @JoinColumn(name = "clean_area_id"))
+    @Column(name = "day_of_week")
+    @Enumerated(EnumType.STRING)
+    private Set<DayOfWeek> days = new HashSet<>();
+    private Integer cycle = 0;
+    @OneToOne
+    private CleanSchedule lastSchedule;
+    @OneToMany(mappedBy = "cleanArea")
+    private Set<CleanSchedule> schedules = new HashSet<>();
+    @OneToMany(mappedBy = "cleanArea")
+    private Set<CleanMember> members = new HashSet<>();
 
-    @ManyToMany(mappedBy = "areas")
-    private Set<Classroom> classrooms = new HashSet<>();
 
 
     public CleanArea(String name) {
         this.name = name;
     }
 
-    public void appendClassroom(Classroom classroom) {
-        classrooms.add(classroom);
+    public void appendClassroom(SchoolClass schoolClass) {
+        classrooms.add(schoolClass);
     }
 
-    public void removeClassroom(Classroom classroom) {
-        if (classrooms.contains(classroom)) {
-            classrooms.remove(classroom);
-            classroom.removeArea(this);
+    public void removeClassroom(SchoolClass schoolClass) {
+        if (classrooms.contains(schoolClass)) {
+            classrooms.remove(schoolClass);
+            schoolClass.removeArea(this);
         }
     }
 

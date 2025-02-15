@@ -1,10 +1,10 @@
 package com.example.fingerprint_backend.service;
 
 import com.example.fingerprint_backend.domain.CleanMembers;
-import com.example.fingerprint_backend.entity.Classroom;
+import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.entity.CleanArea;
 import com.example.fingerprint_backend.entity.CleanMember;
-import com.example.fingerprint_backend.repository.ClassroomRepository;
+import com.example.fingerprint_backend.repository.SchoolClassRepository;
 import com.example.fingerprint_backend.repository.CleanAreaRepository;
 import com.example.fingerprint_backend.repository.CleanMemberRepository;
 import com.example.fingerprint_backend.types.CleanAttendanceStatus;
@@ -17,13 +17,13 @@ import java.util.List;
 @Service
 public class CleanManagementService {
 
-    private final ClassroomRepository classroomRepository;
+    private final SchoolClassRepository schoolClassRepository;
     private final CleanMemberRepository cleanMemberRepository;
     private final CleanAreaRepository cleanAreaRepository;
 
     @Autowired
-    public CleanManagementService(ClassroomRepository classroomRepository, CleanMemberRepository cleanMemberRepository, CleanAreaRepository cleanAreaRepository) {
-        this.classroomRepository = classroomRepository;
+    public CleanManagementService(SchoolClassRepository schoolClassRepository, CleanMemberRepository cleanMemberRepository, CleanAreaRepository cleanAreaRepository) {
+        this.schoolClassRepository = schoolClassRepository;
         this.cleanMemberRepository = cleanMemberRepository;
         this.cleanAreaRepository = cleanAreaRepository;
     }
@@ -31,12 +31,12 @@ public class CleanManagementService {
     /**
      * 반 이름으로 반을 생성하는 메소드
      */
-    public Classroom createClassroom(String classroomName) {
-        boolean isExist = classroomRepository.existsClassroomByName(classroomName);
+    public SchoolClass createClassroom(String classroomName) {
+        boolean isExist = schoolClassRepository.existsSchoolClassByName(classroomName);
         if (isExist) {
             throw new IllegalStateException("이미 존재하는 반 이름입니다.");
         }
-        return classroomRepository.save(new Classroom(classroomName));
+        return schoolClassRepository.save(new SchoolClass(classroomName));
     }
 
     /**
@@ -47,8 +47,8 @@ public class CleanManagementService {
         if (isExist) {
             throw new IllegalStateException("이미 존재하는 학번입니다.");
         }
-        Classroom classroom = this.getClassroomByName(classroomName);
-        CleanMember member = new CleanMember(studentNumber, name, classroom, CleanAttendanceStatus.ATTENDING, CleanRole.MEMBER);
+        SchoolClass schoolClass = this.getClassroomByName(classroomName);
+        CleanMember member = new CleanMember(studentNumber, name, schoolClass, CleanAttendanceStatus.ATTENDING, CleanRole.MEMBER);
         return cleanMemberRepository.save(member);
     }
 
@@ -60,21 +60,21 @@ public class CleanManagementService {
         if (isExist) {
             throw new IllegalStateException("이미 존재하는 학번입니다.");
         }
-        Classroom classroom = this.getClassroomByName(classroomName);
-        CleanMember member = new CleanMember(studentNumber, name, classroom, cleanAttendanceStatus, cleanRole);
+        SchoolClass schoolClass = this.getClassroomByName(classroomName);
+        CleanMember member = new CleanMember(studentNumber, name, schoolClass, cleanAttendanceStatus, cleanRole);
         return cleanMemberRepository.save(member);
     }
 
-    public Classroom getClassroomByName(String classroomName) {
-        return classroomRepository.findByName(classroomName).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 반 이름입니다."));
+    public SchoolClass getClassroomByName(String classroomName) {
+        return schoolClassRepository.findByName(classroomName).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 반 이름입니다."));
     }
 
     /**
      * 반 이름으로 학생들을 가져온다.
      */
     public List<CleanMember> getMembersByClassroomName(String classroomName) {
-        Classroom classroom = getClassroomByName(classroomName);
-        return classroom.getMembers();
+        SchoolClass schoolClass = getClassroomByName(classroomName);
+        return schoolClass.getMembers();
     }
 
     /**
@@ -100,8 +100,8 @@ public class CleanManagementService {
      */
     public CleanMember changeClassroom(String studentNumber, String classroomName) {
         CleanMember cleanMember = getMemberByStudentNumber(studentNumber);
-        Classroom classroom = getClassroomByName(classroomName);
-        cleanMember.setClassroom(classroom);
+        SchoolClass schoolClass = getClassroomByName(classroomName);
+        cleanMember.setSchoolClass(schoolClass);
         return cleanMemberRepository.save(cleanMember);
     }
 
@@ -109,10 +109,10 @@ public class CleanManagementService {
      * 청소 구역을 설정하는 메소드
      */
     public void setCleanArea(String classroomName, String areaName) {
-        Classroom classroom = getClassroomByName(classroomName);
+        SchoolClass schoolClass = getClassroomByName(classroomName);
         CleanArea area = cleanAreaRepository.getByName(areaName).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 구역 이름입니다."));
-        classroom.appendArea(area);
-        classroomRepository.save(classroom);
+        schoolClass.appendArea(area);
+        schoolClassRepository.save(schoolClass);
     }
 
     /**
@@ -126,8 +126,8 @@ public class CleanManagementService {
      * 반 이름과 상태로 특정 상태의 학생들을 가져오는 메소드
      */
     public List<CleanMember> getMembersByClassroomNameAndCleanMemberStatus(String classroomName, CleanAttendanceStatus status) {
-        Classroom classroom = getClassroomByName(classroomName);
-        CleanMembers members = new CleanMembers(classroom.getMembers());
+        SchoolClass schoolClass = getClassroomByName(classroomName);
+        CleanMembers members = new CleanMembers(schoolClass.getMembers());
         return members.getMembersByStatus(status);
     }
 

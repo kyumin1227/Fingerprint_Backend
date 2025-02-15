@@ -15,7 +15,9 @@ public class CleanGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int memberCount;
+    @ManyToOne
+    private SchoolClass schoolClass;
+    private int memberCount;  // 그룹의 최대 인원
     @OneToMany
     private Set<CleanMember> members = new HashSet<>(memberCount);
     private boolean isCleaned = false;  // 청소 완료 여부

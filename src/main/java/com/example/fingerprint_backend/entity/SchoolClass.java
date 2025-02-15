@@ -12,24 +12,25 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-public class Classroom {
+public class SchoolClass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String name;
-    @OneToMany(mappedBy = "classroom")
-    private List<CleanMember> members = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(
-            name = "classroom_cleanarea",
-            joinColumns = @JoinColumn(name = "classroom_id"),
-            inverseJoinColumns = @JoinColumn(name = "cleanarea_id")
-    )
+    @OneToOne
+    private CleanMember manager;
+    @OneToMany(mappedBy = "schoolClass")
+    private Set<CleanMember> members = new HashSet<>();
+    @OneToMany(mappedBy = "schoolClass")
+    private Set<CleanSchedule> schedules = new HashSet<>();
+    @OneToMany(mappedBy = "schoolClass")
     private Set<CleanArea> areas = new HashSet<>();
+    @OneToMany(mappedBy = "schoolClass")
+    private Set<CleanGroup> groups = new HashSet<>();
 
 
-    public Classroom(String name) {
+    public SchoolClass(String name) {
         this.name = name;
     }
 
@@ -61,8 +62,8 @@ public class Classroom {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Classroom classroom = (Classroom) o;
-        return Objects.equals(id, classroom.id) && Objects.equals(name, classroom.name);
+        SchoolClass schoolClass = (SchoolClass) o;
+        return Objects.equals(id, schoolClass.id) && Objects.equals(name, schoolClass.name);
     }
 
     @Override

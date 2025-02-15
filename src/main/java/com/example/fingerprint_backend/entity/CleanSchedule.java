@@ -10,23 +10,25 @@ import java.time.LocalDate;
 @Entity
 @NoArgsConstructor
 @Getter @Setter
+@Table(name = "clean_schedule",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "clean_area_id", "school_class_id"})})
 public class CleanSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDate date;
     @ManyToOne
     private CleanArea cleanArea;
     @ManyToOne
-    private Classroom classroom;
-    @ManyToOne
+    private SchoolClass schoolClass;
+    @OneToOne
     private CleanGroup cleanGroup;
+    private LocalDate date;
     private boolean isCanceled = false; // 청소 취소 여부
 
-    public CleanSchedule(LocalDate date, CleanArea cleanArea, Classroom classroom) {
+    public CleanSchedule(LocalDate date, CleanArea cleanArea, SchoolClass schoolClass) {
         this.date = date;
         this.cleanArea = cleanArea;
-        this.classroom = classroom;
+        this.schoolClass = schoolClass;
     }
 
 }
