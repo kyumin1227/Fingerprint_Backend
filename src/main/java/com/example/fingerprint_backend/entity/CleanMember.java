@@ -15,6 +15,7 @@ public class CleanMember {
     @Id
     private String studentNumber;
     @ManyToOne
+    @JoinColumn(name = "school_class_id")
     private SchoolClass schoolClass;
     @ManyToOne
     @JoinColumn
