@@ -1,7 +1,7 @@
 package com.example.fingerprint_backend.domain;
 
+import com.example.fingerprint_backend.entity.CleanArea;
 import com.example.fingerprint_backend.entity.CleanMember;
-import com.example.fingerprint_backend.types.CleanAttendanceStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +14,9 @@ public class CleanMembers {
         this.members = members;
     }
 
-    public List<CleanMember> getMembersByStatus(CleanAttendanceStatus status) {
+    public List<CleanMember> getMembersByArea(CleanArea area) {
         return members.stream()
-                .filter(member -> member.getCleanAttendanceStatus().equals(status))
+                .filter(member -> member.getCleanArea().equals(area))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
