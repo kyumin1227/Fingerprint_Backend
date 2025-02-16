@@ -1,7 +1,7 @@
 package com.example.fingerprint_backend.entity;
 
+import com.example.fingerprint_backend.types.CleanRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,52 +10,75 @@ import java.util.*;
 
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
-@Getter @Setter
+@Getter
 public class SchoolClass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String name;
     @OneToOne
-    private CleanMember manager;
+    private CleanMember manager;    // 생성 시에만 null 가능
+    @OneToOne
+    @Setter
+    private CleanArea defaultArea;
     @OneToMany(mappedBy = "schoolClass")
-    private Set<CleanMember> members = new HashSet<>();
+    private final Set<CleanMember> members = new HashSet<>();
     @OneToMany(mappedBy = "schoolClass")
-    private Set<CleanSchedule> schedules = new HashSet<>();
+    private final Set<CleanSchedule> schedules = new HashSet<>();
     @OneToMany(mappedBy = "schoolClass")
-    private Set<CleanArea> areas = new HashSet<>();
+    private final Set<CleanArea> areas = new HashSet<>();
     @OneToMany(mappedBy = "schoolClass")
-    private Set<CleanGroup> groups = new HashSet<>();
+    private final Set<CleanGroup> groups = new HashSet<>();
 
 
     public SchoolClass(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalStateException("반 이름은 null일 수 없습니다.");
+        }
         this.name = name;
     }
 
-    public void appendMember(CleanMember cleanMember) {
-        if (!members.contains(cleanMember)) {
-            members.add(cleanMember);
+    public void setManager(CleanMember manager) {
+        if (manager == null) {
+            throw new IllegalStateException("관리자는 null일 수 없습니다.");
         }
+        if (this.manager != null) {
+            this.manager.setCleanRole(CleanRole.MEMBER);
+        }
+        this.manager = manager;
+    }
+
+    public void appendMember(CleanMember cleanMember) {
+        members.add(cleanMember);
     }
 
     public void removeMember(CleanMember cleanMember) {
         members.remove(cleanMember);
     }
 
+    public void appendSchedule(CleanSchedule cleanSchedule) {
+        schedules.add(cleanSchedule);
+    }
+
+    public void removeSchedule(CleanSchedule cleanSchedule) {
+        schedules.remove(cleanSchedule);
+    }
+
     public void appendArea(CleanArea cleanArea) {
-        if (!areas.contains(cleanArea)) {
-            areas.add(cleanArea);
-            cleanArea.appendClassroom(this);
-        }
+        areas.add(cleanArea);
     }
 
     public void removeArea(CleanArea cleanArea) {
-        if (areas.contains(cleanArea)) {
-            areas.remove(cleanArea);
-            cleanArea.removeClassroom(this);
-        }
+        areas.remove(cleanArea);
+    }
+
+    public void appendGroup(CleanGroup cleanGroup) {
+        groups.add(cleanGroup);
+    }
+
+    public void removeGroup(CleanGroup cleanGroup) {
+        groups.remove(cleanGroup);
     }
 
     @Override

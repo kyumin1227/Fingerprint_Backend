@@ -15,36 +15,27 @@ public class CleanGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne  @JoinColumn(nullable = false)
     private SchoolClass schoolClass;
+    @Column(nullable = false)
     private int memberCount;  // 그룹의 최대 인원
-    @OneToMany
-    private Set<CleanMember> members = new HashSet<>(memberCount);
+    @OneToMany  @JoinColumn(nullable = false)
+    private Set<CleanMember> members;
     private boolean isCleaned = false;  // 청소 완료 여부
 
 
-    public CleanGroup(int memberCount) {
+    public CleanGroup(SchoolClass schoolClass, int memberCount, Set<CleanMember> members) {
         if (memberCount <= 0) {
             throw new IllegalArgumentException("그룹의 최대 인원은 0보다 커야 합니다.");
         }
-        this.memberCount = memberCount;
-    }
-
-    public CleanGroup(int memberCount, Set<CleanMember> members) {
-        if (memberCount <= 0) {
-            throw new IllegalArgumentException("그룹의 최대 인원은 0보다 커야 합니다.");
+        if (memberCount > 9) {
+            throw new IllegalArgumentException("그룹의 최대 인원은 9명을 초과할 수 없습니다.");
         }
         if (members.size() > memberCount) {
             throw new IllegalArgumentException("멤버 수가 그룹의 최대 인원을 초과합니다.");
         }
+        this.schoolClass = schoolClass;
         this.memberCount = memberCount;
-        this.members = members;
-    }
-
-    public void setMembers(Set<CleanMember> members) {
-        if (members.size() > memberCount) {
-            throw new IllegalArgumentException("멤버 수가 그룹의 최대 인원을 초과합니다.");
-        }
         this.members = members;
     }
 
@@ -62,6 +53,28 @@ public class CleanGroup {
             throw new IllegalArgumentException("그룹에 존재하지 않는 멤버입니다.");
         }
         members.remove(member);
+    }
+
+    public void setCleaned(boolean cleaned) {
+        if (cleaned != isCleaned && cleaned) {
+            members.forEach(member -> member.setCleaningCount(member.getCleaningCount() + 1));
+        } else if (cleaned != isCleaned) {
+            members.forEach(member -> member.setCleaningCount(member.getCleaningCount() - 1));
+        }
+        isCleaned = cleaned;
+    }
+
+    public void changeMemberCount(int memberCount) {
+        if (memberCount <= 0) {
+            throw new IllegalArgumentException("그룹의 최대 인원은 0보다 커야 합니다.");
+        }
+        if (memberCount > 9) {
+            throw new IllegalArgumentException("그룹의 최대 인원은 9명을 초과할 수 없습니다.");
+        }
+        if (members.size() > memberCount) {
+            throw new IllegalArgumentException("멤버 수가 그룹의 최대 인원을 초과합니다.");
+        }
+        this.memberCount = memberCount;
     }
 
     @Override

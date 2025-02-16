@@ -1,6 +1,5 @@
 package com.example.fingerprint_backend.entity;
 
-import com.example.fingerprint_backend.types.CleanAttendanceStatus;
 import com.example.fingerprint_backend.types.CleanRole;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,56 +10,86 @@ import java.util.Objects;
 
 @Entity
 @NoArgsConstructor
-@Getter @Setter
+@Getter
 public class CleanMember {
 
     @Id
     private String studentNumber;
     @ManyToOne
+    @JoinColumn(nullable = false)
     private SchoolClass schoolClass;
     @ManyToOne
     private CleanArea cleanArea;
+    @Column(nullable = false)
     private String name;
     @Enumerated(EnumType.STRING)
     private CleanRole cleanRole = CleanRole.MEMBER;
+    @Setter
     private String profileImage;
+    @Setter
     private Integer cleaningCount = 0;
 
 
-    public CleanMember(String studentNumber, String name, SchoolClass schoolClass, CleanAttendanceStatus cleanAttendanceStatus, CleanRole cleanRole) {
-        if (schoolClass == null) {
-            throw new IllegalStateException("Classroom은 null일 수 없습니다.");
-        }
+    public CleanMember(String studentNumber, String name, SchoolClass schoolClass) {
+        validateParameters(studentNumber, name, schoolClass);
         this.studentNumber = studentNumber;
         this.name = name;
         this.schoolClass = schoolClass;
-        this.cleanAttendanceStatus = cleanAttendanceStatus;
-        this.cleanRole = cleanRole;
+        this.cleanArea = schoolClass.getDefaultArea();
         schoolClass.appendMember(this);
     }
 
-    /**
-     * 멤버에 반을 추가하면 반에도 자동으로 멤버를 추가 하는 메소드
-     * CleanMemberにClassroomを追加したら自動にClassroomにもCleanMemberを追加すろメソッド
-     */
-    public void setSchoolClass(SchoolClass schoolClass) {
-        if (this.schoolClass.equals(schoolClass)) {
-            return;
-        }
-        this.schoolClass.removeMember(this);
-        schoolClass.appendMember(this);
+    public CleanMember(String studentNumber, String name, SchoolClass schoolClass, CleanRole cleanRole) {
+        validateParameters(studentNumber, name, schoolClass);
+        this.studentNumber = studentNumber;
+        this.name = name;
         this.schoolClass = schoolClass;
+        this.cleanRole = cleanRole;
+        this.cleanArea = schoolClass.getDefaultArea();
+        schoolClass.appendMember(this);
+        if (cleanRole == CleanRole.MANAGER) {
+            schoolClass.setManager(this);
+        }
+    }
+
+    public void setCleanRole(CleanRole cleanRole) {
+        if (cleanRole == null) {
+            throw new IllegalStateException("역할은 null일 수 없습니다.");
+        }
+        this.cleanRole = cleanRole;
+        if (cleanRole == CleanRole.MANAGER) {
+            schoolClass.setManager(this);
+        }
+    }
+
+    private void validateParameters(String studentNumber, String name, SchoolClass schoolClass) {
+        if (studentNumber == null || studentNumber.isEmpty()) {
+            throw new IllegalStateException("학번은 null일 수 없습니다.");
+        }
+        if (schoolClass == null) {
+            throw new IllegalStateException("반은 null일 수 없습니다.");
+        }
+        if (name == null || name.isEmpty()) {
+            throw new IllegalStateException("이름은 null일 수 없습니다.");
+        }
+    }
+
+    public void setCleanArea(CleanArea cleanArea) {
+        this.cleanArea = cleanArea;
+        if (cleanArea != null) {
+            cleanArea.appendMember(this);
+        }
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         CleanMember that = (CleanMember) o;
-        return Objects.equals(studentNumber, that.studentNumber) && Objects.equals(name, that.name) && Objects.equals(schoolClass, that.schoolClass) && cleanAttendanceStatus == that.cleanAttendanceStatus && cleanRole == that.cleanRole;
+        return Objects.equals(studentNumber, that.studentNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(studentNumber, name, schoolClass, cleanAttendanceStatus, cleanRole);
+        return Objects.hash(studentNumber);
     }
 }

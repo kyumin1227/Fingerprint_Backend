@@ -16,12 +16,13 @@ public class CleanSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne  @JoinColumn(nullable = false)
     private CleanArea cleanArea;
-    @ManyToOne
+    @ManyToOne  @JoinColumn(nullable = false)
     private SchoolClass schoolClass;
     @OneToOne
     private CleanGroup cleanGroup;
+    @Column(nullable = false)
     private LocalDate date;
     private boolean isCanceled = false; // 청소 취소 여부
 
