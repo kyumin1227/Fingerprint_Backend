@@ -9,5 +9,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface CleanScheduleRepository extends JpaRepository<CleanSchedule, Long> {
-    Optional<CleanSchedule> getCleanScheduleByDateAndCleanAreaAndSchoolClass(LocalDate date, CleanArea cleanArea, SchoolClass schoolClass);
+    boolean existsByDateAndSchoolClassAndCleanArea(LocalDate date, SchoolClass schoolClass, CleanArea cleanArea);
+    Optional<CleanSchedule> findByDateAndSchoolClassAndCleanArea(LocalDate date, SchoolClass schoolClass, CleanArea cleanArea);
 }
