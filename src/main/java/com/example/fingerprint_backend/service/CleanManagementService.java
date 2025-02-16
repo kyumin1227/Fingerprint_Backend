@@ -1,68 +1,72 @@
-//package com.example.fingerprint_backend.service;
-//
-//import com.example.fingerprint_backend.domain.CleanMembers;
-//import com.example.fingerprint_backend.entity.SchoolClass;
-//import com.example.fingerprint_backend.entity.CleanArea;
-//import com.example.fingerprint_backend.entity.CleanMember;
-//import com.example.fingerprint_backend.repository.SchoolClassRepository;
-//import com.example.fingerprint_backend.repository.CleanAreaRepository;
-//import com.example.fingerprint_backend.repository.CleanMemberRepository;
-//import com.example.fingerprint_backend.types.CleanRole;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.List;
-//import java.util.Set;
-//
-//@Service
-//public class CleanManagementService {
-//
-//    private final SchoolClassRepository schoolClassRepository;
-//    private final CleanMemberRepository cleanMemberRepository;
-//    private final CleanAreaRepository cleanAreaRepository;
-//
-//    @Autowired
-//    public CleanManagementService(SchoolClassRepository schoolClassRepository, CleanMemberRepository cleanMemberRepository, CleanAreaRepository cleanAreaRepository) {
-//        this.schoolClassRepository = schoolClassRepository;
-//        this.cleanMemberRepository = cleanMemberRepository;
-//        this.cleanAreaRepository = cleanAreaRepository;
-//    }
-//
-//    /**
-//     * 반 이름으로 반을 생성하는 메소드
-//     */
-//    public SchoolClass createSchoolClass(String schoolClassName) {
-//        boolean isExist = schoolClassRepository.existsSchoolClassByName(schoolClassName);
-//        if (isExist) {
-//            throw new IllegalStateException("이미 존재하는 반 이름입니다.");
+package com.example.fingerprint_backend.service;
+
+import com.example.fingerprint_backend.domain.CleanMembers;
+import com.example.fingerprint_backend.entity.SchoolClass;
+import com.example.fingerprint_backend.entity.CleanArea;
+import com.example.fingerprint_backend.entity.CleanMember;
+import com.example.fingerprint_backend.repository.SchoolClassRepository;
+import com.example.fingerprint_backend.repository.CleanAreaRepository;
+import com.example.fingerprint_backend.repository.CleanMemberRepository;
+import com.example.fingerprint_backend.types.CleanRole;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
+
+@Service
+public class CleanManagementService {
+
+    private final SchoolClassRepository schoolClassRepository;
+    private final CleanMemberRepository cleanMemberRepository;
+    private final CleanAreaRepository cleanAreaRepository;
+    private final CleanHelperService cleanHelperService;
+
+    @Autowired
+    public CleanManagementService(SchoolClassRepository schoolClassRepository, CleanMemberRepository cleanMemberRepository, CleanAreaRepository cleanAreaRepository, CleanHelperService cleanHelperService) {
+        this.schoolClassRepository = schoolClassRepository;
+        this.cleanMemberRepository = cleanMemberRepository;
+        this.cleanAreaRepository = cleanAreaRepository;
+        this.cleanHelperService = cleanHelperService;
+    }
+
+    /**
+     * 반 이름으로 반을 생성하는 메소드
+     */
+    public SchoolClass createSchoolClass(String schoolClassName) {
+        cleanHelperService.validateSchoolClassNameIsUnique(schoolClassName);
+        return schoolClassRepository.save(new SchoolClass(schoolClassName));
+    }
+
+    /**
+     * 학생을 생성하는 메소드 (기본값으로 MEMBER 설정)
+     */
+    public CleanMember createMember(String studentNumber, String name, String schoolClassName) {
+        cleanHelperService.validateStudentNumberIsUnique(studentNumber);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        CleanMember member = new CleanMember(studentNumber, name, schoolClass);
+        member.setCleanArea(schoolClass.getDefaultArea());
+        CleanMember save = cleanMemberRepository.save(member);
+        schoolClass.appendMember(save);
+        return save;
+    }
+
+    /**
+     * 학생을 생성하는 메소드
+     */
+    public CleanMember createMember(String studentNumber, String name, String schoolClassName, CleanRole cleanRole) {
+        cleanHelperService.validateStudentNumberIsUnique(studentNumber);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        CleanMember member = new CleanMember(studentNumber, name, schoolClass, cleanRole);
+        member.setCleanArea(schoolClass.getDefaultArea());
+        CleanMember save = cleanMemberRepository.save(member);
+        schoolClass.appendMember(save);
+//        if (cleanRole == CleanRole.MANAGER) {
+//            schoolClass.setManager(save);
 //        }
-//        return schoolClassRepository.save(new SchoolClass(schoolClassName));
-//    }
-//
-//    /**
-//     * 학생을 생성하는 메소드 (기본값으로 ATTENDING, MEMBER 설정)
-//     */
-//    public CleanMember createMember(String studentNumber, String name, String schoolClassName) {
-//        validateUniqueStudentNumber(studentNumber);
-//        SchoolClass schoolClass = this.getSchoolClassByName(schoolClassName);
-//        CleanMember member = new CleanMember(studentNumber, name, schoolClass);
-//        return cleanMemberRepository.save(member);
-//    }
-//
-//    /**
-//     * 학생을 생성하는 메소드
-//     */
-//    public CleanMember createMember(String studentNumber, String name, String schoolClassName, CleanRole cleanRole) {
-//        validateUniqueStudentNumber(studentNumber);
-//        SchoolClass schoolClass = this.getSchoolClassByName(schoolClassName);
-//        CleanMember member = new CleanMember(studentNumber, name, schoolClass);
-//        return cleanMemberRepository.save(member);
-//    }
-//
-//    public SchoolClass getSchoolClassByName(String schoolClassName) {
-//        return schoolClassRepository.findByName(schoolClassName).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 반 이름입니다."));
-//    }
-//
+        return save;
+    }
+
 //    /**
 //     * 반 이름으로 학생들을 가져온다.
 //     */
@@ -101,13 +105,6 @@
 //    }
 //
 //    /**
-//     * 청소 구역 이름으로 청소 구역을 가져 오는 메소드
-//     */
-//    public CleanArea getAreaByName(String areaName) {
-//        return cleanAreaRepository.getByName(areaName).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 구역 이름입니다."));
-//    }
-//
-//    /**
 //     * 반 이름과 상태로 특정 상태의 학생들을 가져오는 메소드
 //     */
 //    public List<CleanMember> getMembersBySchoolClassNameAndCleanMemberStatus(String schoolClassName, CleanArea area) {
@@ -115,12 +112,5 @@
 //        CleanMembers members = new CleanMembers(schoolClass.getMembers().stream().toList());
 //        return members.getMembersByArea(area);
 //    }
-//
-//    public void validateUniqueStudentNumber(String studentNumber) {
-//        boolean isExist = cleanMemberRepository.existsCleanMemberByStudentNumber(studentNumber);
-//        if (isExist) {
-//            throw new IllegalStateException("이미 존재하는 학번입니다.");
-//        }
-//    }
-//
-//}
+
+}

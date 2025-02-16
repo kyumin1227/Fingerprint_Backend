@@ -18,12 +18,10 @@ public class SchoolClass {
     @Column(unique = true, nullable = false)
     private String name;
     @OneToOne
-    private CleanMember manager;    // 생성 시에만 null 가능
-    @OneToOne
     @Setter
     private CleanArea defaultArea;
     @OneToMany(mappedBy = "schoolClass")
-    private final Set<CleanMember> members = new HashSet<>();
+    private final Set<CleanMember> classMembers = new HashSet<>();
     @OneToMany(mappedBy = "schoolClass")
     private final Set<CleanSchedule> schedules = new HashSet<>();
     @OneToMany(mappedBy = "schoolClass")
@@ -39,22 +37,22 @@ public class SchoolClass {
         this.name = name;
     }
 
-    public void setManager(CleanMember manager) {
-        if (manager == null) {
-            throw new IllegalStateException("관리자는 null일 수 없습니다.");
-        }
-        if (this.manager != null) {
-            this.manager.setCleanRole(CleanRole.MEMBER);
-        }
-        this.manager = manager;
-    }
+//    public void setManager(CleanMember manager) {
+//        if (manager == null) {
+//            throw new IllegalStateException("관리자는 null일 수 없습니다.");
+//        }
+//        if (this.manager != null) {
+//            this.manager.setCleanRole(CleanRole.MEMBER);
+//        }
+//        this.manager = manager;
+//    }
 
     public void appendMember(CleanMember cleanMember) {
-        members.add(cleanMember);
+        classMembers.add(cleanMember);
     }
 
     public void removeMember(CleanMember cleanMember) {
-        members.remove(cleanMember);
+        classMembers.remove(cleanMember);
     }
 
     public void appendSchedule(CleanSchedule cleanSchedule) {

@@ -12,13 +12,12 @@ import java.util.Objects;
 @NoArgsConstructor
 @Getter
 public class CleanMember {
-
     @Id
     private String studentNumber;
     @ManyToOne
-    @JoinColumn(nullable = false)
     private SchoolClass schoolClass;
     @ManyToOne
+    @JoinColumn
     private CleanArea cleanArea;
     @Column(nullable = false)
     private String name;
@@ -36,7 +35,6 @@ public class CleanMember {
         this.name = name;
         this.schoolClass = schoolClass;
         this.cleanArea = schoolClass.getDefaultArea();
-        schoolClass.appendMember(this);
     }
 
     public CleanMember(String studentNumber, String name, SchoolClass schoolClass, CleanRole cleanRole) {
@@ -46,10 +44,6 @@ public class CleanMember {
         this.schoolClass = schoolClass;
         this.cleanRole = cleanRole;
         this.cleanArea = schoolClass.getDefaultArea();
-        schoolClass.appendMember(this);
-        if (cleanRole == CleanRole.MANAGER) {
-            schoolClass.setManager(this);
-        }
     }
 
     public void setCleanRole(CleanRole cleanRole) {
@@ -57,9 +51,9 @@ public class CleanMember {
             throw new IllegalStateException("역할은 null일 수 없습니다.");
         }
         this.cleanRole = cleanRole;
-        if (cleanRole == CleanRole.MANAGER) {
-            schoolClass.setManager(this);
-        }
+//        if (cleanRole == CleanRole.MANAGER) {
+//            schoolClass.setManager(this);
+//        }
     }
 
     private void validateParameters(String studentNumber, String name, SchoolClass schoolClass) {

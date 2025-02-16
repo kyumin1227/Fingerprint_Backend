@@ -17,7 +17,7 @@ public class CleanHelperService {
     private final CleanGroupRepository cleanGroupRepository;
 
     @Autowired
-    public CleanHelperService(SchoolClassRepository schoolClassRepository, CleanMemberRepository cleanMemberRepository, CleanAreaRepository cleanAreaRepository, CleanGroupService cleanGroupService, CleanScheduleRepository cleanScheduleRepository, CleanGroupRepository cleanGroupRepository) {
+    public CleanHelperService(SchoolClassRepository schoolClassRepository, CleanMemberRepository cleanMemberRepository, CleanAreaRepository cleanAreaRepository, CleanScheduleRepository cleanScheduleRepository, CleanGroupRepository cleanGroupRepository) {
         this.schoolClassRepository = schoolClassRepository;
         this.cleanMemberRepository = cleanMemberRepository;
         this.cleanAreaRepository = cleanAreaRepository;

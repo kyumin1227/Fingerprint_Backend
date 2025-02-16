@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,10 +30,8 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @SpringBootTest
-// 환경 변수 추가 필요 ("DB_URL, DB_USER, DB_PASSWORD")
-@TestPropertySource(properties = {
-
-})
+@ContextConfiguration(initializers = DotenvTestInitializer.class)
+@jakarta.transaction.Transactional
 class FingerprintBackendApplicationTests {
 
 	@Autowired

@@ -4,7 +4,6 @@
 //import com.example.fingerprint_backend.entity.CleanMember;
 //import com.example.fingerprint_backend.entity.SchoolClass;
 //import com.example.fingerprint_backend.repository.CleanGroupRepository;
-//import jakarta.transaction.Transactional;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Service;
 //
@@ -17,10 +16,12 @@
 //public class CleanGroupService {
 //
 //    private final CleanGroupRepository cleanGroupRepository;
+//    private final CleanHelperService cleanHelperService;
 //
 //    @Autowired
-//    public CleanGroupService(CleanGroupRepository cleanGroupRepository) {
+//    public CleanGroupService(CleanGroupRepository cleanGroupRepository, CleanHelperService cleanHelperService) {
 //        this.cleanGroupRepository = cleanGroupRepository;
+//        this.cleanHelperService = cleanHelperService;
 //    }
 //
 //    /**
@@ -32,19 +33,10 @@
 //    }
 //
 //    /**
-//     * 그룹이 존재하는지 확인하는 메소드
-//     */
-//    public void validateGroupExists(CleanGroup cleanGroup) {
-//        if (!cleanGroupRepository.existsCleanGroupById(cleanGroup.getId())) {
-//            throw new IllegalArgumentException("존재하지 않는 청소 그룹입니다.");
-//        }
-//    }
-//
-//    /**
 //     * 청소 그룹에 멤버를 세팅하는 메소드
 //     */
 //    public CleanGroup setMembers(CleanGroup cleanGroup, Set<CleanMember> members) {
-//        validateGroupExists(cleanGroup);
+//        cleanHelperService.validateExistCleanGroup(cleanGroup);
 //        cleanGroup.setMembers(members);
 //        return cleanGroupRepository.save(cleanGroup);
 //    }
@@ -53,7 +45,7 @@
 //     * 청소 그룹의 멤버 수를 세팅하는 메소드
 //     */
 //    public CleanGroup setMemberCount(CleanGroup cleanGroup, int memberCount) {
-//        validateGroupExists(cleanGroup);
+//        cleanHelperService.validateExistCleanGroup(cleanGroup);
 //        cleanGroup.setMemberCount(memberCount);
 //        return cleanGroupRepository.save(cleanGroup);
 //    }
@@ -62,7 +54,7 @@
 //     * 청소 그룹에 멤버를 추가하는 메소드
 //     */
 //    public CleanGroup appendMember(CleanGroup cleanGroup, CleanMember member) {
-//        validateGroupExists(cleanGroup);
+//        cleanHelperService.validateExistCleanGroup(cleanGroup);
 //        cleanGroup.appendMember(member);
 //        return cleanGroupRepository.save(cleanGroup);
 //    }
@@ -72,7 +64,7 @@
 //     * 그룹에 멤버가 없을 경우 그룹을 삭제한다.
 //     */
 //    public CleanGroup removeMember(CleanGroup cleanGroup, CleanMember member) {
-//        validateGroupExists(cleanGroup);
+//        cleanHelperService.validateExistCleanGroup(cleanGroup);
 //        cleanGroup.removeMember(member);
 //        if (cleanGroup.getMembers().isEmpty()) {
 //            deleteGroup(cleanGroup);
@@ -85,7 +77,7 @@
 //     * 청소 그룹을 삭제하는 메소드
 //     */
 //    public void deleteGroup(CleanGroup cleanGroup) {
-//        validateGroupExists(cleanGroup);
+//        cleanHelperService.validateExistCleanGroup(cleanGroup);
 //        cleanGroupRepository.delete(cleanGroup);
 //    }
 //
