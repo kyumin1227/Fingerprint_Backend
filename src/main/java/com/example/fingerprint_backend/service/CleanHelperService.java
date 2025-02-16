@@ -13,7 +13,6 @@ public class CleanHelperService {
     private final SchoolClassRepository schoolClassRepository;
     private final CleanMemberRepository cleanMemberRepository;
     private final CleanAreaRepository cleanAreaRepository;
-    private final CleanGroupService cleanGroupService;
     private final CleanScheduleRepository cleanScheduleRepository;
     private final CleanGroupRepository cleanGroupRepository;
 
@@ -22,56 +21,87 @@ public class CleanHelperService {
         this.schoolClassRepository = schoolClassRepository;
         this.cleanMemberRepository = cleanMemberRepository;
         this.cleanAreaRepository = cleanAreaRepository;
-        this.cleanGroupService = cleanGroupService;
         this.cleanScheduleRepository = cleanScheduleRepository;
         this.cleanGroupRepository = cleanGroupRepository;
     }
 
+    /**
+     * 반 이름으로 SchoolClass 엔티티를 가져오는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 반 이름일 경우
+     */
     public SchoolClass getSchoolClassByName(String schoolClassName) {
         return schoolClassRepository.findSchoolClassByName(schoolClassName)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 반 이름입니다."));
     }
 
-    public void validateExistSchoolClassByName(String schoolClassName) {
+    /**
+     * 반 이름이 존재하는지 확인하는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 반 이름일 경우
+     */
+    public void validateSchoolClassExistsByName(String schoolClassName) {
         boolean isExist = schoolClassRepository.existsSchoolClassByName(schoolClassName);
         if (!isExist) {
             throw new IllegalArgumentException("존재하지 않는 반 이름입니다.");
         }
     }
 
-    public void validateUniqueSchoolClassName(String schoolClassName) {
+    /**
+     * 반 이름이 유일한지 확인하는 메소드
+     * @throws IllegalArgumentException 이미 존재하는 반 이름일 경우
+     */
+    public void validateSchoolClassNameIsUnique(String schoolClassName) {
         boolean isExist = schoolClassRepository.existsSchoolClassByName(schoolClassName);
         if (isExist) {
             throw new IllegalArgumentException("이미 존재하는 반 이름입니다.");
         }
     }
 
+    /**
+     * 학번으로 CleanMember 엔티티를 가져오는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 학번일 경우
+     */
     public CleanMember getCleanMemberByStudentNumber(String studentNumber) {
         return cleanMemberRepository.findByStudentNumber(studentNumber)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 학번입니다."));
     }
 
-    public void validateExistCleanMemberByStudentNumber(String studentNumber) {
+    /**
+     * 학번이 존재하는지 확인하는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 학번일 경우
+     */
+    public void validateCleanMemberExistsByStudentNumber(String studentNumber) {
         boolean isExist = cleanMemberRepository.existsByStudentNumber(studentNumber);
         if (!isExist) {
             throw new IllegalArgumentException("존재하지 않는 학번입니다.");
         }
     }
 
-    public void validateUniqueStudentNumber(String studentNumber) {
+    /**
+     * 학번이 유일한지 확인하는 메소드
+     * @throws IllegalArgumentException 이미 존재하는 학번일 경우
+     */
+    public void validateStudentNumberIsUnique(String studentNumber) {
         boolean isExist = cleanMemberRepository.existsByStudentNumber(studentNumber);
         if (isExist) {
             throw new IllegalArgumentException("이미 존재하는 학번입니다.");
         }
     }
 
+    /**
+     * 청소 구역 이름과 반 이름으로 CleanArea 엔티티를 가져오는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 청소 구역 이름일 경우
+     */
     public CleanArea getCleanAreaByNameAndClassName(String areaName, String schoolClassName) {
         SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
         return cleanAreaRepository.findByNameAndSchoolClass(areaName, schoolClass)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 구역 이름입니다."));
     }
 
-    public void validateExistCleanAreaByAreaNameAndClassName(String areaName, String schoolClassName) {
+    /**
+     * 청소 구역 이름과 반 이름이 존재하는지 확인하는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 청소 구역 이름일 경우
+     */
+    public void validateCleanAreaExistsByAreaNameAndClassName(String areaName, String schoolClassName) {
         SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
         boolean isExist = cleanAreaRepository.existsByNameAndSchoolClass(areaName, schoolClass);
         if (!isExist) {
@@ -79,7 +109,11 @@ public class CleanHelperService {
         }
     }
 
-    public void validateUniqueAreaNameAndClassName(String areaName, String schoolClassName) {
+    /**
+     * 청소 구역 이름과 반 이름으로 청소 구역이 유일한지 확인하는 메소드
+     * @throws IllegalArgumentException 이미 존재하는 청소 구역 이름일 경우
+     */
+    public void validateAreaNameAndClassNameIsUnique(String areaName, String schoolClassName) {
         SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
         boolean isExist = cleanAreaRepository.existsByNameAndSchoolClass(areaName, schoolClass);
         if (isExist) {
@@ -87,6 +121,10 @@ public class CleanHelperService {
         }
     }
 
+    /**
+     * 청소 일정을 가져오는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 청소 일정일 경우
+     */
     public CleanSchedule getCleanScheduleByDateAndClassNameAndAreaName(LocalDate date, String schoolClassName, String areaName) {
         SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
         CleanArea cleanArea = getCleanAreaByNameAndClassName(areaName, schoolClassName);
@@ -94,7 +132,11 @@ public class CleanHelperService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 일정입니다."));
     }
 
-    public void validateExistCleanScheduleByDateAndClassNameAndAreaName(LocalDate date, String schoolClassName, String areaName) {
+    /**
+     * 청소 일정이 존재하는지 확인하는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 청소 일정일 경우
+     */
+    public void validateCleanScheduleExistsByDateAndClassNameAndAreaName(LocalDate date, String schoolClassName, String areaName) {
         SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
         CleanArea cleanArea = getCleanAreaByNameAndClassName(areaName, schoolClassName);
         boolean isExist = cleanScheduleRepository.existsByDateAndSchoolClassAndCleanArea(date, schoolClass, cleanArea);
@@ -103,7 +145,11 @@ public class CleanHelperService {
         }
     }
 
-    public void validateExistCleanGroup(CleanGroup cleanGroup) {
+    /**
+     * 청소 그룹이 존재하는지 확인하는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 청소 그룹일 경우
+     */
+    public void validateCleanGroupExists(CleanGroup cleanGroup) {
         boolean isExist = cleanGroupRepository.existsById(cleanGroup.getId());
         if (!isExist) {
             throw new IllegalArgumentException("존재하지 않는 청소 그룹입니다.");
