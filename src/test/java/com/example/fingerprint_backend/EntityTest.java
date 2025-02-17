@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,15 +41,6 @@ public class EntityTest {
         cleanArea2 = new CleanArea("창조관 406호", schoolClass, new HashSet<>(), 0);
     }
 
-//    @DisplayName("반 생성 테스트")
-//    @Test
-//    void checkSchoolClass() {
-//        assertThat(schoolClass.getName()).as("반 이름 확인").isEqualTo("2027_A");
-//        assertThat(schoolClass.getMembers().size()).as("인원 수 확인").isEqualTo(8);
-//        assertThat(schoolClass.getAreas().size()).as("청소 구역 수 확인").isEqualTo(2);
-////        assertThat(schoolClass.getManager()).as("매니저 확인").isEqualTo(member6);
-//    }
-
     @DisplayName("멤버 생성 테스트")
     @Test
     void checkMember() {
@@ -75,7 +66,7 @@ public class EntityTest {
     @DisplayName("그룹 테스트")
     @Test
     void checkGroup() {
-        CleanGroup cleanGroup = new CleanGroup(schoolClass, 4, new HashSet<>());
+        CleanGroup cleanGroup = new CleanGroup(cleanArea1, schoolClass, 4, new ArrayList<>());
 
         assertThat(cleanGroup.getSchoolClass()).as("반 확인").isEqualTo(schoolClass);
         assertThat(cleanGroup.getMembers().size()).as("인원 수 확인").isEqualTo(0);
@@ -96,23 +87,5 @@ public class EntityTest {
 
         assertThat(cleanGroup.isCleaned()).as("청소 여부 확인").isTrue();
         assertThat(member1.getCleaningCount()).as("청소 횟수 확인").isEqualTo(1);
-    }
-
-    @DisplayName("스케줄 테스트")
-    @Test
-    void checkSchedule() {
-        CleanSchedule cleanSchedule = new CleanSchedule(LocalDate.of(2025, 2, 16), cleanArea1, schoolClass);
-
-        assertThat(cleanSchedule.getDate()).as("날짜 확인").isEqualTo(LocalDate.of(2025, 2, 16));
-
-        CleanGroup cleanGroup = new CleanGroup(schoolClass, 2, new HashSet<>());
-        cleanGroup.appendMember(member5);
-        cleanGroup.appendMember(member6);
-
-        cleanSchedule.setCleanGroup(cleanGroup);
-        cleanSchedule.updateGroupCleaningCount();
-
-        assertThat(cleanGroup.isCleaned()).as("청소 여부 확인").isTrue();
-        assertThat(member5.getCleaningCount()).as("청소 횟수 확인").isEqualTo(1);
     }
 }

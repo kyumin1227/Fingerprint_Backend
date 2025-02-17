@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.service;
 
-import com.example.fingerprint_backend.domain.CleanMembers;
+import com.example.fingerprint_backend.entity.CleanSchedule;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.entity.CleanArea;
 import com.example.fingerprint_backend.entity.CleanMember;
@@ -69,14 +69,15 @@ public class CleanManagementService {
         return save;
     }
 
-//    /**
-//     * 반 이름으로 학생들을 가져온다.
-//     */
-//    public Set<CleanMember> getMembersBySchoolClassName(String schoolClassName) {
-//        SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
-//        return schoolClass.getMembers();
-//    }
-//
+    /**
+     * 반 이름으로 학생들을 가져온다.
+     */
+    public List<CleanMember> getMembersBySchoolClassName(String schoolClassName) {
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        return schoolClass.getClassMembers();
+    }
+
+
     /**
      * 청소 구역을 생성하는 메소드
      */
@@ -91,7 +92,7 @@ public class CleanManagementService {
     }
 
     /**
-     * 학습의 기본 청소 구역을 설정하는 메소드
+     * 학급의 기본 청소 구역을 설정하는 메소드
      */
     public void setDefaultArea(String areaName, String schoolClassName) {
         cleanHelperService.validateCleanAreaExistsByAreaNameAndClassName(areaName, schoolClassName);
@@ -113,9 +114,8 @@ public class CleanManagementService {
     /**
      * 반 이름과 구역으로 특정 구역의 학생들을 가져오는 메소드
      */
-    public Set<CleanMember> getMembersBySchoolClassNameAndAreaName(String schoolClassName, String areaName) {
+    public List<CleanMember> getMembersBySchoolClassNameAndAreaName(String areaName, String schoolClassName) {
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
         return cleanArea.getMembers();
     }
-
 }

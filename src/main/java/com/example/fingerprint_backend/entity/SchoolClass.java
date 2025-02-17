@@ -24,13 +24,11 @@ public class SchoolClass {
     @Setter
     private CleanArea defaultArea;
     @OneToMany(mappedBy = "schoolClass")
-    private final Set<CleanMember> classMembers = new HashSet<>();
+    private final List<CleanMember> classMembers = new ArrayList<>();
     @OneToMany(mappedBy = "schoolClass")
-    private final Set<CleanSchedule> schedules = new HashSet<>();
+    private final List<CleanSchedule> schedules = new ArrayList<>();
     @OneToMany(mappedBy = "schoolClass")
-    private final Set<CleanArea> areas = new HashSet<>();
-    @OneToMany(mappedBy = "schoolClass")
-    private final Set<CleanGroup> groups = new HashSet<>();
+    private final List<CleanArea> areas = new ArrayList<>();
 
 
     public SchoolClass(String name) {
@@ -72,14 +70,6 @@ public class SchoolClass {
 
     public void removeArea(CleanArea cleanArea) {
         areas.remove(cleanArea);
-    }
-
-    public void appendGroup(CleanGroup cleanGroup) {
-        groups.add(cleanGroup);
-    }
-
-    public void removeGroup(CleanGroup cleanGroup) {
-        groups.remove(cleanGroup);
     }
 
     @Override

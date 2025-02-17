@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.Set;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -112,9 +112,9 @@ public class ScenarioTest {
         cleanManagementService.createMember("2423008", "김성관", "2027_A");
         cleanManagementService.createMember("2423009", "김성식", "2027_A");
 
-        Set<CleanMember> members = cleanManagementService.getMembersBySchoolClassNameAndAreaName("2027_A", "창조관 405호");
+        List<CleanMember> members = cleanManagementService.getMembersBySchoolClassNameAndAreaName("창조관 405호", "2027_A");
         assertThat(members.size()).as("구역의 멤버 수").isEqualTo(8);
 
-//        cleanScheduleService.setCleanScheduleByRandom("2027_A", "창조관 405호");
+//        TODO 스케줄 생성, 그룹 랜덤 할당
     }
 }

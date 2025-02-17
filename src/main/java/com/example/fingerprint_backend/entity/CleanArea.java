@@ -3,12 +3,9 @@ package com.example.fingerprint_backend.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.DayOfWeek;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
@@ -17,7 +14,8 @@ public class CleanArea {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne  @JoinColumn(nullable = false)
+    @ManyToOne
+    @JoinColumn(nullable = false)
     private SchoolClass schoolClass;
     @Column(nullable = false)
     private String name;
@@ -27,13 +25,13 @@ public class CleanArea {
     @Enumerated(EnumType.STRING)
     private Set<DayOfWeek> days;
     private Integer cycle = 0;
-    @OneToOne
-    @Setter
-    private CleanSchedule lastSchedule;
     @OneToMany(mappedBy = "cleanArea")
-    private Set<CleanSchedule> schedules = new HashSet<>();
+    private List<CleanSchedule> schedules = new ArrayList<>();
     @OneToMany(mappedBy = "cleanArea")
-    private Set<CleanMember> members = new HashSet<>();
+    private List<CleanMember> members = new ArrayList<>();
+    @OneToMany(mappedBy = "cleanArea")
+    @OrderBy("id")
+    private List<CleanGroup> groups = new ArrayList<>();
 
 
     public CleanArea(String name, SchoolClass schoolClass, Set<DayOfWeek> days, Integer cycle) {
@@ -67,6 +65,14 @@ public class CleanArea {
 
     public void appendSchedule(CleanSchedule schedule) {
         schedules.add(schedule);
+    }
+
+    public void removeSchedule(CleanSchedule schedule) {
+        schedules.remove(schedule);
+    }
+
+    public void appendGroup(CleanGroup group) {
+        groups.add(group);
     }
 
     public void setCycle(Integer cycle) {
