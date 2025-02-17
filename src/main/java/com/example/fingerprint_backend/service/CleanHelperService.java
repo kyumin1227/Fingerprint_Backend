@@ -122,35 +122,80 @@ public class CleanHelperService {
     }
 
     /**
-     * 청소 일정을 가져오는 메소드
-     * @throws IllegalArgumentException 존재하지 않는 청소 일정일 경우
+     * 청소 스케줄을 가져오는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 청소 스케줄일 경우
      */
-    public CleanSchedule getCleanScheduleByDateAndClassNameAndAreaName(LocalDate date, String schoolClassName, String areaName) {
+    public CleanSchedule getCleanScheduleByDateAndClassNameAndAreaName(LocalDate date, String areaName, String schoolClassName) {
         SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
         CleanArea cleanArea = getCleanAreaByNameAndClassName(areaName, schoolClassName);
         return cleanScheduleRepository.findByDateAndSchoolClassAndCleanArea(date, schoolClass, cleanArea)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 일정입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 스케줄입니다."));
     }
 
     /**
-     * 청소 일정이 존재하는지 확인하는 메소드
-     * @throws IllegalArgumentException 존재하지 않는 청소 일정일 경우
+     * 청소 스케줄이 생성되었는지 확인하는 메소드
+     * @throws IllegalArgumentException 생성 되지 않은 청소 스케줄일 경우
      */
-    public void validateCleanScheduleExistsByDateAndClassNameAndAreaName(LocalDate date, String schoolClassName, String areaName) {
+    public void validateCleanScheduleExistsByDateAndClassNameAndAreaName(LocalDate date, String areaName, String schoolClassName) {
         SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
         CleanArea cleanArea = getCleanAreaByNameAndClassName(areaName, schoolClassName);
         boolean isExist = cleanScheduleRepository.existsByDateAndSchoolClassAndCleanArea(date, schoolClass, cleanArea);
         if (!isExist) {
-            throw new IllegalArgumentException("존재하지 않는 청소 일정입니다.");
+            throw new IllegalArgumentException("존재하지 않는 청소 스케줄입니다.");
         }
+    }
+
+    /**
+     * 취소되지 않은 청소 스케줄이 있는지 확인하는 메소드
+     * @throws IllegalArgumentException 취소되지 않은 청소 스케줄이 존재하는 경우
+     */
+    public void validateCleanScheduleByDateAndClassNameAndAreaNameIsUnique(LocalDate date, String areaName, String schoolClassName) {
+        SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
+        CleanArea cleanArea = getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        boolean isExist = cleanScheduleRepository.existsByDateAndSchoolClassAndCleanAreaAndIsCanceled(date, schoolClass, cleanArea, false);
+        if (isExist) {
+            throw new IllegalArgumentException("이미 존재하는 청소 스케줄입니다.");
+        }
+    }
+
+    /**
+     * 취소된 청소 스케줄인지 확인하는 메소드
+     * @throws IllegalStateException 취소된 청소 스케줄일 경우
+     */
+    public void validateCleanScheduleIsCanceled(LocalDate date, String areaName, String schoolClassName) {
+        SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
+        CleanArea cleanArea = getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        boolean isExist = cleanScheduleRepository.existsByDateAndSchoolClassAndCleanAreaAndIsCanceled(date, schoolClass, cleanArea, true);
+        if (isExist) {
+            throw new IllegalStateException("취소된 청소 스케줄입니다.");
+        }
+    }
+
+    /**
+     * 날짜가 과거인지 확인하는 메소드
+     * @throws IllegalArgumentException 과거의 날짜일 경우
+     */
+    public void validateDateIsNotPast(LocalDate date) {
+        if (date.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("과거의 날짜는 입력할 수 없습니다.");
+        }
+    }
+
+    /**
+     * 청소 그룹을 가져오는 메소드
+     * @throws IllegalArgumentException 존재하지 않는 청소 그룹일 경우
+     */
+    public CleanGroup getCleanGroupById(Long groupId) {
+        return cleanGroupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 그룹입니다."));
     }
 
     /**
      * 청소 그룹이 존재하는지 확인하는 메소드
      * @throws IllegalArgumentException 존재하지 않는 청소 그룹일 경우
      */
-    public void validateCleanGroupExists(CleanGroup cleanGroup) {
-        boolean isExist = cleanGroupRepository.existsById(cleanGroup.getId());
+    public void validateCleanGroupExists(Long groupId) {
+        boolean isExist = cleanGroupRepository.existsById(groupId);
         if (!isExist) {
             throw new IllegalArgumentException("존재하지 않는 청소 그룹입니다.");
         }
