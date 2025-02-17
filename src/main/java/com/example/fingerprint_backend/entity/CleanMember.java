@@ -70,6 +70,9 @@ public class CleanMember {
     }
 
     public void setCleanArea(CleanArea cleanArea) {
+        if (this.cleanArea != null) {
+            this.cleanArea.removeMember(this);
+        }
         this.cleanArea = cleanArea;
         if (cleanArea != null) {
             cleanArea.appendMember(this);

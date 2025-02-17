@@ -101,30 +101,21 @@ public class CleanManagementService {
         schoolClassRepository.save(schoolClass);
     }
 
-//    /**
-//     * 학번으로 학생을 가져온다.
-//     */
-//    public CleanMember getMemberByStudentNumber(String studentNumber) {
-//        return cleanMemberRepository.getCleanMemberByStudentNumber(studentNumber).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 학번입니다."));
-//    }
-//
-//    /**
-//     * 청소 구역을 설정하는 메소드
-//     */
-//    public void setCleanArea(String schoolClassName, String areaName) {
-//        SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
-//        CleanArea area = cleanAreaRepository.getByName(areaName).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 청소 구역 이름입니다."));
-//        schoolClass.appendArea(area);
-//        schoolClassRepository.save(schoolClass);
-//    }
-//
-//    /**
-//     * 반 이름과 상태로 특정 상태의 학생들을 가져오는 메소드
-//     */
-//    public List<CleanMember> getMembersBySchoolClassNameAndCleanMemberStatus(String schoolClassName, CleanArea area) {
-//        SchoolClass schoolClass = getSchoolClassByName(schoolClassName);
-//        CleanMembers members = new CleanMembers(schoolClass.getMembers().stream().toList());
-//        return members.getMembersByArea(area);
-//    }
+    /**
+     * 학생의 청소 구역을 설정하는 메소드
+     */
+    public void setMemberCleanArea(String studentNumber, String areaName) {
+        CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(studentNumber);
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, member.getSchoolClass().getName());
+        member.setCleanArea(cleanArea);
+    }
+
+    /**
+     * 반 이름과 구역으로 특정 구역의 학생들을 가져오는 메소드
+     */
+    public Set<CleanMember> getMembersBySchoolClassNameAndAreaName(String schoolClassName, String areaName) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        return cleanArea.getMembers();
+    }
 
 }
