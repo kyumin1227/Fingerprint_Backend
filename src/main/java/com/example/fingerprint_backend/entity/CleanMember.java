@@ -52,9 +52,9 @@ public class CleanMember {
             throw new IllegalStateException("역할은 null일 수 없습니다.");
         }
         this.cleanRole = cleanRole;
-//        if (cleanRole == CleanRole.MANAGER) {
-//            schoolClass.setManager(this);
-//        }
+        if (cleanRole.equals(CleanRole.MANAGER)) {
+            schoolClass.setManager(this);
+        }
     }
 
     private void validateParameters(String studentNumber, String name, SchoolClass schoolClass) {

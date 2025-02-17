@@ -18,6 +18,9 @@ public class SchoolClass {
     @Column(unique = true, nullable = false)
     private String name;
     @OneToOne
+    @JoinColumn(name = "manager_id")
+    private CleanMember manager = null;
+    @OneToOne
     @Setter
     private CleanArea defaultArea;
     @OneToMany(mappedBy = "schoolClass")
@@ -37,15 +40,15 @@ public class SchoolClass {
         this.name = name;
     }
 
-//    public void setManager(CleanMember manager) {
-//        if (manager == null) {
-//            throw new IllegalStateException("관리자는 null일 수 없습니다.");
-//        }
-//        if (this.manager != null) {
-//            this.manager.setCleanRole(CleanRole.MEMBER);
-//        }
-//        this.manager = manager;
-//    }
+    public void setManager(CleanMember manager) {
+        if (manager == null) {
+            throw new IllegalStateException("관리자는 null일 수 없습니다.");
+        }
+        if (this.manager != null) {
+            this.manager.setCleanRole(CleanRole.MEMBER);
+        }
+        this.manager = manager;
+    }
 
     public void appendMember(CleanMember cleanMember) {
         classMembers.add(cleanMember);

@@ -8,6 +8,7 @@ import com.example.fingerprint_backend.repository.SchoolClassRepository;
 import com.example.fingerprint_backend.repository.CleanAreaRepository;
 import com.example.fingerprint_backend.repository.CleanMemberRepository;
 import com.example.fingerprint_backend.types.CleanRole;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional
 public class CleanManagementService {
 
     private final SchoolClassRepository schoolClassRepository;
@@ -61,9 +63,9 @@ public class CleanManagementService {
         member.setCleanArea(schoolClass.getDefaultArea());
         CleanMember save = cleanMemberRepository.save(member);
         schoolClass.appendMember(save);
-//        if (cleanRole == CleanRole.MANAGER) {
-//            schoolClass.setManager(save);
-//        }
+        if (cleanRole == CleanRole.MANAGER) {
+            schoolClass.setManager(save);
+        }
         return save;
     }
 
@@ -75,18 +77,30 @@ public class CleanManagementService {
 //        return schoolClass.getMembers();
 //    }
 //
-//    /**
-//     * 청소 구역을 생성하는 메소드
-//     */
-//    public CleanArea createArea(String areaName) {
-//        // TODO : 청소 구역 생성 시, 같은 반에 중복되는 청소 구역이 없도록 확인
-//        boolean isExist = cleanAreaRepository.existsCleanAreaByName(areaName);
-//        if (isExist) {
-//            throw new IllegalStateException("이미 존재하는 청소 구역 이름입니다.");
-//        }
-//        return cleanAreaRepository.save(new CleanArea(areaName));
-//    }
-//
+    /**
+     * 청소 구역을 생성하는 메소드
+     */
+    public CleanArea createArea(String areaName, String schoolClassName) {
+        cleanHelperService.validateAreaNameAndClassNameIsUnique(areaName, schoolClassName);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        CleanArea save = cleanAreaRepository.save(new CleanArea(areaName, schoolClass, Set.of(), 0));
+        if (schoolClass.getDefaultArea() == null) {
+            schoolClass.setDefaultArea(save);
+        }
+        return save;
+    }
+
+    /**
+     * 학습의 기본 청소 구역을 설정하는 메소드
+     */
+    public void setDefaultArea(String areaName, String schoolClassName) {
+        cleanHelperService.validateCleanAreaExistsByAreaNameAndClassName(areaName, schoolClassName);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        CleanArea area = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        schoolClass.setDefaultArea(area);
+        schoolClassRepository.save(schoolClass);
+    }
+
 //    /**
 //     * 학번으로 학생을 가져온다.
 //     */

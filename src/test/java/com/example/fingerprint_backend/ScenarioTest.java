@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend;
 
+import com.example.fingerprint_backend.entity.CleanArea;
 import com.example.fingerprint_backend.entity.CleanMember;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.CleanManagementService;
@@ -15,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ContextConfiguration(initializers = DotenvTestInitializer.class)
 @Transactional
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ScenarioTest {
 
     @Autowired
@@ -25,20 +25,18 @@ public class ScenarioTest {
 
     @DisplayName("관리자의 초기 반 생성 및 학생 지정")
     @Test
-    @Order(1)
     void createClassAndSetManager() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
         CleanMember member = cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
 
-//        assertThat(schoolClass.getManager()).isEqualTo(member);
+        assertThat(schoolClass.getManager()).isEqualTo(member);
     }
 
     @DisplayName("학생 추가")
     @Test
-    @Order(2)
     void appendMember() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-//        CleanMember member = cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
         cleanManagementService.createMember("2423001", "권혁일", "2027_A");
         cleanManagementService.createMember("2423002", "김규민", "2027_A");
         cleanManagementService.createMember("2423003", "김근형", "2027_A");
@@ -47,6 +45,28 @@ public class ScenarioTest {
         cleanManagementService.createMember("2423008", "김성관", "2027_A");
         cleanManagementService.createMember("2423009", "김성식", "2027_A");
 
-        assertThat(schoolClass.getClassMembers().size()).isEqualTo(7);
+        assertThat(schoolClass.getClassMembers().size()).isEqualTo(8);
+    }
+
+    @DisplayName("청소 구역 추가")
+    @Test
+    void appendArea() {
+        schoolClass = cleanManagementService.createSchoolClass("2027_A");
+        cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
+        CleanArea area1 = cleanManagementService.createArea("창조관 405호", "2027_A");
+        cleanManagementService.createMember("2423001", "권혁일", "2027_A");
+        cleanManagementService.createMember("2423002", "김규민", "2027_A");
+        cleanManagementService.createMember("2423003", "김근형", "2027_A");
+        CleanArea area2 = cleanManagementService.createArea("창조관 406호", "2027_A");
+        cleanManagementService.setDefaultArea("창조관 406호", "2027_A");
+        cleanManagementService.createMember("2423005", "김민규", "2027_A");
+        cleanManagementService.createMember("2423006", "김민석", "2027_A");
+        cleanManagementService.createMember("2423008", "김성관", "2027_A");
+        cleanManagementService.createMember("2423009", "김성식", "2027_A");
+
+        assertThat(schoolClass.getAreas().size()).as("학급의 구역 수").isEqualTo(2);
+        assertThat(schoolClass.getDefaultArea().getName()).as("학급의 기본 구역 이름").isEqualTo("창조관 406호");
+        assertThat(area1.getMembers().size()).as("구역 1의 멤버 수").isEqualTo(3);
+        assertThat(area2.getMembers().size()).as("구역 2의 멤버 수").isEqualTo(4);
     }
 }
