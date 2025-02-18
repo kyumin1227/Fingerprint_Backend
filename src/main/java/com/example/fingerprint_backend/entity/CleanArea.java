@@ -14,7 +14,7 @@ public class CleanArea {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private SchoolClass schoolClass;
     @Column(nullable = false)

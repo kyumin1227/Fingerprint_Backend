@@ -1,6 +1,9 @@
 package com.example.fingerprint_backend.entity;
 
 import com.example.fingerprint_backend.types.CleanRole;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,13 +14,15 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @Getter
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "studentNumber")
 public class CleanMember {
     @Id
     private String studentNumber;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_class_id")
+    @JsonBackReference
     private SchoolClass schoolClass;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private CleanArea cleanArea;
     @Column(nullable = false)

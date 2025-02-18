@@ -13,12 +13,12 @@ public class CleanGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private SchoolClass schoolClass;
     @Column(nullable = false)
     private int memberCount;  // 그룹의 최대 인원
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "group_member",
             joinColumns = @JoinColumn(name = "group_id"),
@@ -26,7 +26,7 @@ public class CleanGroup {
     )
     private List<CleanMember> members;
     private boolean isCleaned = false;  // 청소 완료 여부
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private CleanArea cleanArea;  // 청소 구역
 
 
