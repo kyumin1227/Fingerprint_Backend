@@ -33,7 +33,7 @@ public class ScenarioTest {
     @Test
     void createClassAndSetManager() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        CleanMember member = cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
+        CleanMember member = cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
 
         assertThat(schoolClass.getManager()).isEqualTo(member);
     }
@@ -42,14 +42,14 @@ public class ScenarioTest {
     @Test
     void appendMember() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
-        cleanManagementService.createMember("2423001", "권혁일", "2027_A");
-        cleanManagementService.createMember("2423002", "김규민", "2027_A");
-        cleanManagementService.createMember("2423003", "김근형", "2027_A");
-        cleanManagementService.createMember("2423005", "김민규", "2027_A");
-        cleanManagementService.createMember("2423006", "김민석", "2027_A");
-        cleanManagementService.createMember("2423008", "김성관", "2027_A");
-        cleanManagementService.createMember("2423009", "김성식", "2027_A");
+        cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
+        cleanManagementService.createMember("2423002", "규민", "김", "2027_A");
+        cleanManagementService.createMember("2423003", "근형", "김", "2027_A");
+        cleanManagementService.createMember("2423005", "민규", "김", "2027_A");
+        cleanManagementService.createMember("2423006", "민석", "김", "2027_A");
+        cleanManagementService.createMember("2423008", "성관", "김", "2027_A");
+        cleanManagementService.createMember("2423009", "성식", "김", "2027_A");
 
         assertThat(schoolClass.getClassMembers().size()).isEqualTo(8);
     }
@@ -58,17 +58,17 @@ public class ScenarioTest {
     @Test
     void appendArea() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
         CleanArea area1 = cleanManagementService.createArea("창조관 405호", "2027_A");
-        cleanManagementService.createMember("2423001", "권혁일", "2027_A");
-        cleanManagementService.createMember("2423002", "김규민", "2027_A");
-        cleanManagementService.createMember("2423003", "김근형", "2027_A");
+        cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
+        cleanManagementService.createMember("2423002", "규민", "김", "2027_A");
+        cleanManagementService.createMember("2423003", "근형", "김", "2027_A");
         CleanArea area2 = cleanManagementService.createArea("창조관 406호", "2027_A");
         cleanManagementService.setDefaultArea("창조관 406호", "2027_A");
-        cleanManagementService.createMember("2423005", "김민규", "2027_A");
-        cleanManagementService.createMember("2423006", "김민석", "2027_A");
-        cleanManagementService.createMember("2423008", "김성관", "2027_A");
-        cleanManagementService.createMember("2423009", "김성식", "2027_A");
+        cleanManagementService.createMember("2423005", "민규", "김", "2027_A");
+        cleanManagementService.createMember("2423006", "민석", "김", "2027_A");
+        cleanManagementService.createMember("2423008", "성관", "김", "2027_A");
+        cleanManagementService.createMember("2423009", "성식", "김", "2027_A");
 
         assertThat(schoolClass.getAreas().size()).as("학급의 구역 수").isEqualTo(2);
         assertThat(schoolClass.getDefaultArea().getName()).as("학급의 기본 구역 이름").isEqualTo("창조관 406호");
@@ -80,13 +80,13 @@ public class ScenarioTest {
     @Test
     void changeArea() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
         CleanArea area1 = cleanManagementService.createArea("창조관 405호", "2027_A");
-        cleanManagementService.createMember("2423001", "권혁일", "2027_A");
+        cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
         CleanArea area2 = cleanManagementService.createArea("창조관 406호", "2027_A");
         cleanManagementService.setDefaultArea("창조관 406호", "2027_A");
-        cleanManagementService.createMember("2423002", "김규민", "2027_A");
-        cleanManagementService.createMember("2423003", "김근형", "2027_A");
+        cleanManagementService.createMember("2423002", "규민", "김", "2027_A");
+        cleanManagementService.createMember("2423003", "근형", "김", "2027_A");
 
 //        구역 변경
         cleanManagementService.setMemberCleanArea("2423001", "창조관 406호");
@@ -105,16 +105,16 @@ public class ScenarioTest {
     @Test
     void createSchedule() {
         cleanManagementService.createSchoolClass("2027_A");
-        cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
         cleanManagementService.createArea("창조관 405호", "2027_A");
         cleanManagementService.setMemberCleanArea("2423007", "창조관 405호");
-        cleanManagementService.createMember("2423001", "권혁일", "2027_A");
-        cleanManagementService.createMember("2423002", "김규민", "2027_A");
-        cleanManagementService.createMember("2423003", "김근형", "2027_A");
-        cleanManagementService.createMember("2423005", "김민규", "2027_A");
-        cleanManagementService.createMember("2423006", "김민석", "2027_A");
-        cleanManagementService.createMember("2423008", "김성관", "2027_A");
-        cleanManagementService.createMember("2423009", "김성식", "2027_A");
+        cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
+        cleanManagementService.createMember("2423002", "규민", "김", "2027_A");
+        cleanManagementService.createMember("2423003", "근형", "김", "2027_A");
+        cleanManagementService.createMember("2423005", "민규", "김", "2027_A");
+        cleanManagementService.createMember("2423006", "민석", "김", "2027_A");
+        cleanManagementService.createMember("2423008", "성관", "김", "2027_A");
+        cleanManagementService.createMember("2423009", "성식", "김", "2027_A");
 
         List<CleanMember> members = cleanManagementService.getMembersBySchoolClassNameAndAreaName("창조관 405호", "2027_A");
         assertThat(members.size()).as("구역의 멤버 수").isEqualTo(8);

@@ -21,7 +21,9 @@ public class CleanMember {
     @JoinColumn
     private CleanArea cleanArea;
     @Column(nullable = false)
-    private String name;
+    private String firstName;
+    @Column(nullable = false)
+    private String givenName;
     @Enumerated(EnumType.STRING)
     private CleanRole cleanRole = CleanRole.MEMBER;
     @Setter
@@ -30,18 +32,20 @@ public class CleanMember {
     private Integer cleaningCount = 0;
 
 
-    public CleanMember(String studentNumber, String name, SchoolClass schoolClass) {
-        validateParameters(studentNumber, name, schoolClass);
+    public CleanMember(String studentNumber, String firstName, String givenName, SchoolClass schoolClass) {
+        validateParameters(studentNumber, firstName, schoolClass);
         this.studentNumber = studentNumber;
-        this.name = name;
+        this.firstName = firstName;
+        this.givenName = givenName;
         this.schoolClass = schoolClass;
         this.cleanArea = schoolClass.getDefaultArea();
     }
 
-    public CleanMember(String studentNumber, String name, SchoolClass schoolClass, CleanRole cleanRole) {
-        validateParameters(studentNumber, name, schoolClass);
+    public CleanMember(String studentNumber, String firstName, String givenName, SchoolClass schoolClass, CleanRole cleanRole) {
+        validateParameters(studentNumber, firstName, schoolClass);
         this.studentNumber = studentNumber;
-        this.name = name;
+        this.firstName = firstName;
+        this.givenName = givenName;
         this.schoolClass = schoolClass;
         this.cleanRole = cleanRole;
         this.cleanArea = schoolClass.getDefaultArea();

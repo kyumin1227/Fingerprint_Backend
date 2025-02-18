@@ -44,10 +44,10 @@ public class CleanManagementService {
     /**
      * 학생을 생성하는 메소드 (기본값으로 MEMBER 설정)
      */
-    public CleanMember createMember(String studentNumber, String name, String schoolClassName) {
+    public CleanMember createMember(String studentNumber, String firstName, String givenName, String schoolClassName) {
         cleanHelperService.validateStudentNumberIsUnique(studentNumber);
         SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
-        CleanMember member = new CleanMember(studentNumber, name, schoolClass);
+        CleanMember member = new CleanMember(studentNumber, firstName, givenName, schoolClass);
         member.setCleanArea(schoolClass.getDefaultArea());
         CleanMember save = cleanMemberRepository.save(member);
         schoolClass.appendMember(save);
@@ -57,10 +57,10 @@ public class CleanManagementService {
     /**
      * 학생을 생성하는 메소드
      */
-    public CleanMember createMember(String studentNumber, String name, String schoolClassName, CleanRole cleanRole) {
+    public CleanMember createMember(String studentNumber, String firstName, String givenName, String schoolClassName, CleanRole cleanRole) {
         cleanHelperService.validateStudentNumberIsUnique(studentNumber);
         SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
-        CleanMember member = new CleanMember(studentNumber, name, schoolClass, cleanRole);
+        CleanMember member = new CleanMember(studentNumber, firstName, givenName, schoolClass, cleanRole);
         member.setCleanArea(schoolClass.getDefaultArea());
         CleanMember save = cleanMemberRepository.save(member);
         schoolClass.appendMember(save);

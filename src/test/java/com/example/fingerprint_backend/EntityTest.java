@@ -29,14 +29,14 @@ public class EntityTest {
     @BeforeAll
     static void setup() {
         schoolClass = new SchoolClass("2027_A");
-        member1 = new CleanMember("2423001", "권혁일", schoolClass);
-        member2 = new CleanMember("2423002", "김규민", schoolClass);
-        member3 = new CleanMember("2423003", "김근형", schoolClass);
-        member4 = new CleanMember("2423005", "김민규", schoolClass);
-        member5 = new CleanMember("2423006", "김민석", schoolClass);
-        member6 = new CleanMember("2423007", "김민정", schoolClass, CleanRole.MANAGER);
-        member7 = new CleanMember("2423008", "김성관", schoolClass);
-        member8 = new CleanMember("2423009", "김성식", schoolClass);
+        member1 = new CleanMember("2423001", "혁일", "권", schoolClass);
+        member2 = new CleanMember("2423002", "규민", "김", schoolClass);
+        member3 = new CleanMember("2423003", "근형", "김", schoolClass);
+        member4 = new CleanMember("2423005", "민규", "김", schoolClass);
+        member5 = new CleanMember("2423006", "민석", "김", schoolClass);
+        member6 = new CleanMember("2423007", "민정", "김", schoolClass, CleanRole.MANAGER);
+        member7 = new CleanMember("2423008", "성관", "김", schoolClass);
+        member8 = new CleanMember("2423009", "성식", "김", schoolClass);
         cleanArea1 = new CleanArea("창조관 405호", schoolClass, new HashSet<>(), 0);
         cleanArea2 = new CleanArea("창조관 406호", schoolClass, new HashSet<>(), 0);
     }
@@ -45,12 +45,12 @@ public class EntityTest {
     @Test
     void checkMember() {
         assertThat(member1.getStudentNumber()).as("학번 확인").isEqualTo("2423001");
-        assertThat(member1.getName()).as("이름 확인").isEqualTo("권혁일");
+        assertThat(member1.getFirstName()).as("이름 확인").isEqualTo("권혁일");
         assertThat(member1.getSchoolClass()).as("반 확인").isEqualTo(schoolClass);
         assertThat(member1.getCleanRole()).as("역할 확인").isEqualTo(CleanRole.MEMBER);
 
         assertThat(member6.getStudentNumber()).as("학번 확인").isEqualTo("2423007");
-        assertThat(member6.getName()).as("이름 확인").isEqualTo("김민정");
+        assertThat(member6.getFirstName()).as("이름 확인").isEqualTo("김민정");
         assertThat(member6.getSchoolClass()).as("반 확인").isEqualTo(schoolClass);
         assertThat(member6.getCleanRole()).as("역할 확인").isEqualTo(CleanRole.MANAGER);
     }

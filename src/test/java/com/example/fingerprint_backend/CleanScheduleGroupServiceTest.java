@@ -48,19 +48,19 @@ public class CleanScheduleGroupServiceTest {
     @BeforeEach
     void setUp() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        member0 = cleanManagementService.createMember("2423007", "김민정", "2027_A", CleanRole.MANAGER);
+        member0 = cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
         area1 = cleanManagementService.createArea("창조관 405호", "2027_A");
         area2 = cleanManagementService.createArea("창조관 304호", "2027_A");
         cleanManagementService.setMemberCleanArea("2423007", "창조관 405호");
         cleanManagementService.setDefaultArea("창조관 405호", "2027_A");
-        member1 = cleanManagementService.createMember("2423001", "권혁일", "2027_A");
-        member2 = cleanManagementService.createMember("2423002", "김규민", "2027_A");
-        member3 = cleanManagementService.createMember("2423003", "김근형", "2027_A");
-        member4 = cleanManagementService.createMember("2423005", "김민규", "2027_A");
-        member5 = cleanManagementService.createMember("2423006", "김민석", "2027_A");
-        member6 = cleanManagementService.createMember("2423008", "김성관", "2027_A");
-        member7 = cleanManagementService.createMember("2423009", "김성식", "2027_A");
-        member8 = cleanManagementService.createMember("2423011", "김효찬", "2027_A");
+        member1 = cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
+        member2 = cleanManagementService.createMember("2423002", "규민", "김", "2027_A");
+        member3 = cleanManagementService.createMember("2423003", "근형", "김", "2027_A");
+        member4 = cleanManagementService.createMember("2423005", "민규", "김", "2027_A");
+        member5 = cleanManagementService.createMember("2423006", "민석", "김", "2027_A");
+        member6 = cleanManagementService.createMember("2423008", "성관", "김", "2027_A");
+        member7 = cleanManagementService.createMember("2423009", "성식", "김", "2027_A");
+        member8 = cleanManagementService.createMember("2423011", "효찬", "김", "2027_A");
         date = LocalDate.now();
     }
 
@@ -204,12 +204,12 @@ public class CleanScheduleGroupServiceTest {
     @DisplayName("랜덤으로 그룹 생성.")
     @Test
     void randomCreateGroup() {
-        cleanManagementService.createMember("2423012", "12번", "2027_A");
-        cleanManagementService.createMember("2423013", "13번", "2027_A");
-        cleanManagementService.createMember("2423014", "14번", "2027_A");
-        cleanManagementService.createMember("2423015", "15번", "2027_A");
-        cleanManagementService.createMember("2423016", "16번", "2027_A");
-        cleanManagementService.createMember("2423017", "17번", "2027_A");
+        cleanManagementService.createMember("2423012", "번", "12", "2027_A");
+        cleanManagementService.createMember("2423013", "번", "13", "2027_A");
+        cleanManagementService.createMember("2423014", "번", "14", "2027_A");
+        cleanManagementService.createMember("2423015", "번", "15", "2027_A");
+        cleanManagementService.createMember("2423016", "번", "16", "2027_A");
+        cleanManagementService.createMember("2423017", "번", "17", "2027_A");
         cleanManagementService.setMemberCleanArea("2423002", "창조관 304호");
         List<CleanMember> members = cleanManagementService.getMembersBySchoolClassNameAndAreaName("창조관 405호", "2027_A");
         cleanScheduleGroupService.createGroupsByRandom("창조관 405호", "2027_A", members, 4);
@@ -218,7 +218,7 @@ public class CleanScheduleGroupServiceTest {
         groups.forEach(group -> {
             System.out.println(group.getId());
             group.getMembers().forEach(member -> {
-                System.out.println(member.getName());
+                System.out.println(member.getFirstName());
             });
         });
 
