@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend;
 
+import com.example.fingerprint_backend.dto.clean.InfoResponse;
 import com.example.fingerprint_backend.entity.*;
 import com.example.fingerprint_backend.service.CleanHelperService;
 import com.example.fingerprint_backend.service.CleanManagementService;
@@ -75,7 +76,7 @@ public class CleanScheduleGroupServiceTest {
         assertThat(cleanSchedule.getCleanArea()).as("청소 구역 확인").isEqualTo(area1);
         assertThat(cleanSchedule.getSchoolClass()).as("반 확인").isEqualTo(schoolClass);
         assertThat(cleanScheduleGroupService.getScheduleBySchoolClassName("2027_A", date.minusDays(1)).size()).as("스케줄 수").isEqualTo(1);
-        assertThat(cleanScheduleGroupService.getScheduleBySchoolClassNameAndAreaName("창조관 405호", "2027_A", date.minusDays(1)).size()).as("구역 스케줄 수").isEqualTo(1);
+        assertThat(cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName("창조관 405호", "2027_A", date.minusDays(1)).size()).as("구역 스케줄 수").isEqualTo(1);
     }
 
     @DisplayName("청소 스케줄 가져오기")
@@ -247,7 +248,7 @@ public class CleanScheduleGroupServiceTest {
     @Test
     void createSchedules1() {
         cleanScheduleGroupService.createCleanSchedules(date, "창조관 405호", "2027_A", 1, Set.of(DayOfWeek.FRIDAY), 4);
-        List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleBySchoolClassNameAndAreaName("창조관 405호", "2027_A", date);
+        List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName("창조관 405호", "2027_A", date);
         schedules.forEach(schedule -> {
             System.out.println(schedule.getDate() + " " + schedule.getDate().getDayOfWeek());
         });
@@ -258,7 +259,7 @@ public class CleanScheduleGroupServiceTest {
     @Test
     void createSchedules2() {
         cleanScheduleGroupService.createCleanSchedules(date, "창조관 405호", "2027_A", 2, Set.of(DayOfWeek.MONDAY, DayOfWeek.FRIDAY), 8);
-        List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleBySchoolClassNameAndAreaName("창조관 405호", "2027_A", date);
+        List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName("창조관 405호", "2027_A", date);
         schedules.forEach(schedule -> {
             System.out.println(schedule.getDate() + " " + schedule.getDate().getDayOfWeek());
             schedule.setCanceled(true);
@@ -267,10 +268,26 @@ public class CleanScheduleGroupServiceTest {
         schedules.get(1).setCanceled(false);
         assertThat(schedules.size()).as("스케줄 수").isEqualTo(8);
         cleanScheduleGroupService.createCleanSchedules(date, "창조관 405호", "2027_A", 2, Set.of(DayOfWeek.MONDAY, DayOfWeek.FRIDAY), 8);
-        schedules = cleanScheduleGroupService.getScheduleBySchoolClassNameAndAreaName("창조관 405호", "2027_A", date);
+        schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName("창조관 405호", "2027_A", date);
         schedules.forEach(schedule -> {
             System.out.println(schedule.getDate() + " " + schedule.getDate().getDayOfWeek());
         });
         assertThat(schedules.size()).as("스케줄 수").isEqualTo(10);
+    }
+
+    @DisplayName("그룹과 스케줄을 생성하고 반환값 파싱")
+    @Test
+    void parseInfo() {
+//        given
+        List<CleanMember> members = cleanManagementService.getMembersBySchoolClassNameAndAreaName("창조관 405호", "2027_A");
+        cleanScheduleGroupService.createGroupsByRandom("창조관 405호", "2027_A", members, 4);
+        cleanScheduleGroupService.createGroupsByRandom("창조관 405호", "2027_A", members, 4);
+        cleanScheduleGroupService.createCleanSchedules(date, "창조관 405호", "2027_A", 1, Set.of(DayOfWeek.FRIDAY), 4);
+
+        List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassName("창조관 405호", "2027_A");
+        List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName("창조관 405호", "2027_A", date);
+
+        List<InfoResponse> infoResponses = cleanScheduleGroupService.parsingInfos(groups, schedules);
+
     }
 }

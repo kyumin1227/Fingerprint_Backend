@@ -14,7 +14,6 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @Getter
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "studentNumber")
 public class CleanMember {
     @Id
     private String studentNumber;
@@ -24,6 +23,7 @@ public class CleanMember {
     private SchoolClass schoolClass;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
+    @JsonBackReference
     private CleanArea cleanArea;
     @Column(nullable = false)
     private String firstName;

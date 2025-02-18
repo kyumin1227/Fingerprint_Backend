@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend.service;
 
+import com.example.fingerprint_backend.dto.clean.InfoResponse;
 import com.example.fingerprint_backend.entity.*;
 import com.example.fingerprint_backend.repository.CleanGroupRepository;
 import com.example.fingerprint_backend.repository.CleanScheduleRepository;
@@ -88,9 +89,9 @@ public class CleanScheduleGroupService {
     /**
      * 구역의 특정 날짜 이후의 스케줄을 가져오는 메소드
      */
-    public List<CleanSchedule> getScheduleBySchoolClassNameAndAreaName(String areaName, String schoolClassName, LocalDate date) {
+    public List<CleanSchedule> getScheduleByAreaNameAndSchoolClassName(String areaName, String schoolClassName, LocalDate date) {
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
-        return cleanScheduleRepository.findAllByDateAfterAndCleanArea(date, cleanArea);
+        return cleanScheduleRepository.findAllByDateGreaterThanEqualAndCleanArea(date, cleanArea);
     }
 
     /**
@@ -267,5 +268,28 @@ public class CleanScheduleGroupService {
         }
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
         cleanArea.setLastScheduledDate(targetDate);
+    }
+
+    public List<InfoResponse> parsingInfos(List<CleanGroup> groups, List<CleanSchedule> schedules) {
+        List<InfoResponse> infoResponses = new ArrayList<>();
+        ArrayList<CleanGroup> groupsCopy = new ArrayList<>(groups);
+        ArrayList<CleanSchedule> schedulesCopy = new ArrayList<>(schedules);
+        for (CleanSchedule schedule : schedulesCopy) {
+            if (schedule.isCanceled()) {
+                infoResponses.add(new InfoResponse(schedule.getDate()));
+            } else if (!groupsCopy.isEmpty()) {
+                CleanGroup group = groupsCopy.remove(0);
+                infoResponses.add(new InfoResponse(
+                        schedule.getDate(),
+                        group.getId(),
+                        group.getMembers(),
+                        group.getMemberCount(),
+                        schedule.getCleanArea().getName(),
+                        schedule.getSchoolClass().getName(),
+                        false
+                ));
+            }
+        }
+        return infoResponses;
     }
 }
