@@ -17,14 +17,12 @@ public class CleanScheduleGroupService {
 
     private final CleanScheduleRepository cleanScheduleRepository;
     private final CleanGroupRepository cleanGroupRepository;
-    private final CleanManagementService cleanManagementService;
     private final CleanHelperService cleanHelperService;
 
     @Autowired
-    public CleanScheduleGroupService(CleanScheduleRepository cleanScheduleRepository, CleanGroupRepository cleanGroupRepository, CleanManagementService cleanManagementService, CleanHelperService cleanHelperService) {
+    public CleanScheduleGroupService(CleanScheduleRepository cleanScheduleRepository, CleanGroupRepository cleanGroupRepository, CleanHelperService cleanHelperService) {
         this.cleanScheduleRepository = cleanScheduleRepository;
         this.cleanGroupRepository = cleanGroupRepository;
-        this.cleanManagementService = cleanManagementService;
         this.cleanHelperService = cleanHelperService;
     }
 
@@ -86,19 +84,19 @@ public class CleanScheduleGroupService {
     }
 
     /**
-     *  구역의 특정 날짜 이후의 스케줄을 가져오는 메소드
+     * 구역의 특정 날짜 이후의 스케줄을 가져오는 메소드
      */
-    public List<CleanSchedule> getScheduleBySchoolClassNameAndAreaName(String areaName, String schoolClassName) {
+    public List<CleanSchedule> getScheduleBySchoolClassNameAndAreaName(String areaName, String schoolClassName, LocalDate date) {
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
-        return cleanArea.getSchedules();
+        return cleanScheduleRepository.findAllByDateAfterAndCleanArea(date, cleanArea);
     }
 
     /**
      * 반의 특정 날짜 이후의 스케줄을 가져오는 메소드
      */
-    public List<CleanSchedule> getScheduleBySchoolClassName(String schoolClassName) {
+    public List<CleanSchedule> getScheduleBySchoolClassName(String schoolClassName, LocalDate date) {
         SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
-        return schoolClass.getSchedules();
+        return cleanScheduleRepository.findAllByDateAfterAndSchoolClass(date, schoolClass);
     }
 
     /**
@@ -161,6 +159,14 @@ public class CleanScheduleGroupService {
     }
 
     /**
+     * 구역 이름과 학급 이름으로 청소 그룹을 가져오는 메소드 (청소 여부)
+     */
+    public List<CleanGroup> getGroupsByAreaNameAndClassNameAndIsCleaned(String areaName, String schoolClassName, boolean isCleaned) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        return cleanGroupRepository.findByIsCleanedAndCleanArea(isCleaned, cleanArea);
+    }
+
+    /**
      * 청소 그룹의 멤버 수를 세팅하는 메소드
      */
     public void setMemberCount(Long groupId, int memberCount) {
@@ -186,6 +192,7 @@ public class CleanScheduleGroupService {
      * 랜덤으로 그룹들을 생성하는 메소드
      */
     public void createGroupsByRandom(String areaName, String schoolClassName, List<CleanMember> members, double groupMemberCount) {
+        fillLastGroupByRandom(areaName, schoolClassName, members);
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
         SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
         if (members == null || members.isEmpty()) {
@@ -199,4 +206,38 @@ public class CleanScheduleGroupService {
             createGroupByRandom(cleanArea, schoolClass, members, (int) groupMemberCount);
         }
     }
+
+    /**
+     * 랜덤으로 마지막 그룹을 채우는 메소드
+     * WARNING: 추가할 멤버 수가 마지막 그룹의 멤버 수 보다 적을 경우 채우지 않음
+     */
+    public void fillLastGroupByRandom(String areaName, String schoolClassName, List<CleanMember> members) {
+        CleanGroup lastGroup = getLastGroup(areaName, schoolClassName);
+        if (lastGroup != null && members.size() >= lastGroup.getMemberCount() - lastGroup.getMembers().size()) {
+            int empty = lastGroup.getMemberCount() - lastGroup.getMembers().size();
+            for (int i = 0; i < empty; i++) {
+                int randomNum = (int) (Math.random() * members.size());
+                CleanMember remove = members.remove(randomNum);
+                try {
+                    lastGroup.appendMember(remove);
+                } catch (IllegalArgumentException e) {
+//                    중복 멤버가 발생할 경우 다시 추가
+                    members.add(remove);
+                    i--;
+                }
+            }
+        }
+    }
+
+    /**
+     * 마지막 그룹을 가져오는 메소드 (청소 하지 않은 그룹)
+     */
+    public CleanGroup getLastGroup(String areaName, String schoolClassName) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        return cleanGroupRepository.findTopByCleanAreaAndIsCleanedOrderByIdDesc(
+                cleanArea, false
+        ).orElse(null);
+    }
+
+
 }

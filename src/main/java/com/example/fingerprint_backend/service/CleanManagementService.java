@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -112,10 +113,10 @@ public class CleanManagementService {
     }
 
     /**
-     * 반 이름과 구역으로 특정 구역의 학생들을 가져오는 메소드
+     * 반 이름과 구역으로 특정 구역의 학생들을 가져오는 메소드 (복사본)
      */
     public List<CleanMember> getMembersBySchoolClassNameAndAreaName(String areaName, String schoolClassName) {
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
-        return cleanArea.getMembers();
+        return new ArrayList<>(cleanArea.getMembers());
     }
 }

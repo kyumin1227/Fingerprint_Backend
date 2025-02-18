@@ -72,8 +72,8 @@ public class CleanScheduleGroupServiceTest {
         assertThat(cleanSchedule.getDate()).as("날짜 확인").isEqualTo(date);
         assertThat(cleanSchedule.getCleanArea()).as("청소 구역 확인").isEqualTo(area1);
         assertThat(cleanSchedule.getSchoolClass()).as("반 확인").isEqualTo(schoolClass);
-        assertThat(cleanScheduleGroupService.getScheduleBySchoolClassName("2027_A").size()).as("스케줄 수").isEqualTo(1);
-        assertThat(cleanScheduleGroupService.getScheduleBySchoolClassNameAndAreaName("창조관 405호", "2027_A").size()).as("구역 스케줄 수").isEqualTo(1);
+        assertThat(cleanScheduleGroupService.getScheduleBySchoolClassName("2027_A", date.minusDays(1)).size()).as("스케줄 수").isEqualTo(1);
+        assertThat(cleanScheduleGroupService.getScheduleBySchoolClassNameAndAreaName("창조관 405호", "2027_A", date.minusDays(1)).size()).as("구역 스케줄 수").isEqualTo(1);
     }
 
     @DisplayName("청소 스케줄 가져오기")
@@ -131,9 +131,9 @@ public class CleanScheduleGroupServiceTest {
     void deleteAndCreateCleanScheduleSchedule() {
         cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
         cleanScheduleGroupService.deleteCleanSchedule(date, "창조관 405호", "2027_A");
-        assertThat(cleanScheduleGroupService.getScheduleBySchoolClassName("2027_A").size()).as("스케줄 수").isEqualTo(0);
+        assertThat(cleanScheduleGroupService.getScheduleBySchoolClassName("2027_A", date.minusDays(1)).size()).as("스케줄 수").isEqualTo(0);
         cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
-        assertThat(cleanScheduleGroupService.getScheduleBySchoolClassName("2027_A").size()).as("스케줄 수").isEqualTo(1);
+        assertThat(cleanScheduleGroupService.getScheduleBySchoolClassName("2027_A", date.minusDays(1)).size()).as("스케줄 수").isEqualTo(1);
     }
 
     @DisplayName("취소되지 않은 마지막 스케줄을 가져옴")

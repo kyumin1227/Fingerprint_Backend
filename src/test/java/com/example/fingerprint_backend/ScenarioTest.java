@@ -1,9 +1,11 @@
 package com.example.fingerprint_backend;
 
 import com.example.fingerprint_backend.entity.CleanArea;
+import com.example.fingerprint_backend.entity.CleanGroup;
 import com.example.fingerprint_backend.entity.CleanMember;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.CleanManagementService;
+import com.example.fingerprint_backend.service.CleanScheduleGroupService;
 import com.example.fingerprint_backend.types.CleanRole;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
@@ -24,6 +26,8 @@ public class ScenarioTest {
     private CleanManagementService cleanManagementService;
 
     private SchoolClass schoolClass;
+    @Autowired
+    private CleanScheduleGroupService cleanScheduleGroupService;
 
     @DisplayName("관리자의 초기 반 생성 및 학생 지정")
     @Test
@@ -97,7 +101,7 @@ public class ScenarioTest {
         assertThat(area2.getMembers().size()).as("구역 2의 멤버 수").isEqualTo(3);
     }
 
-    @DisplayName("청소 구역의 스케줄 생성 후 랜덤으로 그룹 할당")
+    @DisplayName("랜덤으로 그룹 할당")
     @Test
     void createSchedule() {
         cleanManagementService.createSchoolClass("2027_A");
@@ -115,6 +119,13 @@ public class ScenarioTest {
         List<CleanMember> members = cleanManagementService.getMembersBySchoolClassNameAndAreaName("창조관 405호", "2027_A");
         assertThat(members.size()).as("구역의 멤버 수").isEqualTo(8);
 
-//        TODO 스케줄 생성, 그룹 랜덤 할당
+        cleanScheduleGroupService.createGroupsByRandom("창조관 405호", "2027_A", members, 3);
+        CleanGroup lastGroup = cleanScheduleGroupService.getLastGroup("창조관 405호", "2027_A");
+        assertThat(lastGroup.getMembers().size()).as("마지막 그룹의 멤버 수").isEqualTo(2);
+
+        members = cleanManagementService.getMembersBySchoolClassNameAndAreaName("창조관 405호", "2027_A");
+        cleanScheduleGroupService.createGroupsByRandom("창조관 405호", "2027_A", members, 3);
+        CleanGroup lastGroup2 = cleanScheduleGroupService.getLastGroup("창조관 405호", "2027_A");
+        assertThat(lastGroup2.getMembers().size()).as("마지막 그룹의 멤버 수").isEqualTo(1);
     }
 }
