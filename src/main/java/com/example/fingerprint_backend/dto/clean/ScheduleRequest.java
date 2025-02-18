@@ -3,14 +3,12 @@ package com.example.fingerprint_backend.dto.clean;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Getter
 @Setter
-public class CleanAreaRequest {
+public class ScheduleRequest {
     private String areaName;
     private String className;
-    private List<String> daysOfWeek;
-    private Integer cycle;
-    private Boolean isDefault;
+    private LocalDate date;
 }

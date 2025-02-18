@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CleanMemberRequest {
+public class MemberRequest {
     private String studentNumber;
     private String firstName;
     private String givenName;
