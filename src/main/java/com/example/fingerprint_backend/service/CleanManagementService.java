@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -86,6 +87,19 @@ public class CleanManagementService {
         cleanHelperService.validateAreaNameAndClassNameIsUnique(areaName, schoolClassName);
         SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
         CleanArea save = cleanAreaRepository.save(new CleanArea(areaName, schoolClass, Set.of(), 0));
+        if (schoolClass.getDefaultArea() == null) {
+            schoolClass.setDefaultArea(save);
+        }
+        return save;
+    }
+
+    /**
+     * 청소 구역을 생성하는 메소드
+     */
+    public CleanArea createArea(String areaName, String schoolClassName, Set<DayOfWeek> days, Integer cycle) {
+        cleanHelperService.validateAreaNameAndClassNameIsUnique(areaName, schoolClassName);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        CleanArea save = cleanAreaRepository.save(new CleanArea(areaName, schoolClass, days, cycle));
         if (schoolClass.getDefaultArea() == null) {
             schoolClass.setDefaultArea(save);
         }

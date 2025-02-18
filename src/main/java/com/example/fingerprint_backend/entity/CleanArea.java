@@ -1,5 +1,7 @@
 package com.example.fingerprint_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,7 @@ public class CleanArea {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
+    @JsonBackReference
     private SchoolClass schoolClass;
     @Column(nullable = false)
     private String name;
@@ -26,11 +29,14 @@ public class CleanArea {
     private Set<DayOfWeek> days;
     private Integer cycle = 0;
     @OneToMany(mappedBy = "cleanArea")
+    @JsonManagedReference
     private List<CleanSchedule> schedules = new ArrayList<>();
     @OneToMany(mappedBy = "cleanArea")
+    @JsonManagedReference
     private List<CleanMember> members = new ArrayList<>();
     @OneToMany(mappedBy = "cleanArea")
     @OrderBy("id")
+    @JsonManagedReference
     private List<CleanGroup> groups = new ArrayList<>();
 
 
@@ -41,15 +47,14 @@ public class CleanArea {
         if (schoolClass == null) {
             throw new IllegalStateException("반은 null일 수 없습니다.");
         }
-        if (days == null) {
-            throw new IllegalStateException("요일은 null일 수 없습니다.");
-        }
         if (cycle < 0) {
             throw new IllegalStateException("주기는 0보다 작을 수 없습니다.");
         }
         this.name = name;
         this.schoolClass = schoolClass;
-        this.days = days;
+        if (days != null) {
+            this.days = days;
+        }
         this.cycle = cycle;
 
         schoolClass.appendArea(this);

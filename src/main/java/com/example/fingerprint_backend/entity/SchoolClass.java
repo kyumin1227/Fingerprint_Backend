@@ -31,6 +31,7 @@ public class SchoolClass {
     @JsonManagedReference
     private final List<CleanMember> classMembers = new ArrayList<>();
     @OneToMany(mappedBy = "schoolClass")
+    @JsonManagedReference
     private final List<CleanSchedule> schedules = new ArrayList<>();
     @OneToMany(mappedBy = "schoolClass")
     private final List<CleanArea> areas = new ArrayList<>();
