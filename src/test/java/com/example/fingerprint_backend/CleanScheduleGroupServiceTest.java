@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -239,5 +241,36 @@ public class CleanScheduleGroupServiceTest {
                 .as("그룹 최대 인원이 0인 경우")
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("그룹의 최대 인원은 1보다 작을 수 없습니다.");
+    }
+
+    @DisplayName("스케줄 생성")
+    @Test
+    void createSchedules1() {
+        cleanScheduleGroupService.createCleanSchedules(date, "창조관 405호", "2027_A", 1, Set.of(DayOfWeek.FRIDAY), 4);
+        List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleBySchoolClassNameAndAreaName("창조관 405호", "2027_A", date);
+        schedules.forEach(schedule -> {
+            System.out.println(schedule.getDate() + " " + schedule.getDate().getDayOfWeek());
+        });
+        assertThat(schedules.size()).as("스케줄 수").isEqualTo(4);
+    }
+
+    @DisplayName("스케줄 생성 후 취소 후 재생성")
+    @Test
+    void createSchedules2() {
+        cleanScheduleGroupService.createCleanSchedules(date, "창조관 405호", "2027_A", 2, Set.of(DayOfWeek.MONDAY, DayOfWeek.FRIDAY), 8);
+        List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleBySchoolClassNameAndAreaName("창조관 405호", "2027_A", date);
+        schedules.forEach(schedule -> {
+            System.out.println(schedule.getDate() + " " + schedule.getDate().getDayOfWeek());
+            schedule.setCanceled(true);
+        });
+        schedules.get(0).setCanceled(false);
+        schedules.get(1).setCanceled(false);
+        assertThat(schedules.size()).as("스케줄 수").isEqualTo(8);
+        cleanScheduleGroupService.createCleanSchedules(date, "창조관 405호", "2027_A", 2, Set.of(DayOfWeek.MONDAY, DayOfWeek.FRIDAY), 8);
+        schedules = cleanScheduleGroupService.getScheduleBySchoolClassNameAndAreaName("창조관 405호", "2027_A", date);
+        schedules.forEach(schedule -> {
+            System.out.println(schedule.getDate() + " " + schedule.getDate().getDayOfWeek());
+        });
+        assertThat(schedules.size()).as("스케줄 수").isEqualTo(10);
     }
 }

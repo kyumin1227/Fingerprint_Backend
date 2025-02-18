@@ -103,7 +103,7 @@ public class ScenarioTest {
 
     @DisplayName("랜덤으로 그룹 할당")
     @Test
-    void createSchedule() {
+    void createGroupByRandom() {
         cleanManagementService.createSchoolClass("2027_A");
         cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
         cleanManagementService.createArea("창조관 405호", "2027_A");

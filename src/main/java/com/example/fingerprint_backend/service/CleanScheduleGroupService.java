@@ -7,9 +7,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -239,5 +241,31 @@ public class CleanScheduleGroupService {
         ).orElse(null);
     }
 
+    /**
+     * 청소 스케줄을 생성하는 메소드
+     * date 이후 cycle 일 주기로 days 요일에 총 count 개의 스케줄을 생성
+     */
+    public void createCleanSchedules(LocalDate date, String areaName, String schoolClassName, int cycle, Set<DayOfWeek> days, int count) {
+        cleanHelperService.validateCreateSchedule(date, cycle, days, count);
+        int day = 1;
+        LocalDate targetDate = date.plusDays(day);
+        while (count > 0) {
+            targetDate = date.plusDays(day);
+            if (days.contains(targetDate.getDayOfWeek())) {
+                try {
+                    createCleanSchedule(targetDate, areaName, schoolClassName);
+                    count--;
+                } catch (IllegalArgumentException e) {
+                    // 이미 존재하는 스케줄인 경우
+                }
+            }
 
+            if (targetDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                day += (cycle - 1) * 7;
+            }
+            day++;
+        }
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        cleanArea.setLastScheduledDate(targetDate);
+    }
 }

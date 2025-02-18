@@ -5,7 +5,9 @@ import com.example.fingerprint_backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Service
 public class CleanHelperService {
@@ -198,6 +200,26 @@ public class CleanHelperService {
         boolean isExist = cleanGroupRepository.existsById(groupId);
         if (!isExist) {
             throw new IllegalArgumentException("존재하지 않는 청소 그룹입니다.");
+        }
+    }
+
+    /**
+     * 스케줄 생성 시 유효성 검사
+     * @throws IllegalArgumentException 과거의 날짜일 경우
+     * @throws IllegalArgumentException 주기가 0보다 작을 경우
+     * @throws IllegalArgumentException 요일이 선택되지 않았을 경우
+     * @throws IllegalArgumentException 생성 갯수가 0보다 작을 경우
+     */
+    public void validateCreateSchedule(LocalDate date, int cycle, Set<DayOfWeek> days, int count) {
+        validateDateIsNotPast(date);
+        if (cycle < 0) {
+            throw new IllegalArgumentException("주기는 0보다 작을 수 없습니다.");
+        }
+        if (days == null || days.isEmpty()) {
+            throw new IllegalArgumentException("요일은 하나 이상 선택해야 합니다.");
+        }
+        if (count < 0) {
+            throw new IllegalArgumentException("생성 갯수는 0보다 작을 수 없습니다.");
         }
     }
 }

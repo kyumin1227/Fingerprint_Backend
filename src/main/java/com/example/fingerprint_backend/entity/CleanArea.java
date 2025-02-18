@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.*;
 
 @Entity
@@ -28,6 +30,7 @@ public class CleanArea {
     @Enumerated(EnumType.STRING)
     private Set<DayOfWeek> days;
     private Integer cycle = 0;
+    private LocalDate lastScheduledDate = LocalDate.now();
     @OneToMany(mappedBy = "cleanArea")
     @JsonManagedReference
     private List<CleanSchedule> schedules = new ArrayList<>();
@@ -92,6 +95,13 @@ public class CleanArea {
             throw new IllegalStateException("요일은 null일 수 없습니다.");
         }
         this.days = days;
+    }
+
+    public void setLastScheduledDate(LocalDate lastScheduledDate) {
+        if (lastScheduledDate.isBefore(LocalDate.now())) {
+            throw new IllegalStateException("마지막 스케줄링 날짜는 과거 일수 없습니다.");
+        }
+        this.lastScheduledDate = lastScheduledDate;
     }
 
     @Override
