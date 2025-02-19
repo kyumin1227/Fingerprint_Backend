@@ -3,9 +3,11 @@ package com.example.fingerprint_backend.controller;
 import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.dto.clean.*;
 import com.example.fingerprint_backend.entity.CleanArea;
+import com.example.fingerprint_backend.entity.CleanGroup;
 import com.example.fingerprint_backend.entity.CleanMember;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.CleanManagementService;
+import com.example.fingerprint_backend.service.CleanOperationService;
 import com.example.fingerprint_backend.service.CleanScheduleGroupService;
 import com.example.fingerprint_backend.types.CleanRole;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class CleanManagerController {
 
     private final CleanManagementService cleanManagementService;
     private final CleanScheduleGroupService cleanScheduleGroupService;
+    private final CleanOperationService cleanOperationService;
 
     @PostMapping("/class")
     public ResponseEntity<ApiResponse> createClass(@RequestBody SchoolClassRequest request) {
@@ -111,5 +114,15 @@ public class CleanManagerController {
                 (double) request.getGroupSize()
         );
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "그룹 생성 성공", null));
+    }
+
+    @PostMapping("/complete")
+    public ResponseEntity<ApiResponse> completeCleaningSchedule(@RequestBody ScheduleRequest request) {
+        CleanGroup completedGroup = cleanOperationService.completeCleaningSchedule(
+                request.getDate(),
+                request.getAreaName(),
+                request.getClassName()
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 완료 처리 성공", completedGroup));
     }
 }

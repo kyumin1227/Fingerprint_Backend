@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class CleanGroup {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
+    @JsonBackReference
     private SchoolClass schoolClass;
     @Column(nullable = false)
     private int memberCount;  // 그룹의 최대 인원
@@ -27,6 +29,7 @@ public class CleanGroup {
     private List<CleanMember> members;
     private boolean isCleaned = false;  // 청소 완료 여부
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     private CleanArea cleanArea;  // 청소 구역
 
 
