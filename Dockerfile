@@ -10,7 +10,7 @@ ARG ROLE_PROFESSOR="1"
 ARG ROLE_ASSISTANT="2"
 ARG ROLE_KEY="3"
 ARG ROLE_STUDENT="4"
-ARG GOOGLE_CLIENT_ID="441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com"
+ARG GOOGLE_CLIENT_ID="441788767782-ht7tasput71q7ahsefa339shqqh6jkbd.apps.googleusercontent.com"
 ARG KAKAO_CLIENT_ID="c347a8b5a07e5dc6aa76a22c3ecf236b"
 
 # 환경변수 할당
