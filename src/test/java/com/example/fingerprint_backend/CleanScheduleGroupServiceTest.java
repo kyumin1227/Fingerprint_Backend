@@ -4,6 +4,7 @@ import com.example.fingerprint_backend.dto.clean.InfoResponse;
 import com.example.fingerprint_backend.entity.*;
 import com.example.fingerprint_backend.service.CleanHelperService;
 import com.example.fingerprint_backend.service.CleanManagementService;
+import com.example.fingerprint_backend.service.CleanOperationService;
 import com.example.fingerprint_backend.service.CleanScheduleGroupService;
 import com.example.fingerprint_backend.types.CleanRole;
 import jakarta.transaction.Transactional;
@@ -29,6 +30,8 @@ public class CleanScheduleGroupServiceTest {
     private CleanScheduleGroupService cleanScheduleGroupService;
     @Autowired
     private CleanManagementService cleanManagementService;
+    @Autowired
+    private CleanOperationService cleanOperationService;
 
     private static SchoolClass schoolClass;
     private static CleanMember member0;
@@ -287,7 +290,7 @@ public class CleanScheduleGroupServiceTest {
         List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassName("창조관 405호", "2027_A");
         List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName("창조관 405호", "2027_A", date);
 
-        List<InfoResponse> infoResponses = cleanScheduleGroupService.parsingInfos(groups, schedules);
+        List<InfoResponse> infoResponses = cleanOperationService.parsingInfos(groups, schedules);
 
     }
 }

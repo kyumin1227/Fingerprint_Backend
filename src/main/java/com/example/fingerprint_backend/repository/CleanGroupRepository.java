@@ -12,4 +12,5 @@ public interface CleanGroupRepository extends JpaRepository<CleanGroup, Long> {
     boolean existsById(@NotNull Long id);
     List<CleanGroup> findByIsCleanedAndCleanArea(boolean isCleaned, CleanArea cleanArea);
     Optional<CleanGroup> findTopByCleanAreaAndIsCleanedOrderByIdDesc(CleanArea cleanArea, boolean isCleaned);
+    Optional<CleanGroup> findTopByCleanAreaAndIsCleanedOrderByIdAsc(CleanArea cleanArea, boolean isCleaned);
 }

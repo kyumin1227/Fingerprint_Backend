@@ -184,6 +184,16 @@ public class CleanHelperService {
     }
 
     /**
+     * 날짜가 미래인지 확인하는 메소드
+     * @throws IllegalArgumentException 미래의 날짜일 경우
+     */
+    public void validateDateIsNotFuture(LocalDate date) {
+        if (date.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("미래의 날짜는 입력할 수 없습니다.");
+        }
+    }
+
+    /**
      * 청소 그룹을 가져오는 메소드
      * @throws IllegalArgumentException 존재하지 않는 청소 그룹일 경우
      */
@@ -220,6 +230,20 @@ public class CleanHelperService {
         }
         if (count < 0) {
             throw new IllegalArgumentException("생성 갯수는 0보다 작을 수 없습니다.");
+        }
+    }
+
+    /**
+     * 스케줄 완료 시 유효성 검사
+     * @throws IllegalArgumentException 취소된 청소 스케줄일 경우
+     * @throws IllegalArgumentException 이미 완료된 청소 스케줄일 경우
+     */
+    public void validateScheduleComplete(CleanSchedule cleanSchedule) {
+        if (cleanSchedule.isCanceled()) {
+            throw new IllegalArgumentException("취소된 청소 스케줄입니다.");
+        }
+        if (cleanSchedule.isCompleted()) {
+            throw new IllegalArgumentException("이미 완료된 청소 스케줄입니다.");
         }
     }
 }

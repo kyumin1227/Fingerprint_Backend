@@ -1,6 +1,5 @@
 package com.example.fingerprint_backend.service;
 
-import com.example.fingerprint_backend.dto.clean.InfoResponse;
 import com.example.fingerprint_backend.entity.*;
 import com.example.fingerprint_backend.repository.CleanGroupRepository;
 import com.example.fingerprint_backend.repository.CleanScheduleRepository;
@@ -195,18 +194,19 @@ public class CleanScheduleGroupService {
      * 랜덤으로 그룹들을 생성하는 메소드
      */
     public void createGroupsByRandom(String areaName, String schoolClassName, List<CleanMember> members, double groupMemberCount) {
-        fillLastGroupByRandom(areaName, schoolClassName, members);
+        ArrayList<CleanMember> membersCopy = new ArrayList<>(members);
+        fillLastGroupByRandom(areaName, schoolClassName, membersCopy);
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
         SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
-        if (members == null || members.isEmpty()) {
+        if (membersCopy.isEmpty()) {
             throw new IllegalArgumentException("리스트가 비어있습니다.");
         } else if (groupMemberCount < 1) {
             throw new IllegalArgumentException("그룹의 최대 인원은 1보다 작을 수 없습니다.");
         }
-        int groupCount = (int) Math.ceil(members.size() / groupMemberCount);
+        int groupCount = (int) Math.ceil(membersCopy.size() / groupMemberCount);
 
         for (int i = 0; i < groupCount; i++) {
-            createGroupByRandom(cleanArea, schoolClass, members, (int) groupMemberCount);
+            createGroupByRandom(cleanArea, schoolClass, membersCopy, (int) groupMemberCount);
         }
     }
 
@@ -243,6 +243,16 @@ public class CleanScheduleGroupService {
     }
 
     /**
+     * 첫 그룹을 가져오는 메소드 (청소 하지 않은 그룹)
+     */
+    public CleanGroup getFirstGroup(String areaName, String schoolClassName) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        return cleanGroupRepository.findTopByCleanAreaAndIsCleanedOrderByIdAsc(
+                cleanArea, false
+        ).orElse(null);
+    }
+
+    /**
      * 청소 스케줄을 생성하는 메소드
      * date 이후 cycle 일 주기로 days 요일에 총 count 개의 스케줄을 생성
      */
@@ -268,28 +278,5 @@ public class CleanScheduleGroupService {
         }
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
         cleanArea.setLastScheduledDate(targetDate);
-    }
-
-    public List<InfoResponse> parsingInfos(List<CleanGroup> groups, List<CleanSchedule> schedules) {
-        List<InfoResponse> infoResponses = new ArrayList<>();
-        ArrayList<CleanGroup> groupsCopy = new ArrayList<>(groups);
-        ArrayList<CleanSchedule> schedulesCopy = new ArrayList<>(schedules);
-        for (CleanSchedule schedule : schedulesCopy) {
-            if (schedule.isCanceled()) {
-                infoResponses.add(new InfoResponse(schedule.getDate()));
-            } else if (!groupsCopy.isEmpty()) {
-                CleanGroup group = groupsCopy.remove(0);
-                infoResponses.add(new InfoResponse(
-                        schedule.getDate(),
-                        group.getId(),
-                        group.getMembers(),
-                        group.getMemberCount(),
-                        schedule.getCleanArea().getName(),
-                        schedule.getSchoolClass().getName(),
-                        false
-                ));
-            }
-        }
-        return infoResponses;
     }
 }

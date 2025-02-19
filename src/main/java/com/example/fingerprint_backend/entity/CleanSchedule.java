@@ -27,6 +27,7 @@ public class CleanSchedule {
     @Column(nullable = false)
     private LocalDate date;
     private boolean isCanceled = false; // 청소 취소 여부
+    private boolean isCompleted = false; // 청소 완료 여부
 
     public CleanSchedule(LocalDate date, CleanArea cleanArea, SchoolClass schoolClass) {
         this.date = date;
@@ -36,5 +37,9 @@ public class CleanSchedule {
 
     public void setCanceled(boolean canceled) {
         this.isCanceled = canceled;
+    }
+
+    public void completed() {
+        this.isCompleted = true;
     }
 }

@@ -45,12 +45,12 @@ public class EntityTest {
     @Test
     void checkMember() {
         assertThat(member1.getStudentNumber()).as("학번 확인").isEqualTo("2423001");
-        assertThat(member1.getFirstName()).as("이름 확인").isEqualTo("권혁일");
+        assertThat(member1.getFirstName()).as("이름 확인").isEqualTo("혁일");
         assertThat(member1.getSchoolClass()).as("반 확인").isEqualTo(schoolClass);
         assertThat(member1.getCleanRole()).as("역할 확인").isEqualTo(CleanRole.MEMBER);
 
         assertThat(member6.getStudentNumber()).as("학번 확인").isEqualTo("2423007");
-        assertThat(member6.getFirstName()).as("이름 확인").isEqualTo("김민정");
+        assertThat(member6.getFirstName()).as("이름 확인").isEqualTo("민정");
         assertThat(member6.getSchoolClass()).as("반 확인").isEqualTo(schoolClass);
         assertThat(member6.getCleanRole()).as("역할 확인").isEqualTo(CleanRole.MANAGER);
     }
