@@ -1,11 +1,12 @@
 package com.example.fingerprint_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import java.util.*;
 @Entity
 @NoArgsConstructor
 @Getter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CleanArea {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,14 +34,15 @@ public class CleanArea {
     private Integer cycle = 0;
     private LocalDate lastScheduledDate = LocalDate.now();
     @OneToMany(mappedBy = "cleanArea")
-    @JsonManagedReference
+    @JsonIgnore
     private List<CleanSchedule> schedules = new ArrayList<>();
     @OneToMany(mappedBy = "cleanArea")
     @JsonManagedReference
+    @JsonIgnore
     private List<CleanMember> members = new ArrayList<>();
     @OneToMany(mappedBy = "cleanArea")
     @OrderBy("id")
-    @JsonManagedReference
+    @JsonIgnore
     private List<CleanGroup> groups = new ArrayList<>();
 
 
