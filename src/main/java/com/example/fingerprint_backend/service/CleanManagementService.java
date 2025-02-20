@@ -133,11 +133,4 @@ public class CleanManagementService {
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
         return new ArrayList<>(cleanArea.getMembers());
     }
-
-    public CleanRole parseRoleOrDefault(String role) {
-        if (role == null) {
-            return CleanRole.MEMBER;
-        }
-        return CleanRole.valueOf(role);
-    }
 }

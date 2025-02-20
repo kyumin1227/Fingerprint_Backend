@@ -2,10 +2,7 @@ package com.example.fingerprint_backend.controller;
 
 import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.dto.clean.*;
-import com.example.fingerprint_backend.entity.CleanArea;
-import com.example.fingerprint_backend.entity.CleanGroup;
-import com.example.fingerprint_backend.entity.CleanMember;
-import com.example.fingerprint_backend.entity.SchoolClass;
+import com.example.fingerprint_backend.entity.*;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.service.CleanOperationService;
 import com.example.fingerprint_backend.service.CleanScheduleGroupService;
@@ -41,13 +38,12 @@ public class CleanManagerController {
 
     @PostMapping("/members")
     public ResponseEntity<ApiResponse> createMember(@RequestBody MemberRequest request) {
-        CleanRole cleanRole = cleanManagementService.parseRoleOrDefault(request.getRole());
         CleanMember member = cleanManagementService.createMember(
                 request.getStudentNumber(),
                 request.getFirstName(),
                 request.getGivenName(),
                 request.getClassName(),
-                cleanRole
+                request.getRole()
         );
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 추가 성공", member));
     }
