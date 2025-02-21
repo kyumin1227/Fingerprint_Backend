@@ -6,7 +6,6 @@ import com.example.fingerprint_backend.entity.*;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.service.CleanOperationService;
 import com.example.fingerprint_backend.service.CleanScheduleGroupService;
-import com.example.fingerprint_backend.types.CleanRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,11 +49,10 @@ public class CleanManagerController {
 
     @PostMapping("/areas")
     public ResponseEntity<ApiResponse> createArea(@RequestBody AreaRequest request) {
-        Set<DayOfWeek> days = request.getDaysOfWeek().stream().map(DayOfWeek::valueOf).collect(Collectors.toSet());
         CleanArea area = cleanManagementService.createArea(
                 request.getAreaName(),
                 request.getClassName(),
-                days,
+                request.getDaysOfWeek(),
                 request.getCycle()
         );
         if (request.getIsDefault() != null && request.getIsDefault()) {

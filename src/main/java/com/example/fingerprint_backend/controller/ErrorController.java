@@ -12,4 +12,9 @@ public class ErrorController {
     public ResponseEntity<ApiResponse> illegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage(), null));
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse> illegalStateException(IllegalStateException e) {
+        return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage(), null));
+    }
 }

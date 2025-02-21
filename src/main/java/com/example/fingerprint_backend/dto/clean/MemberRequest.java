@@ -12,7 +12,7 @@ public class MemberRequest {
     private String givenName;
     private String className;
     private String areaName;
-    private CleanRole role;
+    private CleanRole role = CleanRole.MEMBER;
 
     public void setRole(String role) {
         try {
