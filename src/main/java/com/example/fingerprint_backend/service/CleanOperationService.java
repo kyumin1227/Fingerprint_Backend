@@ -30,6 +30,8 @@ public class CleanOperationService {
      * @return 파싱된 청소 정보 리스트
      */
     public List<InfoResponse> parsingInfos(List<CleanGroup> groups, List<CleanSchedule> schedules) {
+        cleanHelperService.validateCleanScheduleNotEmpty(schedules);
+        cleanHelperService.validateCleanGroupNotEmpty(groups);
         List<InfoResponse> infoResponses = new ArrayList<>();
         ArrayList<CleanGroup> groupsCopy = new ArrayList<>(groups);
         ArrayList<CleanSchedule> schedulesCopy = new ArrayList<>(schedules);

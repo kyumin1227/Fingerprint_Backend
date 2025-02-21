@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -244,6 +245,26 @@ public class CleanHelperService {
         }
         if (cleanSchedule.isCompleted()) {
             throw new IllegalArgumentException("이미 완료된 청소 스케줄입니다.");
+        }
+    }
+
+    /**
+     * 조회할 청소 그룹이 없을 경우
+     * @throws IllegalStateException 조회할 청소 그룹이 없을 경우
+     */
+    public void validateCleanGroupNotEmpty(List<CleanGroup> groups) {
+        if (groups == null || groups.isEmpty()) {
+            throw new IllegalStateException("조회할 청소 그룹이 없습니다.");
+        }
+    }
+
+    /**
+     * 조회할 청소 스케줄이 없을 경우
+     * @throws IllegalStateException 조회할 청소 스케줄이 없을 경우
+     */
+    public void validateCleanScheduleNotEmpty(List<CleanSchedule> schedules) {
+        if (schedules == null || schedules.isEmpty()) {
+            throw new IllegalStateException("조회할 청소 스케줄이 없습니다.");
         }
     }
 }

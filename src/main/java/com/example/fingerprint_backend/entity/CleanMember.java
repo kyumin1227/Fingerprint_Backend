@@ -3,6 +3,7 @@ package com.example.fingerprint_backend.entity;
 import com.example.fingerprint_backend.types.CleanRole;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @Getter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CleanMember {
     @Id
     private String studentNumber;
