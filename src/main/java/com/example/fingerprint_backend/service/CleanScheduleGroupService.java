@@ -34,6 +34,22 @@ public class CleanScheduleGroupService {
     public CleanSchedule createCleanSchedule(LocalDate date, String cleanAreaName, String schoolClassName) {
         cleanHelperService.validateDateIsNotPast(date);
         cleanHelperService.validateCleanScheduleByDateAndClassNameAndAreaNameIsUnique(date, cleanAreaName, schoolClassName);
+        cleanHelperService.validateCleanScheduleIsCanceled(date, cleanAreaName, schoolClassName);
+        CleanArea area = cleanHelperService.getCleanAreaByNameAndClassName(cleanAreaName, schoolClassName);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        CleanSchedule cleanSchedule = new CleanSchedule(date, area, schoolClass);
+        CleanSchedule save = cleanScheduleRepository.save(cleanSchedule);
+        area.appendSchedule(save);
+        schoolClass.appendSchedule(save);
+        return save;
+    }
+
+    /**
+     * 청소 스케줄을 생성하는 메소드 (취소된 스케줄은 복구, 지난 날짜 생성 불가)
+     */
+    public CleanSchedule createAndRestoreCleanSchedule(LocalDate date, String cleanAreaName, String schoolClassName) {
+        cleanHelperService.validateDateIsNotPast(date);
+        cleanHelperService.validateCleanScheduleByDateAndClassNameAndAreaNameIsUnique(date, cleanAreaName, schoolClassName);
         try {
             cleanHelperService.validateCleanScheduleIsCanceled(date, cleanAreaName, schoolClassName);
         } catch (IllegalStateException e) {
@@ -42,7 +58,6 @@ public class CleanScheduleGroupService {
             cleanSchedule.setCanceled(false);
             return cleanSchedule;
         }
-        cleanHelperService.validateCleanScheduleByDateAndClassNameAndAreaNameIsUnique(date, cleanAreaName, schoolClassName);
         CleanArea area = cleanHelperService.getCleanAreaByNameAndClassName(cleanAreaName, schoolClassName);
         SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
         CleanSchedule cleanSchedule = new CleanSchedule(date, area, schoolClass);
@@ -253,8 +268,8 @@ public class CleanScheduleGroupService {
     }
 
     /**
-     * 청소 스케줄을 생성하는 메소드
-     * date 이후 cycle 일 주기로 days 요일에 총 count 개의 스케줄을 생성
+     * 청소 스케줄을 생성하는 메소드 (존재하거나 취소된 스케줄은 생성하지 않음)
+     * date 이후 cycle 일 주기로 days 요일에 count 개의 스케줄을 생성
      */
     public void createCleanSchedules(LocalDate date, String areaName, String schoolClassName, int cycle, Set<DayOfWeek> days, int count) {
         cleanHelperService.validateCreateSchedule(date, cycle, days, count);
@@ -266,8 +281,8 @@ public class CleanScheduleGroupService {
                 try {
                     createCleanSchedule(targetDate, areaName, schoolClassName);
                     count--;
-                } catch (IllegalArgumentException e) {
-                    // 이미 존재하는 스케줄인 경우
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    // 이미 존재하거나 취소된 스케줄인 경우 다음 날짜로 넘어감
                 }
             }
 

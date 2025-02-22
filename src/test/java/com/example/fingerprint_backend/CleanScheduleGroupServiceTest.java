@@ -72,8 +72,8 @@ public class CleanScheduleGroupServiceTest {
 
     @DisplayName("청소 스케줄 생성")
     @Test
-    void createCleanScheduleSchedule() {
-        CleanSchedule cleanSchedule = cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
+    void createAndRestoreCleanScheduleSchedule() {
+        CleanSchedule cleanSchedule = cleanScheduleGroupService.createAndRestoreCleanSchedule(date, "창조관 405호", "2027_A");
 
         assertThat(cleanSchedule.getDate()).as("날짜 확인").isEqualTo(date);
         assertThat(cleanSchedule.getCleanArea()).as("청소 구역 확인").isEqualTo(area1);
@@ -85,7 +85,7 @@ public class CleanScheduleGroupServiceTest {
     @DisplayName("청소 스케줄 가져오기")
     @Test
     void getSchedule() {
-        cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date, "창조관 405호", "2027_A");
         CleanSchedule cleanSchedule = cleanScheduleGroupService.getCleanSchedule(date, "창조관 405호", "2027_A");
         assertThat(cleanSchedule.getDate()).as("날짜 확인").isEqualTo(date);
         assertThat(cleanSchedule.getCleanArea()).as("청소 구역 확인").isEqualTo(area1);
@@ -103,7 +103,7 @@ public class CleanScheduleGroupServiceTest {
     @DisplayName("청소 스케줄 취소")
     @Test
     void cancelSchedule() {
-        cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date, "창조관 405호", "2027_A");
         cleanScheduleGroupService.cancelCleanSchedule(date, "창조관 405호", "2027_A");
         assertThatCode(() -> cleanHelperService.validateCleanScheduleIsCanceled(date, "창조관 405호", "2027_A"))
                 .isInstanceOf(IllegalStateException.class)
@@ -113,7 +113,7 @@ public class CleanScheduleGroupServiceTest {
     @DisplayName("취소된 청소 스케줄 복구")
     @Test
     void restoreSchedule() {
-        cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date, "창조관 405호", "2027_A");
         cleanScheduleGroupService.cancelCleanSchedule(date, "창조관 405호", "2027_A");
         cleanScheduleGroupService.restoreCleanSchedule(date, "창조관 405호", "2027_A");
         assertThatCode(() -> cleanHelperService.validateCleanScheduleIsCanceled(date, "창조관 405호", "2027_A"))
@@ -122,10 +122,10 @@ public class CleanScheduleGroupServiceTest {
 
     @DisplayName("청소 스케줄 취소 후 생성으로 복구")
     @Test
-    void cancelAndCreateCleanScheduleSchedule() {
-        cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
+    void cancelAndCreateAndRestoreCleanScheduleSchedule() {
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date, "창조관 405호", "2027_A");
         cleanScheduleGroupService.cancelCleanSchedule(date, "창조관 405호", "2027_A");
-        assertThatCode(() -> cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A"))
+        assertThatCode(() -> cleanScheduleGroupService.createAndRestoreCleanSchedule(date, "창조관 405호", "2027_A"))
                 .as("취소된 스케줄 생성 시도")
                 .doesNotThrowAnyException();
         CleanSchedule cleanSchedule = cleanScheduleGroupService.getCleanSchedule(date, "창조관 405호", "2027_A");
@@ -134,11 +134,11 @@ public class CleanScheduleGroupServiceTest {
 
     @DisplayName("청소 스케줄 삭제 후 재생성")
     @Test
-    void deleteAndCreateCleanScheduleSchedule() {
-        cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
+    void deleteAndCreateAndRestoreCleanScheduleSchedule() {
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date, "창조관 405호", "2027_A");
         cleanScheduleGroupService.deleteCleanSchedule(date, "창조관 405호", "2027_A");
         assertThat(cleanScheduleGroupService.getScheduleBySchoolClassName("2027_A", date.minusDays(1)).size()).as("스케줄 수").isEqualTo(0);
-        cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date, "창조관 405호", "2027_A");
         assertThat(cleanScheduleGroupService.getScheduleBySchoolClassName("2027_A", date.minusDays(1)).size()).as("스케줄 수").isEqualTo(1);
     }
 
@@ -146,11 +146,11 @@ public class CleanScheduleGroupServiceTest {
     @Test
     void getLastSchedule() {
         // given
-        cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", "2027_A");
-        cleanScheduleGroupService.createCleanSchedule(date.plusDays(1), "창조관 405호", "2027_A");
-        CleanSchedule target = cleanScheduleGroupService.createCleanSchedule(date.plusWeeks(1), "창조관 405호", "2027_A");
-        cleanScheduleGroupService.createCleanSchedule(date.plusWeeks(1).plusDays(1), "창조관 405호", "2027_A");
-        cleanScheduleGroupService.createCleanSchedule(date.plusWeeks(2), "창조관 405호", "2027_A");
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date, "창조관 405호", "2027_A");
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date.plusDays(1), "창조관 405호", "2027_A");
+        CleanSchedule target = cleanScheduleGroupService.createAndRestoreCleanSchedule(date.plusWeeks(1), "창조관 405호", "2027_A");
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date.plusWeeks(1).plusDays(1), "창조관 405호", "2027_A");
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(date.plusWeeks(2), "창조관 405호", "2027_A");
         cleanScheduleGroupService.cancelCleanSchedule(date.plusWeeks(2), "창조관 405호", "2027_A");
         cleanScheduleGroupService.cancelCleanSchedule(date.plusWeeks(1).plusDays(1), "창조관 405호", "2027_A");
 
@@ -163,7 +163,7 @@ public class CleanScheduleGroupServiceTest {
 
     @DisplayName("청소 그룹을 생성한다.")
     @Test
-    void createCleanSchedule() {
+    void createAndRestoreCleanSchedule() {
         CleanGroup group = cleanScheduleGroupService.createGroup("창조관 405호", "2027_A", 4);
 
         assertThat(group.getCleanArea()).as("청소 구역 확인").isEqualTo(area1);

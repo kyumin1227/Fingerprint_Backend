@@ -66,7 +66,7 @@ public class CleanManagerController {
      */
     @PostMapping("/schedules")
     public ResponseEntity<ApiResponse> createSchedule(@RequestBody ScheduleRequest request) {
-        cleanScheduleGroupService.createCleanSchedule(
+        cleanScheduleGroupService.createAndRestoreCleanSchedule(
                 request.getDate(),
                 request.getAreaName(),
                 request.getClassName()
