@@ -10,8 +10,10 @@ ARG ROLE_PROFESSOR="1"
 ARG ROLE_ASSISTANT="2"
 ARG ROLE_KEY="3"
 ARG ROLE_STUDENT="4"
-ARG GOOGLE_CLIENT_ID="441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com"
+ARG GOOGLE_CLIENT_ID="441788767782-ht7tasput71q7ahsefa339shqqh6jkbd.apps.googleusercontent.com"
 ARG KAKAO_CLIENT_ID="c347a8b5a07e5dc6aa76a22c3ecf236b"
+ARG JWT_SECRET="fingerprint"
+ARG JWT_EXPIRATION=36000
 
 # 환경변수 할당
 ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
@@ -24,6 +26,8 @@ ENV ROLE_PROFESSOR=${ROLE_PROFESSOR}
 ENV ROLE_ASSISTANT=${ROLE_ASSISTANT}
 ENV ROLE_KEY=${ROLE_KEY}
 ENV ROLE_STUDENT=${ROLE_STUDENT}
+ENV JWT_SECRET=${JWT_SECRET}
+ENV JWT_EXPIRATION=${JWT_EXPIRATION}
 
 #COPY wait-for-it.sh /wait-for-it.sh
 #RUN chmod +x /wait-for-it.sh
@@ -53,7 +57,9 @@ RUN echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" >> /app/.env && \
     echo "ROLE_PROFESSOR=${ROLE_PROFESSOR}" >> /app/.env && \
     echo "ROLE_ASSISTANT=${ROLE_ASSISTANT}" >> /app/.env && \
     echo "ROLE_KEY=${ROLE_KEY}" >> /app/.env && \
-    echo "ROLE_STUDENT=${ROLE_STUDENT}" >> /app/.env
+    echo "ROLE_STUDENT=${ROLE_STUDENT}" >> /app/.env && \
+    echo "JWT_SECRET=${JWT_SECRET}" >> /app/.env && \
+    echo "JWT_EXPIRATION=${JWT_EXPIRATION}" >> /app/.env
 
 # 포트 지정
 # Expose the port that your Spring Boot application runs on

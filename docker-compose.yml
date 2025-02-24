@@ -21,7 +21,7 @@ services:
       retries: 5
 
   app:
-    image: kyumin1227/fingerprint_backend_spring
+    image: kyumin1227/fingerprint_backend_spring:latest
     container_name: fingerprint_backend
     environment:
       GOOGLE_CLIENT_ID: 441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com
@@ -37,6 +37,8 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
+      JWT_SECRET: secret
+      JWT_EXPIRATION: 36000
     ports:
       - "8080:8080"
     depends_on:

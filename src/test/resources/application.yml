@@ -1,20 +1,15 @@
 spring.application.name: fingerprint_backend
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: "jdbc:mysql://localhost:3306/fingerprint_db_test?serverTimezone=Asia/Seoul"
+    username: "test"
+    password: "test"
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
-
-management:
-  metrics:
-    enable:
-      processor: false
