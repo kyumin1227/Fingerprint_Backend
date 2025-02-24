@@ -3,6 +3,8 @@ package com.example.fingerprint_backend.controller;
 import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.dto.clean.*;
 import com.example.fingerprint_backend.entity.*;
+import com.example.fingerprint_backend.scheduled.CleanScheduled;
+import com.example.fingerprint_backend.service.CleanHelperService;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.service.CleanOperationService;
 import com.example.fingerprint_backend.service.CleanScheduleGroupService;
@@ -27,6 +29,8 @@ public class CleanManagerController {
     private final CleanManagementService cleanManagementService;
     private final CleanScheduleGroupService cleanScheduleGroupService;
     private final CleanOperationService cleanOperationService;
+    private final CleanHelperService cleanHelperService;
+    private final CleanScheduled cleanScheduled;
 
     @PostMapping("/class")
     public ResponseEntity<ApiResponse> createClass(@RequestBody SchoolClassRequest request) {
@@ -58,6 +62,16 @@ public class CleanManagerController {
         if (request.getIsDefault() != null && request.getIsDefault()) {
             cleanManagementService.setDefaultArea(request.getAreaName(), request.getClassName());
         }
+        if (request.getStartDate() != null) {
+            area.setLastScheduledDate(request.getStartDate());
+        }
+        if (request.getDisplay() != null) {
+            area.setDisplay(request.getDisplay());
+        }
+        if (request.getGroupSize() != null) {
+            area.setGroupSize(request.getGroupSize());
+        }
+        cleanScheduled.createScheduleIfNeeded();
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 구역 생성 성공", area));
     }
 

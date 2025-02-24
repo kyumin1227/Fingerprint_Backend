@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Set;
 
@@ -267,4 +268,32 @@ public class CleanHelperService {
             throw new IllegalStateException("조회할 청소 스케줄이 없습니다.");
         }
     }
+
+    /**
+     * 스케줄이 구역의 규칙에 맞게 생성되었는지 확인하는 메소드
+     * @return 스케줄이 구역의 규칙에 맞게 생성된 경우 true, 아닌 경우 false
+     */
+    public boolean validateIsScheduleByAreaRules(LocalDate date, String areaName, String schoolClassName) {
+        CleanArea cleanArea = getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        if (!cleanArea.getDays().contains(date.getDayOfWeek())) {
+            return false;
+        }
+        LocalDate dateForWeekday = getDateForWeekday(date, date.getDayOfWeek());
+        while (date.isBefore(dateForWeekday)) {
+            date = date.plusWeeks(cleanArea.getCycle());
+            if (date.equals(dateForWeekday)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private LocalDate getDateForWeekday(LocalDate date, DayOfWeek targetDay) {
+        // 기준 날짜가 속한 주의 월요일을 구합니다.
+        LocalDate monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        // 월요일로부터 targetDay까지의 일수 차이를 구한 후 더합니다.
+        int daysToAdd = targetDay.getValue() - DayOfWeek.MONDAY.getValue();
+        return monday.plusDays(daysToAdd);
+    }
+
 }

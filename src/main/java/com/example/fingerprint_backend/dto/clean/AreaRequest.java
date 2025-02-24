@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,9 @@ public class AreaRequest {
     private Set<DayOfWeek> daysOfWeek = new HashSet<>();
     private Integer cycle;
     private Boolean isDefault;
+    private LocalDate startDate;
+    private Integer display;
+    private Integer groupSize;
 
     public void setDaysOfWeek(List<String> daysOfWeek) {
         Set<DayOfWeek> days = new HashSet<>();

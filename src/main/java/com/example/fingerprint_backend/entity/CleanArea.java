@@ -33,6 +33,8 @@ public class CleanArea {
     private Set<DayOfWeek> days;
     private Integer cycle = 0;
     private LocalDate lastScheduledDate = LocalDate.now();
+    private Integer display = 5;    // 한 번에 보여줄 스케줄 수
+    private Integer groupSize = 4;  // 그룹의 최대 인원
     @OneToMany(mappedBy = "cleanArea")
     @JsonIgnore
     private List<CleanSchedule> schedules = new ArrayList<>();
@@ -102,9 +104,26 @@ public class CleanArea {
 
     public void setLastScheduledDate(LocalDate lastScheduledDate) {
         if (lastScheduledDate.isBefore(LocalDate.now())) {
-            throw new IllegalStateException("마지막 스케줄링 날짜는 과거 일수 없습니다.");
+            throw new IllegalStateException("스케줄 생성 날짜는 과거 일수 없습니다.");
         }
         this.lastScheduledDate = lastScheduledDate;
+    }
+
+    public void setDisplay(Integer display) {
+        if (display < 0) {
+            throw new IllegalStateException("한 번에 보여줄 스케줄 수는 0보다 작을 수 없습니다.");
+        }
+        this.display = display;
+    }
+
+    public void setGroupSize(Integer groupSize) {
+        if (groupSize <= 0) {
+            throw new IllegalStateException("그룹의 최대 인원은 0보다 커야 합니다.");
+        }
+        if (groupSize > 9) {
+            throw new IllegalStateException("그룹의 최대 인원은 9명을 초과할 수 없습니다.");
+        }
+        this.groupSize = groupSize;
     }
 
     @Override
