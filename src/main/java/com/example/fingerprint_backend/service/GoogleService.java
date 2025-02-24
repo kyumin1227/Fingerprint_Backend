@@ -118,7 +118,7 @@ public class GoogleService {
     public boolean googleTokenCheck(String credential) throws GeneralSecurityException, IOException {
 
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
-                // Client ID를 여기에 설정하세요. 여러 클라이언트 ID를 사용할 경우, 리스트로 추가.
+                // Client ID 설정, 여러 클라이언트 ID를 사용할 경우, 리스트로 추가.
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
 

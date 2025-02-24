@@ -6,6 +6,7 @@ import com.example.fingerprint_backend.dto.GoogleLoginUserInfoDto;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.service.GoogleService;
+import com.example.fingerprint_backend.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.security.GeneralSecurityException;
 public class GoogleController {
 
     final private GoogleService googleService;
+    final private JwtService jwtService;
 
     @PostMapping("/api/login")
     public ResponseEntity<ApiResponse> login(@RequestBody GoogleLoginDto googleLoginDto) throws GeneralSecurityException, IOException {
@@ -48,6 +50,10 @@ public class GoogleController {
         }
 
         GoogleLoginUserInfoDto successUserInfo = googleService.getStdNumAndKakao(userInfoDto);
+
+//        토큰 생성
+        String token = jwtService.generateToken(successUserInfo.getStudentNumber(), successUserInfo.getEmail());
+        successUserInfo.setAccessToken(token);
 
 //        로그인 성공
         return ResponseEntity.status(HttpStatus.OK)

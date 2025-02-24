@@ -39,6 +39,8 @@ public class FingerprintBackendApplication {
 		System.setProperty("ROLE_ASSISTANT", dotenv.get("ROLE_ASSISTANT"));
 		System.setProperty("ROLE_KEY", dotenv.get("ROLE_KEY"));
 		System.setProperty("ROLE_STUDENT", dotenv.get("ROLE_STUDENT"));
+		System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));
+		System.setProperty("JWT_EXPIRATION", dotenv.get("JWT_EXPIRATION"));
 
 		SpringApplication.run(FingerprintBackendApplication.class, args);
 	}

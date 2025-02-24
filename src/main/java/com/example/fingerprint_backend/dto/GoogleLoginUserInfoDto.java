@@ -13,4 +13,5 @@ public class GoogleLoginUserInfoDto {
     private String studentNumber;
     private String kakao;
     private MemberRole role;
+    private String accessToken;
 }
