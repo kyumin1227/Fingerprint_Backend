@@ -15,8 +15,6 @@ public class RoleService {
 
     private final MemberRepository memberRepository;
 
-    @Value("${ROLE_ADMIN}")
-    private String adminKey;
     @Value("${ROLE_PROFESSOR}")
     private String professorKey;
     @Value("${ROLE_ASSISTANT}")
@@ -33,9 +31,7 @@ public class RoleService {
      */
     public MemberRole checkRoleCode(String roleCode) {
 
-        if (adminKey.equals(roleCode)) {
-            return MemberRole.Admin;
-        } else if (professorKey.equals(roleCode)) {
+        if (professorKey.equals(roleCode)) {
             return MemberRole.Professor;
         } else if (assistantKey.equals(roleCode)) {
             return MemberRole.Assistant;
@@ -68,6 +64,19 @@ public class RoleService {
         MemberEntity changeRoleMember = memberRepository.save(byStudentNumber.get());
 
         return changeRoleMember;
+    }
+
+    /**
+     * 해당 학번의 Role을 반환하는 함수
+     * @param stdNum
+     * @return MemberRole
+     */
+    public MemberRole getRole(String stdNum) {
+        Optional<MemberEntity> byStudentNumber = memberRepository.findByStudentNumber(stdNum);
+        if (byStudentNumber.isEmpty()) {
+            return null;
+        }
+        return byStudentNumber.get().getRole();
     }
 
 }

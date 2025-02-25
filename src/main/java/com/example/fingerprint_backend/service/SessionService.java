@@ -84,7 +84,7 @@ public class SessionService {
 
         targetDate.get().getMembers().add(stdNum);
 //        열쇠 담당이 신청할 경우 isAble을 true로 변경
-        if (role.equals(MemberRole.Admin) || role.equals(MemberRole.Key)) {
+        if (role.equals(MemberRole.Key)) {
             targetDate.get().setIsAble(true);
         }
 
@@ -108,13 +108,13 @@ public class SessionService {
 
         targetDate.get().getMembers().remove(stdNum);
 //        열쇠 담당이 취소할 경우 다른 열쇠 담당이 있는지 확인
-        if (role.equals(MemberRole.Admin) || role.equals(MemberRole.Key)) {
+        if (role.equals(MemberRole.Key)) {
             Set<String> members = targetDate.get().getMembers();
             boolean keyExist = false;
             for (String memberNum : members) {
                 Optional<MemberEntity> byStudentNumber = memberRepository.findByStudentNumber(memberNum);
                 MemberRole memberRole = byStudentNumber.get().getRole();
-                if (memberRole.equals(MemberRole.Key) || memberRole.equals(MemberRole.Admin)) {
+                if (memberRole.equals(MemberRole.Key)) {
                     keyExist = true;
                     break;
                 }

@@ -1,12 +1,12 @@
 package com.example.fingerprint_backend.controller;
 
 import com.example.fingerprint_backend.ApiResponse;
-import com.example.fingerprint_backend.dto.GoogleLoginDto;
 import com.example.fingerprint_backend.dto.GoogleLoginUserInfoDto;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.service.GoogleService;
-import com.example.fingerprint_backend.service.JwtService;
+import com.example.fingerprint_backend.jwt.JWTUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +19,24 @@ import java.security.GeneralSecurityException;
 
 @RestController
 @RequiredArgsConstructor
-public class GoogleController {
+public class AuthController {
 
     final private GoogleService googleService;
-    final private JwtService jwtService;
+    final private JWTUtil JWTUtil;
 
     @PostMapping("/api/login")
-    public ResponseEntity<ApiResponse> login(@RequestBody GoogleLoginDto googleLoginDto) throws GeneralSecurityException, IOException {
-        String credential = googleLoginDto.getCredential();
+    public ResponseEntity<ApiResponse> login(HttpServletRequest request) throws GeneralSecurityException, IOException {
+        String header = request.getHeader("Authorization");
+        if (header == null || !header.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse(false, "로그인 실패: Authorization 헤더가 누락되었거나 올바르지 않습니다.", null));
+        }
+        String credential = header.substring(7);
         System.out.println("credential = " + credential);
 
 //        최초 로그인 시 토큰 진위여부 검증
         if (!googleService.googleTokenCheck(credential)) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse(false, "로그인 실패: 올바르지 않은 토큰입니다.", null));
         }
 
@@ -39,7 +44,7 @@ public class GoogleController {
 
 //        영진 전문대 이메일 여부 확인
         if (!userInfoDto.getEmail().endsWith("@g.yju.ac.kr")) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse(false, "거부: 영진 전문대 학생이 아닙니다. \n @g.yju.ac.kr 이메일을 이용해주세요", null));
         }
 
@@ -52,7 +57,7 @@ public class GoogleController {
         GoogleLoginUserInfoDto successUserInfo = googleService.getStdNumAndKakao(userInfoDto);
 
 //        토큰 생성
-        String token = jwtService.generateToken(successUserInfo.getStudentNumber(), successUserInfo.getEmail());
+        String token = JWTUtil.generateToken(successUserInfo.getStudentNumber(), successUserInfo.getEmail());
         successUserInfo.setAccessToken(token);
 
 //        로그인 성공

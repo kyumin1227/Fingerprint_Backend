@@ -1,17 +1,24 @@
-package com.example.fingerprint_backend.service;
+package com.example.fingerprint_backend.jwt;
 
-import com.example.fingerprint_backend.types.MemberRole;
+import com.example.fingerprint_backend.repository.MemberRepository;
+import com.example.fingerprint_backend.service.RoleService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 
-@Service
-public class JwtService {
+@Component
+public class JWTUtil {
+
+    private final RoleService roleService;
+
+    public JWTUtil(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
     @Value("${JWT_SECRET}")
     private String jwtSecret;
@@ -30,6 +37,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(studentNumber)  // 토큰의 주체(subject)에 학번을 설정
                 .claim("email", email)      // 추가 클레임: 이메일
+                .claim("role", roleService.getRole(studentNumber))   // 추가 클레임: 역할
                 .setIssuedAt(now)           // 발행 시간
                 .setExpiration(expiryDate)  // 만료 시간
                 .signWith(key, SignatureAlgorithm.HS256) // HS256 알고리즘으로 서명
