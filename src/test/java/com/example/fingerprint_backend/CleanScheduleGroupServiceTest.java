@@ -6,7 +6,6 @@ import com.example.fingerprint_backend.service.CleanHelperService;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.service.CleanOperationService;
 import com.example.fingerprint_backend.service.CleanScheduleGroupService;
-import com.example.fingerprint_backend.types.CleanRole;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,7 @@ public class CleanScheduleGroupServiceTest {
     @BeforeEach
     void setUp() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        member0 = cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
+        member0 = cleanManagementService.createMember("2423007", "민정", "김", "2027_A");
         area1 = cleanManagementService.createArea("창조관 405호", "2027_A");
         area2 = cleanManagementService.createArea("창조관 304호", "2027_A");
         cleanManagementService.setMemberCleanArea("2423007", "창조관 405호");
@@ -224,7 +223,7 @@ public class CleanScheduleGroupServiceTest {
         groups.forEach(group -> {
             System.out.println(group.getId());
             group.getMembers().forEach(member -> {
-                System.out.println(member.getFirstName());
+                System.out.println(member.getGivenName());
             });
         });
 
@@ -275,7 +274,7 @@ public class CleanScheduleGroupServiceTest {
         schedules.forEach(schedule -> {
             System.out.println(schedule.getDate() + " " + schedule.getDate().getDayOfWeek());
         });
-        assertThat(schedules.size()).as("스케줄 수").isEqualTo(10);
+        assertThat(schedules.size()).as("스케줄 수").isEqualTo(16);
     }
 
     @DisplayName("그룹과 스케줄을 생성하고 반환값 파싱")
@@ -292,5 +291,6 @@ public class CleanScheduleGroupServiceTest {
 
         List<InfoResponse> infoResponses = cleanOperationService.parsingInfos(groups, schedules);
 
+        assertThat(infoResponses.size()).as("정보 수").isEqualTo(4);
     }
 }

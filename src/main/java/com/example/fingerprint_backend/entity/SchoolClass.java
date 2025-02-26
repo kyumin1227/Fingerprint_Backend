@@ -1,6 +1,5 @@
 package com.example.fingerprint_backend.entity;
 
-import com.example.fingerprint_backend.types.CleanRole;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -22,14 +21,14 @@ public class SchoolClass {
     @Column(unique = true, nullable = false)
     private String name;
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manager_id")
-    private CleanMember manager = null;
-    @OneToOne(fetch = FetchType.LAZY)
     @Setter
     private CleanArea defaultArea;
     @OneToMany(mappedBy = "schoolClass")
     @JsonManagedReference
-    private final List<CleanMember> classMembers = new ArrayList<>();
+    private final List<MemberEntity> members = new ArrayList<>();
+    @OneToMany(mappedBy = "schoolClass")
+    @JsonManagedReference
+    private final List<CleanMember> classCleanMembers = new ArrayList<>();
     @OneToMany(mappedBy = "schoolClass")
     @JsonManagedReference
     private final List<CleanSchedule> schedules = new ArrayList<>();
@@ -44,22 +43,12 @@ public class SchoolClass {
         this.name = name;
     }
 
-    public void setManager(CleanMember manager) {
-        if (manager == null) {
-            throw new IllegalStateException("관리자는 null일 수 없습니다.");
-        }
-        if (this.manager != null) {
-            this.manager.setCleanRole(CleanRole.MEMBER);
-        }
-        this.manager = manager;
+    public void appendCleanMember(CleanMember cleanMember) {
+        classCleanMembers.add(cleanMember);
     }
 
-    public void appendMember(CleanMember cleanMember) {
-        classMembers.add(cleanMember);
-    }
-
-    public void removeMember(CleanMember cleanMember) {
-        classMembers.remove(cleanMember);
+    public void removeCleanMember(CleanMember cleanMember) {
+        classCleanMembers.remove(cleanMember);
     }
 
     public void appendSchedule(CleanSchedule cleanSchedule) {

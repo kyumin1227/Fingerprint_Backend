@@ -1,13 +1,11 @@
 package com.example.fingerprint_backend.service;
 
-import com.example.fingerprint_backend.entity.CleanSchedule;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.entity.CleanArea;
 import com.example.fingerprint_backend.entity.CleanMember;
 import com.example.fingerprint_backend.repository.SchoolClassRepository;
 import com.example.fingerprint_backend.repository.CleanAreaRepository;
 import com.example.fingerprint_backend.repository.CleanMemberRepository;
-import com.example.fingerprint_backend.types.CleanRole;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,31 +41,15 @@ public class CleanManagementService {
     }
 
     /**
-     * 학생을 생성하는 메소드 (기본값으로 MEMBER 설정)
+     * 청소 학생을 생성하는 메소드
      */
-    public CleanMember createMember(String studentNumber, String firstName, String givenName, String schoolClassName) {
+    public CleanMember createMember(String studentNumber, String givenName, String familyName, String schoolClassName) {
         cleanHelperService.validateStudentNumberIsUnique(studentNumber);
         SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
-        CleanMember member = new CleanMember(studentNumber, firstName, givenName, schoolClass);
+        CleanMember member = new CleanMember(studentNumber, givenName, familyName, schoolClass);
         member.setCleanArea(schoolClass.getDefaultArea());
         CleanMember save = cleanMemberRepository.save(member);
-        schoolClass.appendMember(save);
-        return save;
-    }
-
-    /**
-     * 학생을 생성하는 메소드
-     */
-    public CleanMember createMember(String studentNumber, String firstName, String givenName, String schoolClassName, CleanRole cleanRole) {
-        cleanHelperService.validateStudentNumberIsUnique(studentNumber);
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
-        CleanMember member = new CleanMember(studentNumber, firstName, givenName, schoolClass, cleanRole);
-        member.setCleanArea(schoolClass.getDefaultArea());
-        CleanMember save = cleanMemberRepository.save(member);
-        schoolClass.appendMember(save);
-        if (cleanRole == CleanRole.MANAGER) {
-            schoolClass.setManager(save);
-        }
+        schoolClass.appendCleanMember(save);
         return save;
     }
 
@@ -76,7 +58,7 @@ public class CleanManagementService {
      */
     public List<CleanMember> getMembersBySchoolClassName(String schoolClassName) {
         SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
-        return schoolClass.getClassMembers();
+        return schoolClass.getClassCleanMembers();
     }
 
 

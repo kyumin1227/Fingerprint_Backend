@@ -71,7 +71,6 @@ public class AuthController {
         String email = googleRegisterDto.getEmail();
         String name = googleRegisterDto.getName();
         String studentNum = googleRegisterDto.getStudentNum();
-        String kakao = googleRegisterDto.getKakao();
 
 //        최초 회원가입 시 토큰 진위여부 검증
         if (!googleService.googleTokenCheck(credential)) {
@@ -94,11 +93,6 @@ public class AuthController {
 //        이미 가입된 학번인 경우
         if (googleService.isUserByStdNum(studentNum)) {
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "회원가입 실패: 이미 가입된 학번입니다.", null));
-        }
-
-//        이미 가입된 카카오톡 계정인 경우
-        if (googleService.isUserByKakao(kakao)) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "회원가입 실패: 이미 가입된 카카오톡 계정입니다.", null));
         }
 
         MemberEntity registered = googleService.register(googleRegisterDto);

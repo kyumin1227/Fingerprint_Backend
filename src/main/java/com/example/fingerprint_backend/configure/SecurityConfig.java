@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.configure;
 
-import com.example.fingerprint_backend.filter.CustomUserDetailService;
+import com.example.fingerprint_backend.jwt.CustomUserDetailService;
 import com.example.fingerprint_backend.jwt.JwtAuthenticationFilter;
 import com.example.fingerprint_backend.jwt.JWTUtil;
 import org.springframework.context.annotation.Bean;

@@ -43,10 +43,9 @@ public class CleanManagerController {
     public ResponseEntity<ApiResponse> createMember(@RequestBody MemberRequest request) {
         CleanMember member = cleanManagementService.createMember(
                 request.getStudentNumber(),
-                request.getFirstName(),
                 request.getGivenName(),
-                request.getClassName(),
-                request.getRole()
+                request.getFamilyName(),
+                request.getClassName()
         );
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 추가 성공", member));
     }

@@ -1,9 +1,8 @@
-package com.example.fingerprint_backend.filter;
+package com.example.fingerprint_backend.jwt;
 
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

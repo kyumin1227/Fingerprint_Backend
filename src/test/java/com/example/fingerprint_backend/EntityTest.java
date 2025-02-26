@@ -1,7 +1,6 @@
 package com.example.fingerprint_backend;
 
 import com.example.fingerprint_backend.entity.*;
-import com.example.fingerprint_backend.types.CleanRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ public class EntityTest {
         member3 = new CleanMember("2423003", "근형", "김", schoolClass);
         member4 = new CleanMember("2423005", "민규", "김", schoolClass);
         member5 = new CleanMember("2423006", "민석", "김", schoolClass);
-        member6 = new CleanMember("2423007", "민정", "김", schoolClass, CleanRole.MANAGER);
+        member6 = new CleanMember("2423007", "민정", "김", schoolClass);
         member7 = new CleanMember("2423008", "성관", "김", schoolClass);
         member8 = new CleanMember("2423009", "성식", "김", schoolClass);
         cleanArea1 = new CleanArea("창조관 405호", schoolClass, new HashSet<>(), 0);
@@ -45,14 +44,12 @@ public class EntityTest {
     @Test
     void checkMember() {
         assertThat(member1.getStudentNumber()).as("학번 확인").isEqualTo("2423001");
-        assertThat(member1.getFirstName()).as("이름 확인").isEqualTo("혁일");
+        assertThat(member1.getGivenName()).as("이름 확인").isEqualTo("혁일");
         assertThat(member1.getSchoolClass()).as("반 확인").isEqualTo(schoolClass);
-        assertThat(member1.getCleanRole()).as("역할 확인").isEqualTo(CleanRole.MEMBER);
 
         assertThat(member6.getStudentNumber()).as("학번 확인").isEqualTo("2423007");
-        assertThat(member6.getFirstName()).as("이름 확인").isEqualTo("민정");
+        assertThat(member6.getGivenName()).as("이름 확인").isEqualTo("민정");
         assertThat(member6.getSchoolClass()).as("반 확인").isEqualTo(schoolClass);
-        assertThat(member6.getCleanRole()).as("역할 확인").isEqualTo(CleanRole.MANAGER);
     }
 
     @DisplayName("청소 구역 생성 테스트")

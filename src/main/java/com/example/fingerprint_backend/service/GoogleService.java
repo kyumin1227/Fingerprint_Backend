@@ -30,6 +30,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 @RequiredArgsConstructor
 public class GoogleService {
 
+//    TODO: AuthService 로 변경하여 JWT 및 로그인 시 에러 처리 합칠 예정
+
     final private MemberRepository memberRepository;
 
     @Value("${GOOGLE_CLIENT_ID}")
@@ -82,20 +84,9 @@ public class GoogleService {
         }
     }
 
-//    가입이 되어있는 유저인지 확인 (회원 = true, 비회원 = false)
-    public Boolean isUserByKakao(String kakao) {
-        Optional<MemberEntity> user = memberRepository.findByKakao(kakao);
-
-        if (user.isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
 //    회원가입
     public MemberEntity register(GoogleRegisterDto info) {
-        MemberEntity member = new MemberEntity(info.getStudentNum(), info.getName(), info.getEmail(), info.getKakao(), MemberLanguage.KOREA, MemberRole.Student, false, LocalDateTime.now());
+        MemberEntity member = new MemberEntity(info.getStudentNum(), info.getEmail(), info.getName(), info.getGivenName(), info.getFamilyName(), MemberLanguage.KOREA);
         MemberEntity save = memberRepository.save(member);
 
         return save;
@@ -137,8 +128,6 @@ public class GoogleService {
 
         Optional<MemberEntity> byEmail = memberRepository.findByEmail(loginUserInfo.getEmail());
         loginUserInfo.setStudentNumber(byEmail.get().getStudentNumber());
-        loginUserInfo.setKakao(byEmail.get().getKakao());
-        loginUserInfo.setRole(byEmail.get().getRole());
 
         return loginUserInfo;
     }

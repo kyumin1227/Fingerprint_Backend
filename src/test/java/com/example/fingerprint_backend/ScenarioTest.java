@@ -8,7 +8,6 @@ import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.service.CleanOperationService;
 import com.example.fingerprint_backend.service.CleanScheduleGroupService;
-import com.example.fingerprint_backend.types.CleanRole;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,20 +35,11 @@ public class ScenarioTest {
     @Autowired
     private CleanOperationService cleanOperationService;
 
-    @DisplayName("관리자의 초기 반 생성 및 학생 지정")
-    @Test
-    void createClassAndSetManager() {
-        schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        CleanMember member = cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
-
-        assertThat(schoolClass.getManager()).isEqualTo(member);
-    }
-
     @DisplayName("학생 추가")
     @Test
     void appendMember() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423007", "민정", "김", "2027_A");
         cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
         cleanManagementService.createMember("2423002", "규민", "김", "2027_A");
         cleanManagementService.createMember("2423003", "근형", "김", "2027_A");
@@ -58,14 +48,14 @@ public class ScenarioTest {
         cleanManagementService.createMember("2423008", "성관", "김", "2027_A");
         cleanManagementService.createMember("2423009", "성식", "김", "2027_A");
 
-        assertThat(schoolClass.getClassMembers().size()).isEqualTo(8);
+        assertThat(schoolClass.getClassCleanMembers().size()).isEqualTo(8);
     }
 
     @DisplayName("기본 청소 구역 변경")
     @Test
     void appendArea() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423007", "민정", "김", "2027_A");
         CleanArea area1 = cleanManagementService.createArea("창조관 405호", "2027_A");
         cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
         cleanManagementService.createMember("2423002", "규민", "김", "2027_A");
@@ -87,7 +77,7 @@ public class ScenarioTest {
     @Test
     void changeArea() {
         schoolClass = cleanManagementService.createSchoolClass("2027_A");
-        cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423007", "민정", "김", "2027_A");
         CleanArea area1 = cleanManagementService.createArea("창조관 405호", "2027_A");
         cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
         CleanArea area2 = cleanManagementService.createArea("창조관 406호", "2027_A");
@@ -112,7 +102,7 @@ public class ScenarioTest {
     @Test
     void createGroupByRandom() {
         cleanManagementService.createSchoolClass("2027_A");
-        cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423007", "민정", "김", "2027_A");
         cleanManagementService.createArea("창조관 405호", "2027_A");
         cleanManagementService.setMemberCleanArea("2423007", "창조관 405호");
         cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
@@ -139,7 +129,7 @@ public class ScenarioTest {
     @Test
     void createGroupAndScheduleAndGetInfo() {
         cleanManagementService.createSchoolClass("2027_A");
-        cleanManagementService.createMember("2423007", "민정", "김", "2027_A", CleanRole.MANAGER);
+        cleanManagementService.createMember("2423007", "민정", "김", "2027_A");
         cleanManagementService.createArea("창조관 405호", "2027_A");
         cleanManagementService.setMemberCleanArea("2423007", "창조관 405호");
         cleanManagementService.createMember("2423001", "혁일", "권", "2027_A");
@@ -165,7 +155,7 @@ public class ScenarioTest {
         infoResponses.forEach(infoResponse -> {
             System.out.println(infoResponse.getGroupId());
             infoResponse.getMembers().forEach(member -> {
-                System.out.println(member.getFirstName());
+                System.out.println(member.getGivenName());
             });
         });
         assertThat(infoResponses.size()).as("스케줄 수").isEqualTo(6);

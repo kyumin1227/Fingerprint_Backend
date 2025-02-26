@@ -26,9 +26,6 @@ public class FingerPrintService {
     private final FingerPrintRepository fingerPrintRepository;
     private final LogRepository logRepository;
     private final MemberRepository memberRepository;
-    private final KakaoService kakaoService;
-    private final KeyService keyService;
-    private final DateRepository dateRepository;
 
     /**
      * 학번의 가입 여부 확인
@@ -123,56 +120,6 @@ public class FingerPrintService {
         LogEntity saved = logRepository.save(logEntity);
 
         return saved;
-    }
-
-    /**
-     * 지문을 인식하였을 때 사용자에게 카카오톡을 송신하는 메소드
-     * @param studentNumber
-     * @param action
-     * @return
-     */
-    public Boolean sendMessage(String studentNumber, LogAction action) {
-
-        String uuid = kakaoService.getUuid(studentNumber);
-
-        if (uuid.isEmpty()) {
-            return false;
-        }
-
-        String adminAccessToken = kakaoService.getAdminAccessToken();
-
-        LocalDateTime dateTime = LocalDateTime.now();
-        LocalDate localDate = LocalDate.now();
-
-        KeyEntity keyInfo = keyService.getKeyInfo(localDate.toString());
-
-//        열쇠 담당이 등교 한 경우 신청한 사람들에게 알림 발송
-        if (keyInfo.getKeyStudent().equals(studentNumber) && action.equals(LogAction.등교)) {
-            Optional<DateEntity> byId = dateRepository.findById(localDate);
-
-            Set<String> members = byId.get().getMembers();
-
-            for (String member : members) {
-                String member_uuid = kakaoService.getUuid(member);
-
-                if (member_uuid.isEmpty()) {
-                    continue;
-                }
-
-                kakaoService.sendKakaoMessage(adminAccessToken, "교실 문 열었습니다.", member_uuid);
-            }
-        };
-
-        if (action.equals(LogAction.등교)) {
-            kakaoService.sendKakaoMessage(adminAccessToken, dateTime + "\n출석 처리 되었습니다.", uuid);
-            return true;
-        } else if (action.equals(LogAction.하교)) {
-            kakaoService.sendKakaoMessage(adminAccessToken, dateTime + "\n하교 처리 되었습니다.", uuid);
-            return true;
-        }
-
-        return false;
-
     }
 
 }

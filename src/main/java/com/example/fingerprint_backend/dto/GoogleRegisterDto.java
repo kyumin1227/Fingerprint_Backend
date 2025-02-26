@@ -9,7 +9,8 @@ public class GoogleRegisterDto {
     private String credential;
     private String email;
     private String name;
-    private String kakao;
+    private String givenName;
+    private String familyName;
     private String studentNum;
 
 }
