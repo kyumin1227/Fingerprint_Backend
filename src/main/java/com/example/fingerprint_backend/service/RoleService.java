@@ -3,80 +3,37 @@ package com.example.fingerprint_backend.service;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.types.MemberRole;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RoleService {
 
-    private final MemberRepository memberRepository;
-
-    @Value("${ROLE_PROFESSOR}")
-    private String professorKey;
-    @Value("${ROLE_ASSISTANT}")
-    private String assistantKey;
-    @Value("${ROLE_KEY}")
-    private String keyKey;
-    @Value("${ROLE_STUDENT}")
-    private String studentKey;
+    private final GetService getService;
 
     /**
-     * RoleCode를 검증하여 해당 코드에 맞는 Role을 반환
-     * @param roleCode
-     * @return MemberRole (해당 코드에 맞는 Role)
+     * 권한을 넘겨주는 함수
      */
-    public MemberRole checkRoleCode(String roleCode) {
+    @Transactional
+    public void changeRole(String requesterStudentNumber, String targetStudentNumber, MemberRole memberRole) {
 
-        if (professorKey.equals(roleCode)) {
-            return MemberRole.Professor;
-        } else if (assistantKey.equals(roleCode)) {
-            return MemberRole.Assistant;
-        } else if (keyKey.equals(roleCode)) {
-            return MemberRole.Key;
-        } else if (studentKey.equals(roleCode)) {
-            return MemberRole.Student;
-        } else {
-            return MemberRole.None;
-        }
+        MemberEntity requester = getService.getMemberByStudentNumber(requesterStudentNumber);
+        MemberEntity target = getService.getMemberByStudentNumber(targetStudentNumber);
 
-    }
-
-    /**
-     * 해당 멤버의 role을 변경하는 함수
-     * @param stdNum
-     * @param memberRole
-     * @return MemberEntity
-     */
-    public MemberEntity changeRole(String stdNum, MemberRole memberRole) {
-
-        Optional<MemberEntity> byStudentNumber = memberRepository.findByStudentNumber(stdNum);
-
-        if (byStudentNumber.isEmpty()) {
-            return null;
-        }
-
-        byStudentNumber.get().setRole(memberRole);
-
-        MemberEntity changeRoleMember = memberRepository.save(byStudentNumber.get());
-
-        return changeRoleMember;
+        requester.removeRole(memberRole);
+        target.addRole(memberRole);
     }
 
     /**
      * 해당 학번의 Role을 반환하는 함수
-     * @param stdNum
-     * @return MemberRole
      */
-    public MemberRole getRole(String stdNum) {
-        Optional<MemberEntity> byStudentNumber = memberRepository.findByStudentNumber(stdNum);
-        if (byStudentNumber.isEmpty()) {
-            return null;
-        }
-        return byStudentNumber.get().getRole();
+    public List<MemberRole> getRole(String stdNum) {
+        return getService.getMemberByStudentNumber(stdNum).getRole();
     }
-
 }

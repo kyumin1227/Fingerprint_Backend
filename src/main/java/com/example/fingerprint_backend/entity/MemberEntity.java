@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,15 +19,39 @@ import java.util.List;
 public class MemberEntity {
     @Id
     private String studentNumber;
-
-    private String name;
     @Column(unique = true)
     private String email;
-    private String kakao;
+    private String name;
+    private String givenName;
+    private String familyName;
     @Enumerated(EnumType.STRING)
     private MemberLanguage language;
     @Enumerated(EnumType.STRING)
-    private MemberRole role;
-    private Boolean signKakao;
+    private List<MemberRole> role = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    private SchoolClass schoolClass;
     private LocalDateTime registerTime; // 가입 일자
+
+    public MemberEntity(String studentNumber, String email, String name, String givenName, String familyName, MemberLanguage language) {
+        this.studentNumber = studentNumber;
+        this.email = email;
+        this.name = name;
+        this.givenName = givenName;
+        this.familyName = familyName;
+        this.language = language;
+        this.registerTime = LocalDateTime.now();
+    }
+
+
+    public void addRole(MemberRole role) {
+        this.role.add(role);
+    }
+
+    public void removeRole(MemberRole role) {
+        if (!this.role.contains(role)) {
+            throw new IllegalStateException("해당 권한이 존재하지 않습니다.");
+        }
+        this.role.remove(role);
+    }
+
 }
