@@ -27,8 +27,10 @@ public class MemberEntity {
     @Enumerated(EnumType.STRING)
     private MemberLanguage language;
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "member_roles", joinColumns = @JoinColumn(name = "member_student_number"))
+    @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private List<MemberRole> role = new ArrayList<>();
+    private List<MemberRole> roles = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     private SchoolClass schoolClass;
     private String profileImage;
@@ -46,14 +48,14 @@ public class MemberEntity {
     }
 
     public void addRole(MemberRole role) {
-        this.role.add(role);
+        this.roles.add(role);
     }
 
     public void removeRole(MemberRole role) {
-        if (!this.role.contains(role)) {
+        if (!this.roles.contains(role)) {
             throw new IllegalStateException("해당 권한이 존재하지 않습니다.");
         }
-        this.role.remove(role);
+        this.roles.remove(role);
     }
 
 }

@@ -17,12 +17,16 @@ public class CustomUserDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collection = new ArrayList<>();
 
-        collection.add(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return "ROLE_" + memberEntity.getRole().toString();
-            }
+        memberEntity.getRoles().forEach(role -> {
+            collection.add(
+                    new GrantedAuthority() {
+                @Override
+                public String getAuthority() {
+                    return "ROLE_" + role.toString();
+                }
+            });
         });
+
         return collection;
     }
 

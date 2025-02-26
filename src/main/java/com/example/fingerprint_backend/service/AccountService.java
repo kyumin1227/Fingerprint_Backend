@@ -51,6 +51,6 @@ public class AccountService {
      * 해당 학번의 Role을 반환하는 함수
      */
     public List<MemberRole> getRole(String stdNum) {
-        return getService.getMemberByStudentNumber(stdNum).getRole();
+        return getService.getMemberByStudentNumber(stdNum).getRoles();
     }
 }

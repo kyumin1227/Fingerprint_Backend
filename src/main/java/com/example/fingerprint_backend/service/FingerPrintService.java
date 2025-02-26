@@ -3,21 +3,15 @@ package com.example.fingerprint_backend.service;
 import com.example.fingerprint_backend.dto.CreateFingerPrintDto;
 import com.example.fingerprint_backend.dto.CreateLogDto;
 import com.example.fingerprint_backend.entity.*;
-import com.example.fingerprint_backend.repository.DateRepository;
 import com.example.fingerprint_backend.repository.FingerPrintRepository;
 import com.example.fingerprint_backend.repository.LogRepository;
 import com.example.fingerprint_backend.repository.MemberRepository;
-import com.example.fingerprint_backend.types.LogAction;
-import com.google.api.client.util.DateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

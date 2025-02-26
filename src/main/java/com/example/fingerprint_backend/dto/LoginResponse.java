@@ -34,7 +34,7 @@ public class LoginResponse {
         this.givenName = memberEntity.getGivenName();
         this.familyName = memberEntity.getFamilyName();
         this.language = memberEntity.getLanguage();
-        this.role = memberEntity.getRole();
+        this.role = memberEntity.getRoles();
         this.className = memberEntity.getSchoolClass().getName();
         this.profileImage = memberEntity.getProfileImage();
         this.registerTime = LocalDateTime.now();
