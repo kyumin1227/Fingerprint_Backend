@@ -50,7 +50,19 @@ public class AccountService {
     /**
      * 해당 학번의 Role을 반환하는 함수
      */
-    public List<MemberRole> getRole(String stdNum) {
-        return getService.getMemberByStudentNumber(stdNum).getRoles();
+    public List<MemberRole> getRole(String studentNumber) {
+        return getService.getMemberByStudentNumber(studentNumber).getRoles();
+    }
+
+    /**
+     * 해당 학번의 반 ID를 반환하는 함수
+     */
+    public Long getClassId(String studentNumber) {
+        MemberEntity member = getService.getMemberByStudentNumber(studentNumber);
+        SchoolClass schoolClass = member.getSchoolClass();
+        if (schoolClass == null) {
+            return null;
+        }
+        return schoolClass.getId();
     }
 }
