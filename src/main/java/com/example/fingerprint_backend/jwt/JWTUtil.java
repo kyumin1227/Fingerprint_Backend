@@ -1,7 +1,6 @@
 package com.example.fingerprint_backend.jwt;
 
-import com.example.fingerprint_backend.repository.MemberRepository;
-import com.example.fingerprint_backend.service.RoleService;
+import com.example.fingerprint_backend.service.AccountService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -14,9 +13,9 @@ import java.util.Date;
 @Component
 public class JWTUtil {
 
-    private final RoleService roleService;
+    private final AccountService roleService;
 
-    public JWTUtil(RoleService roleService) {
+    public JWTUtil(AccountService roleService) {
         this.roleService = roleService;
     }
 

@@ -26,22 +26,24 @@ public class MemberEntity {
     private String familyName;
     @Enumerated(EnumType.STRING)
     private MemberLanguage language;
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private List<MemberRole> role = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     private SchoolClass schoolClass;
+    private String profileImage;
     private LocalDateTime registerTime; // 가입 일자
 
-    public MemberEntity(String studentNumber, String email, String name, String givenName, String familyName, MemberLanguage language) {
+    public MemberEntity(String studentNumber, String email, String name, String givenName, String familyName, MemberLanguage language, String profileImage) {
         this.studentNumber = studentNumber;
         this.email = email;
         this.name = name;
         this.givenName = givenName;
         this.familyName = familyName;
         this.language = language;
+        this.profileImage = profileImage;
         this.registerTime = LocalDateTime.now();
     }
-
 
     public void addRole(MemberRole role) {
         this.role.add(role);

@@ -1,10 +1,11 @@
 package com.example.fingerprint_backend.controller;
 
 import com.example.fingerprint_backend.ApiResponse;
-import com.example.fingerprint_backend.dto.GoogleLoginUserInfoDto;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
+import com.example.fingerprint_backend.dto.LoginResponse;
 import com.example.fingerprint_backend.entity.MemberEntity;
-import com.example.fingerprint_backend.service.GoogleService;
+import com.example.fingerprint_backend.service.AccountService;
+import com.example.fingerprint_backend.service.AuthService;
 import com.example.fingerprint_backend.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -14,89 +15,54 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
 
-    final private GoogleService googleService;
-    final private JWTUtil JWTUtil;
+    private final AuthService authService;
+    private final AccountService accountService;
+    private final JWTUtil JWTUtil;
 
     @PostMapping("/api/login")
-    public ResponseEntity<ApiResponse> login(HttpServletRequest request) throws GeneralSecurityException, IOException {
-        String header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "로그인 실패: Authorization 헤더가 누락되었거나 올바르지 않습니다.", null));
-        }
-        String credential = header.substring(7);
-        System.out.println("credential = " + credential);
+    public ResponseEntity<ApiResponse> login(HttpServletRequest request) {
+        String googleIdToken = authService.extractGoogleIdToken(request.getHeader("Authorization"));
+        String email = authService.verifyAndExtractGoogleEmail(googleIdToken);
 
-//        최초 로그인 시 토큰 진위여부 검증
-        if (!googleService.googleTokenCheck(credential)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "로그인 실패: 올바르지 않은 토큰입니다.", null));
-        }
+//        이메일 형식 검증 (학교 이메일)
+        authService.validateEmail(email);
+        MemberEntity loginMember = authService.getMemberByEmail(email);
 
-        GoogleLoginUserInfoDto userInfoDto = googleService.googleDecode(credential);
+        String token = JWTUtil.generateToken(loginMember.getStudentNumber(), loginMember.getEmail());
 
-//        영진 전문대 이메일 여부 확인
-        if (!userInfoDto.getEmail().endsWith("@g.yju.ac.kr")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "거부: 영진 전문대 학생이 아닙니다. \n @g.yju.ac.kr 이메일을 이용해주세요", null));
-        }
-
-//        회원이 아닌 경우
-        if (!googleService.isUserByEmail(userInfoDto)) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse(false, "가입 필요: 학번 및 카카오톡 아이디 등록이 필요합니다.", userInfoDto));
-        }
-
-        GoogleLoginUserInfoDto successUserInfo = googleService.getStdNumAndKakao(userInfoDto);
-
-//        토큰 생성
-        String token = JWTUtil.generateToken(successUserInfo.getStudentNumber(), successUserInfo.getEmail());
-        successUserInfo.setAccessToken(token);
+        LoginResponse loginResponse = new LoginResponse(loginMember, token);
 
 //        로그인 성공
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(true, "로그인: 사용자 인증 성공", successUserInfo));
+                .body(new ApiResponse(true, "로그인: 사용자 인증 성공", loginResponse));
     }
 
     @PostMapping("/api/register")
-    public ResponseEntity<ApiResponse> register(@RequestBody GoogleRegisterDto googleRegisterDto) throws GeneralSecurityException, IOException {
-        String credential = googleRegisterDto.getCredential();
-        String email = googleRegisterDto.getEmail();
-        String name = googleRegisterDto.getName();
-        String studentNum = googleRegisterDto.getStudentNum();
+    public ResponseEntity<ApiResponse> register(HttpServletRequest request,
+                                                @RequestBody GoogleRegisterDto googleRegisterDto) {
 
-//        최초 회원가입 시 토큰 진위여부 검증
-        if (!googleService.googleTokenCheck(credential)) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse(false, "회원가입 실패: 올바르지 않은 토큰입니다.", null));
-        }
+        String googleIdToken = authService.extractGoogleIdToken(request.getHeader("Authorization"));
+        authService.verifyAndExtractGoogleEmail(googleIdToken);
 
-        GoogleLoginUserInfoDto userInfoDto = googleService.googleDecode(credential);
+        authService.validateRegisterInfo(googleRegisterDto);
 
-//        토큰의 정보와 이메일, 이름 정보가 일치하지 않는 경우
-        if (!userInfoDto.getName().equals(name) || !userInfoDto.getEmail().equals(email)) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "회원가입 실패: 토큰 정보가 일치하지 않습니다.", null));
-        }
+        LoginResponse userInfo = authService.googleDecode(googleIdToken);
 
-//        이미 가입된 이메일일 경우
-        if (googleService.isUserByEmail(userInfoDto)) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "회원가입 실패: 이미 가입된 이메일입니다.", null));
-        }
+        authService.validateEmail(userInfo.getEmail());
+        authService.validateEmailUnique(userInfo.getEmail());
+        authService.validateStudentNumberUnique(googleRegisterDto.getStudentNumber());
 
-//        이미 가입된 학번인 경우
-        if (googleService.isUserByStdNum(studentNum)) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "회원가입 실패: 이미 가입된 학번입니다.", null));
-        }
+        MemberEntity registered = authService.register(userInfo, googleRegisterDto);
+        accountService.setSchoolClass(registered, googleRegisterDto.getClassName());
 
-        MemberEntity registered = googleService.register(googleRegisterDto);
+        String token = JWTUtil.generateToken(registered.getStudentNumber(), registered.getEmail());
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "회원가입 성공", registered));
+        LoginResponse loginResponse = new LoginResponse(registered, token);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "회원가입 성공", loginResponse));
     }
 }

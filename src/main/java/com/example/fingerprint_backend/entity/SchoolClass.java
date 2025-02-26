@@ -43,6 +43,14 @@ public class SchoolClass {
         this.name = name;
     }
 
+    public void appendMember(MemberEntity member) {
+        members.add(member);
+    }
+
+    public void removeMember(MemberEntity member) {
+        members.remove(member);
+    }
+
     public void appendCleanMember(CleanMember cleanMember) {
         classCleanMembers.add(cleanMember);
     }
