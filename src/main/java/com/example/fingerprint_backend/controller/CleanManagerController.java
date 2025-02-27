@@ -9,6 +9,7 @@ import com.example.fingerprint_backend.service.CleanHelperService;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.service.CleanOperationService;
 import com.example.fingerprint_backend.service.CleanScheduleGroupService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,7 @@ public class CleanManagerController {
     }
 
     @PostMapping("/areas")
+    @Transactional
     public ResponseEntity<ApiResponse> createArea(@AuthenticationPrincipal CustomUserDetails user,
                                                   @RequestBody AreaRequest request) {
         CleanArea area = cleanManagementService.createArea(

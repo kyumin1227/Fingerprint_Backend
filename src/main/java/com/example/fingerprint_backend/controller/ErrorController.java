@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ErrorController {
 
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
-    public ResponseEntity<ApiResponse> illegalArgumentException(IllegalArgumentException e) {
+    public ResponseEntity<ApiResponse> illegalArgumentException(Exception e) {
         return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage(), null));
     }
 
