@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -52,6 +49,30 @@ public class CleanManagerController {
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 추가 성공", member));
     }
 
+    @PatchMapping("/members/{studentNumber}")
+    public ResponseEntity<ApiResponse> updateMember(@AuthenticationPrincipal CustomUserDetails user,
+                                                    @PathVariable String studentNumber,
+                                                    @RequestBody MemberRequest request) {
+        cleanHelperService.validateCleanMemberInSchoolClass(user.getClassId(), studentNumber);
+        cleanHelperService.validateCleanMemberExistsByStudentNumber(studentNumber);
+        CleanMember member = cleanManagementService.updateMember(
+                studentNumber,
+                request.getGivenName(),
+                request.getFamilyName(),
+                request.getAreaName()
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 수정 성공", member));
+    }
+
+    @DeleteMapping("/members/{studentNumber}")
+    public ResponseEntity<ApiResponse> deleteMember(@AuthenticationPrincipal CustomUserDetails user,
+                                                    @PathVariable String studentNumber) {
+        cleanHelperService.validateCleanMemberInSchoolClass(user.getClassId(), studentNumber);
+        cleanHelperService.validateCleanMemberExistsByStudentNumber(studentNumber);
+        cleanManagementService.deleteMember(studentNumber);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 삭제 성공", null));
+    }
+
     @PostMapping("/areas")
     @Transactional
     public ResponseEntity<ApiResponse> createArea(@AuthenticationPrincipal CustomUserDetails user,
@@ -62,7 +83,7 @@ public class CleanManagerController {
                 request.getDaysOfWeek(),
                 request.getCycle()
         );
-        if (request.getIsDefault() != null && request.getIsDefault()) {
+        if (request.getIsDefault()) {
             cleanManagementService.setDefaultArea(request.getAreaName(), user.getClassId());
         }
         if (request.getStartDate() != null) {

@@ -132,6 +132,7 @@ public class ScenarioTest {
         assertThat(lastGroup2.getMembers().size()).as("마지막 그룹의 멤버 수").isEqualTo(1);
     }
 
+    @DisplayName("그룹 생성 및 스케줄링 후 정보 가져오기")
     @Test
     void createGroupAndScheduleAndGetInfo() {
         Long classId = cleanManagementService.createSchoolClass("2027_A").getId();
@@ -165,5 +166,74 @@ public class ScenarioTest {
             });
         });
         assertThat(infoResponses.size()).as("스케줄 수").isEqualTo(6);
+    }
+
+    @DisplayName("멤버 삭제")
+    @Test
+    void deleteMember() {
+        Long classId = cleanManagementService.createSchoolClass("2027_A").getId();
+        CleanArea area = cleanManagementService.createArea("창조관 405호", classId, Set.of(DayOfWeek.MONDAY), 1);
+        cleanManagementService.createMember("2423007", "민정", "김", classId, area);
+        cleanManagementService.createMember("2423001", "혁일", "권", classId, area);
+        cleanManagementService.createMember("2423002", "규민", "김", classId, area);
+
+        cleanScheduleGroupService.createCleanSchedules(LocalDate.now(), "창조관 405호", classId, 1, Set.of(DayOfWeek.MONDAY), 2);
+        List<CleanMember> members = cleanManagementService.getMembersByAreaNameAndClassId("창조관 405호", classId);
+        cleanScheduleGroupService.createGroupsByRandom("창조관 405호", classId, members, 3);
+        cleanScheduleGroupService.createGroupsByRandom("창조관 405호", classId, members, 3);
+
+        List<CleanMember> groupMembers = cleanScheduleGroupService.getFirstGroup("창조관 405호", classId).getMembers();
+        assertThat(groupMembers.size()).as("그룹의 멤버 수").isEqualTo(3);
+
+        cleanManagementService.deleteMember("2423002");
+        assertThat(cleanHelperService.getSchoolClassById(classId).getClassCleanMembers().size()).as("반의 멤버 수").isEqualTo(2);
+        assertThat(cleanScheduleGroupService.getFirstGroup("창조관 405호", classId).getMembers().size()).as("그룹의 멤버 수").isEqualTo(2);
+        assertThat(cleanScheduleGroupService.getLastGroup("창조관 405호", classId).getMembers().size()).as("그룹의 멤버 수").isEqualTo(2);
+        assertThat(cleanHelperService.getCleanAreaByNameAndClassId("창조관 405호", classId).getMembers().size()).as("구역의 멤버 수").isEqualTo(2);
+
+    }
+
+    @DisplayName("멤버 구역 변경")
+    @Test
+    void changeCleanArea() {
+        Long classId = cleanManagementService.createSchoolClass("2027_A").getId();
+        CleanArea area1 = cleanManagementService.createArea("창조관 405호", classId, Set.of(DayOfWeek.MONDAY), 1);
+        CleanArea area2 = cleanManagementService.createArea("창조관 406호", classId, Set.of(DayOfWeek.MONDAY), 1);
+        cleanManagementService.createMember("2423007", "민정", "김", classId, area1);
+        cleanManagementService.createMember("2423001", "혁일", "권", classId, area1);
+        cleanManagementService.createMember("2423002", "규민", "김", classId, area1);
+
+        cleanScheduleGroupService.createCleanSchedules(LocalDate.now(), "창조관 405호", classId, 1, Set.of(DayOfWeek.MONDAY), 2);
+        List<CleanMember> members = cleanManagementService.getMembersByAreaNameAndClassId("창조관 405호", classId);
+        cleanScheduleGroupService.createGroupsByRandom("창조관 405호", classId, members, 3);
+        cleanScheduleGroupService.createGroupsByRandom("창조관 405호", classId, members, 3);
+
+        List<CleanMember> groupMembers = cleanScheduleGroupService.getFirstGroup("창조관 405호", classId).getMembers();
+        assertThat(groupMembers.size()).as("그룹의 멤버 수").isEqualTo(3);
+
+        cleanManagementService.setMemberCleanArea("2423002", "창조관 406호");
+        assertThat(cleanHelperService.getCleanMemberByStudentNumber("2423002").getCleanArea().getName()).as("멤버의 구역 이름").isEqualTo("창조관 406호");
+        assertThat(cleanScheduleGroupService.getFirstGroup("창조관 405호", classId).getMembers().size()).as("그룹의 멤버 수").isEqualTo(2);
+        assertThat(cleanScheduleGroupService.getLastGroup("창조관 405호", classId).getMembers().size()).as("그룹의 멤버 수").isEqualTo(2);
+        assertThat(cleanHelperService.getCleanAreaByNameAndClassId("창조관 405호", classId).getMembers().size()).as("구역의 멤버 수").isEqualTo(2);
+        assertThat(cleanHelperService.getCleanAreaByNameAndClassId("창조관 406호", classId).getMembers().size()).as("구역의 멤버 수").isEqualTo(1);
+        assertThat(cleanHelperService.getSchoolClassByName("2027_A").getClassCleanMembers().size()).as("반의 멤버 수").isEqualTo(3);
+    }
+
+    @DisplayName("멤버 수정")
+    @Test
+    void updateMember() {
+        Long classId = cleanManagementService.createSchoolClass("2027_A").getId();
+        CleanArea area1 = cleanManagementService.createArea("창조관_405호", classId);
+        CleanArea area2 = cleanManagementService.createArea("창조관_406호", classId);
+        cleanManagementService.createMember("2423002", "규민", "김", classId, area1);
+        cleanScheduleGroupService.createGroupsByRandom("창조관_405호", classId, cleanManagementService.getMembersByAreaNameAndClassId("창조관_405호", classId), 3);
+
+        cleanManagementService.updateMember("2423002", "변경", "성", "창조관_406호");
+        assertThat(cleanHelperService.getCleanMemberByStudentNumber("2423002").getGivenName()).as("이름 변경").isEqualTo("변경");
+        assertThat(cleanHelperService.getCleanMemberByStudentNumber("2423002").getFamilyName()).as("성 변경").isEqualTo("성");
+        assertThat(cleanHelperService.getCleanMemberByStudentNumber("2423002").getCleanArea().getName()).as("구역 변경").isEqualTo("창조관_406호");
+        assertThat(area2.getMembers().size()).as("구역의 멤버 수").isEqualTo(1);
+        assertThat(cleanScheduleGroupService.getGroupsByAreaNameAndClassId("창조관_405호", classId).get(0).getMembers().size()).as("그룹의 멤버 수").isEqualTo(0);
     }
 }

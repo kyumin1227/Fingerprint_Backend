@@ -332,4 +332,10 @@ public class CleanHelperService {
         return schoolClass.getAreas();
     }
 
+    public void validateCleanMemberInSchoolClass(Long schoolClassId, String studentNumber) {
+        boolean isExist = cleanMemberRepository.existsByStudentNumberAndSchoolClassId(studentNumber, schoolClassId);
+        if (!isExist) {
+            throw new IllegalArgumentException("해당 학생은 해당 반에 속해있지 않습니다.");
+        }
+    }
 }

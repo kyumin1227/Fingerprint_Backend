@@ -23,13 +23,15 @@ public class CleanManagementService {
     private final CleanMemberRepository cleanMemberRepository;
     private final CleanAreaRepository cleanAreaRepository;
     private final CleanHelperService cleanHelperService;
+    private final CleanScheduleGroupService cleanScheduleGroupService;
 
     @Autowired
-    public CleanManagementService(SchoolClassRepository schoolClassRepository, CleanMemberRepository cleanMemberRepository, CleanAreaRepository cleanAreaRepository, CleanHelperService cleanHelperService) {
+    public CleanManagementService(SchoolClassRepository schoolClassRepository, CleanMemberRepository cleanMemberRepository, CleanAreaRepository cleanAreaRepository, CleanHelperService cleanHelperService, CleanScheduleGroupService cleanScheduleGroupService) {
         this.schoolClassRepository = schoolClassRepository;
         this.cleanMemberRepository = cleanMemberRepository;
         this.cleanAreaRepository = cleanAreaRepository;
         this.cleanHelperService = cleanHelperService;
+        this.cleanScheduleGroupService = cleanScheduleGroupService;
     }
 
     /**
@@ -99,10 +101,20 @@ public class CleanManagementService {
     }
 
     /**
-     * 학생의 청소 구역을 설정하는 메소드
+     * 학생의 청소 구역을 설정하는 메소드, 기존 구역에서 제거 후 새로운 구역으로 설정
      */
     public void setMemberCleanArea(String studentNumber, String areaName) {
         CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(studentNumber);
+        if (member.getCleanArea() != null) {
+            cleanScheduleGroupService.getGroupsByAreaNameAndClassIdAndIsCleaned(member.getCleanArea().getName(), member.getSchoolClass().getId(), false)
+                    .forEach(group -> {
+                        try {
+                            group.removeMember(member);
+                        } catch (IllegalArgumentException e) {
+                            // 멤버가 그룹에 존재하지 않는 경우
+                        }
+                    });
+        }
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, member.getSchoolClass().getName());
         member.setCleanArea(cleanArea);
     }
@@ -113,5 +125,41 @@ public class CleanManagementService {
     public List<CleanMember> getMembersByAreaNameAndClassId(String areaName, Long schoolClassId) {
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         return new ArrayList<>(cleanArea.getMembers());
+    }
+
+    /**
+     * 학생을 삭제하는 메소드 (반, 구역, 남은 청소 그룹에서 삭제 후 삭제 표시)
+     */
+    @Transactional
+    public void deleteMember(String studentNumber) {
+        CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(studentNumber);
+        member.getSchoolClass().removeCleanMember(member);
+        CleanArea cleanArea = member.getCleanArea();
+        cleanArea.removeMember(member);
+        cleanScheduleGroupService.getGroupsByAreaNameAndClassIdAndIsCleaned(cleanArea.getName(), member.getSchoolClass().getId(), false)
+                .forEach(group -> {
+                    try {
+                        group.removeMember(member);
+                    } catch (IllegalArgumentException e) {
+                        // 멤버가 그룹에 존재하지 않는 경우
+                    }
+                });
+        member.setIsDeleted(true);
+    }
+
+    /**
+     * 학생 정보를 수정하는 메소드
+     */
+    @Transactional
+    public CleanMember updateMember(String studentNumber, String givenName, String familyName, String areaName) {
+        CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(studentNumber);
+        if (givenName != null) {
+            member.setGivenName(givenName);
+        }
+        if (familyName != null) {
+            member.setFamilyName(familyName);
+        }
+        setMemberCleanArea(studentNumber, areaName);
+        return member;
     }
 }

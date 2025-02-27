@@ -26,13 +26,16 @@ public class CleanMember {
     @JsonBackReference
     private CleanArea cleanArea;
     @Column(nullable = false)
+    @Setter
     private String givenName;
     @Column(nullable = false)
+    @Setter
     private String familyName;
     @Setter
     private String profileImage;
     @Setter
     private Integer cleaningCount = 0;
+    @Setter
     private Boolean isDeleted = false;
 
 
