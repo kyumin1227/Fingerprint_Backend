@@ -327,4 +327,9 @@ public class CleanHelperService {
         return monday.plusDays(daysToAdd);
     }
 
+    public List<CleanArea> getCleanAreasBySchoolClassId(Long schoolClassId) {
+        SchoolClass schoolClass = getSchoolClassById(schoolClassId);
+        return schoolClass.getAreas();
+    }
+
 }
