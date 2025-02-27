@@ -37,8 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 if (JWTUtil.validateToken(token)) {
                     String studentNumber = JWTUtil.getStudentNumberFromToken(token);
-                    Long classId = JWTUtil.getClassIdFromToken(token);
-                    //        TODO: 유저 정보에 반 아이디 추가
                     CustomUserDetails userDetails = userDetailsService.loadUserByUsername(studentNumber);
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -46,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     System.out.println(userDetails.getUsername());
                     System.out.println(userDetails.getPassword());
                     System.out.println(userDetails.getAuthorities());
-                    System.out.println("반 아이디: " + classId);
+                    System.out.println("반 아이디: " + userDetails.getClassId());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     System.out.println("토큰 검증 성공");
                 }

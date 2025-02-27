@@ -3,6 +3,7 @@ package com.example.fingerprint_backend.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,15 +33,20 @@ public class CleanMember {
     private String profileImage;
     @Setter
     private Integer cleaningCount = 0;
+    private Boolean isDeleted = false;
 
 
-    public CleanMember(String studentNumber, String givenName, String familyName, SchoolClass schoolClass) {
+    public CleanMember(String studentNumber, String givenName, String familyName, SchoolClass schoolClass, CleanArea cleanArea) {
         validateParameters(studentNumber, givenName, schoolClass);
         this.studentNumber = studentNumber;
         this.givenName = givenName;
         this.familyName = familyName;
         this.schoolClass = schoolClass;
-        this.cleanArea = schoolClass.getDefaultArea();
+        if (cleanArea == null) {
+            this.cleanArea = schoolClass.getDefaultArea();
+        } else {
+            this.cleanArea = cleanArea;
+        }
     }
 
     private void validateParameters(String studentNumber, String name, SchoolClass schoolClass) {
@@ -63,6 +69,14 @@ public class CleanMember {
         if (cleanArea != null) {
             cleanArea.appendMember(this);
         }
+    }
+
+    public void deleteCleanMember() {
+        this.cleanArea.removeMember(this);
+        this.cleanArea = null;
+        this.schoolClass.removeCleanMember(this);
+        this.schoolClass = null;
+        this.isDeleted = true;
     }
 
     @Override

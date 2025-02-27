@@ -13,7 +13,6 @@ import java.util.Set;
 @Setter
 public class AreaRequest {
     private String areaName;
-    private String className;
     private Set<DayOfWeek> daysOfWeek = new HashSet<>();
     private Integer cycle;
     private Boolean isDefault;

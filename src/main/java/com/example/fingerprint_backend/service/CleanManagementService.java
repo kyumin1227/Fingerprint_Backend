@@ -43,10 +43,10 @@ public class CleanManagementService {
     /**
      * 청소 학생을 생성하는 메소드
      */
-    public CleanMember createMember(String studentNumber, String givenName, String familyName, String schoolClassName) {
+    public CleanMember createMember(String studentNumber, String givenName, String familyName, Long schoolClassId, CleanArea cleanArea) {
         cleanHelperService.validateStudentNumberIsUnique(studentNumber);
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
-        CleanMember member = new CleanMember(studentNumber, givenName, familyName, schoolClass);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassById(schoolClassId);
+        CleanMember member = new CleanMember(studentNumber, givenName, familyName, schoolClass, cleanArea);
         member.setCleanArea(schoolClass.getDefaultArea());
         CleanMember save = cleanMemberRepository.save(member);
         schoolClass.appendCleanMember(save);
@@ -61,13 +61,12 @@ public class CleanManagementService {
         return schoolClass.getClassCleanMembers();
     }
 
-
     /**
      * 청소 구역을 생성하는 메소드
      */
-    public CleanArea createArea(String areaName, String schoolClassName) {
-        cleanHelperService.validateAreaNameAndClassNameIsUnique(areaName, schoolClassName);
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+    public CleanArea createArea(String areaName, Long schoolClassId) {
+        cleanHelperService.validateAreaNameAndClassIdIsUnique(areaName, schoolClassId);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassById(schoolClassId);
         CleanArea save = cleanAreaRepository.save(new CleanArea(areaName, schoolClass, Set.of(), 0));
         if (schoolClass.getDefaultArea() == null) {
             schoolClass.setDefaultArea(save);
@@ -78,9 +77,9 @@ public class CleanManagementService {
     /**
      * 청소 구역을 생성하는 메소드
      */
-    public CleanArea createArea(String areaName, String schoolClassName, Set<DayOfWeek> days, Integer cycle) {
-        cleanHelperService.validateAreaNameAndClassNameIsUnique(areaName, schoolClassName);
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+    public CleanArea createArea(String areaName, Long schoolClassId, Set<DayOfWeek> days, Integer cycle) {
+        cleanHelperService.validateAreaNameAndClassIdIsUnique(areaName, schoolClassId);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassById(schoolClassId);
         CleanArea save = cleanAreaRepository.save(new CleanArea(areaName, schoolClass, days, cycle));
         if (schoolClass.getDefaultArea() == null) {
             schoolClass.setDefaultArea(save);
@@ -91,10 +90,10 @@ public class CleanManagementService {
     /**
      * 학급의 기본 청소 구역을 설정하는 메소드
      */
-    public void setDefaultArea(String areaName, String schoolClassName) {
-        cleanHelperService.validateCleanAreaExistsByAreaNameAndClassName(areaName, schoolClassName);
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
-        CleanArea area = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+    public void setDefaultArea(String areaName, Long schoolClassId) {
+        cleanHelperService.validateCleanAreaExistsByAreaNameAndClassId(areaName, schoolClassId);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassById(schoolClassId);
+        CleanArea area = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         schoolClass.setDefaultArea(area);
         schoolClassRepository.save(schoolClass);
     }
@@ -111,8 +110,8 @@ public class CleanManagementService {
     /**
      * 반 이름과 구역으로 특정 구역의 학생들을 가져오는 메소드 (복사본)
      */
-    public List<CleanMember> getMembersBySchoolClassNameAndAreaName(String areaName, String schoolClassName) {
-        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+    public List<CleanMember> getMembersByAreaNameAndClassId(String areaName, Long schoolClassId) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         return new ArrayList<>(cleanArea.getMembers());
     }
 }

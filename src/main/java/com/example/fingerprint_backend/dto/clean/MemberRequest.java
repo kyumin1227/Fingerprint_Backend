@@ -9,7 +9,6 @@ public class MemberRequest {
     private String studentNumber;
     private String givenName;
     private String familyName;
-    private String className;
     private String areaName;
 
 }

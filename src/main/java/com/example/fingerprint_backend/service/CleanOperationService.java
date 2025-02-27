@@ -67,11 +67,11 @@ public class CleanOperationService {
      * @return 완료 처리 된 CleanGroup
      */
     @Transactional
-    public CleanGroup completeCleaningSchedule(LocalDate date, String areaName, String className) {
+    public CleanGroup completeCleaningSchedule(LocalDate date, String areaName, Long schoolClassId) {
         cleanHelperService.validateDateIsNotFuture(date);
-        CleanSchedule cleanSchedule = cleanHelperService.getCleanScheduleByDateAndClassNameAndAreaName(date, areaName, className);
+        CleanSchedule cleanSchedule = cleanHelperService.getCleanScheduleByDateAndAreaNameAndClassId(date, areaName, schoolClassId);
         cleanHelperService.validateScheduleComplete(cleanSchedule);
-        CleanGroup cleanGroup = cleanScheduleGroupService.getFirstGroup(areaName, className);
+        CleanGroup cleanGroup = cleanScheduleGroupService.getFirstGroup(areaName, schoolClassId);
         cleanGroup.setCleaned(true);
         cleanSchedule.completed();
         return cleanGroup;

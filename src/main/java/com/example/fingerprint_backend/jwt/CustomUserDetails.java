@@ -41,6 +41,10 @@ public class CustomUserDetails implements UserDetails {
         return memberEntity.getStudentNumber();
     }
 
+    public Long getClassId() {
+        return memberEntity.getSchoolClass().getId();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

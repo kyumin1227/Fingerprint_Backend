@@ -36,12 +36,12 @@ public class CleanScheduled {
         List<CleanArea> areas = cleanAreaRepository.findAll();
 
         for (CleanArea cleanArea : areas) {
-            List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName(cleanArea.getName(), cleanArea.getSchoolClass().getName(), today);
+            List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId(cleanArea.getName(), cleanArea.getSchoolClass().getId(), today);
             if (schedules.size() < cleanArea.getDisplay()) {
                 cleanScheduleGroupService.createCleanSchedules(
                         cleanArea.getLastScheduledDate(),
                         cleanArea.getName(),
-                        cleanArea.getSchoolClass().getName(),
+                        cleanArea.getSchoolClass().getId(),
                         cleanArea.getCycle(),
                         cleanArea.getDays(),
                         cleanArea.getDisplay() - schedules.size()
@@ -59,11 +59,11 @@ public class CleanScheduled {
         List<CleanArea> areas = cleanAreaRepository.findAll();
 
         for (CleanArea cleanArea : areas) {
-            List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassNameAndIsCleaned(cleanArea.getName(), cleanArea.getSchoolClass().getName(), false);
+            List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassIdAndIsCleaned(cleanArea.getName(), cleanArea.getSchoolClass().getId(), false);
             while (groups.size() < cleanArea.getDisplay()) {
                 cleanScheduleGroupService.createGroupsByRandom(
                         cleanArea.getName(),
-                        cleanArea.getSchoolClass().getName(),
+                        cleanArea.getSchoolClass().getId(),
                         cleanArea.getMembers(),
                         cleanArea.getGroupSize()
                 );
@@ -82,12 +82,12 @@ public class CleanScheduled {
         List<CleanArea> areas = cleanAreaRepository.findAll();
 
         for (CleanArea cleanArea : areas) {
-            List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName(cleanArea.getName(), cleanArea.getSchoolClass().getName(), today.minusDays(minusDays));
+            List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId(cleanArea.getName(), cleanArea.getSchoolClass().getId(), today.minusDays(minusDays));
             for (CleanSchedule schedule : schedules) {
                 if (schedule.isCanceled()) {
                     continue;
                 }
-                cleanOperationService.completeCleaningSchedule(today.minusDays(minusDays), cleanArea.getName(), cleanArea.getSchoolClass().getName());
+                cleanOperationService.completeCleaningSchedule(today.minusDays(minusDays), cleanArea.getName(), cleanArea.getSchoolClass().getId());
             }
         }
     }

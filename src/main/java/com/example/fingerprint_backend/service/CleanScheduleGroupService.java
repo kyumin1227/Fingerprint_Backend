@@ -31,12 +31,12 @@ public class CleanScheduleGroupService {
     /**
      * 청소 스케줄을 생성하는 메소드 (취소된 스케줄은 복구, 지난 날짜 생성 불가)
      */
-    public CleanSchedule createCleanSchedule(LocalDate date, String cleanAreaName, String schoolClassName) {
+    public CleanSchedule createCleanSchedule(LocalDate date, String cleanAreaName, Long schoolClassId) {
         cleanHelperService.validateDateIsNotPast(date);
-        cleanHelperService.validateCleanScheduleByDateAndClassNameAndAreaNameIsUnique(date, cleanAreaName, schoolClassName);
-        cleanHelperService.validateCleanScheduleIsCanceled(date, cleanAreaName, schoolClassName);
-        CleanArea area = cleanHelperService.getCleanAreaByNameAndClassName(cleanAreaName, schoolClassName);
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        cleanHelperService.validateCleanScheduleByDateAndClassNameAndAreaNameIsUnique(date, cleanAreaName, schoolClassId);
+        cleanHelperService.validateCleanScheduleIsCanceled(date, cleanAreaName, schoolClassId);
+        CleanArea area = cleanHelperService.getCleanAreaByNameAndClassId(cleanAreaName, schoolClassId);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassById(schoolClassId);
         CleanSchedule cleanSchedule = new CleanSchedule(date, area, schoolClass);
         CleanSchedule save = cleanScheduleRepository.save(cleanSchedule);
         area.appendSchedule(save);
@@ -47,19 +47,19 @@ public class CleanScheduleGroupService {
     /**
      * 청소 스케줄을 생성하는 메소드 (취소된 스케줄은 복구, 지난 날짜 생성 불가)
      */
-    public CleanSchedule createAndRestoreCleanSchedule(LocalDate date, String cleanAreaName, String schoolClassName) {
+    public CleanSchedule createAndRestoreCleanSchedule(LocalDate date, String cleanAreaName, Long schoolClassId) {
         cleanHelperService.validateDateIsNotPast(date);
-        cleanHelperService.validateCleanScheduleByDateAndClassNameAndAreaNameIsUnique(date, cleanAreaName, schoolClassName);
+        cleanHelperService.validateCleanScheduleByDateAndClassNameAndAreaNameIsUnique(date, cleanAreaName, schoolClassId);
         try {
-            cleanHelperService.validateCleanScheduleIsCanceled(date, cleanAreaName, schoolClassName);
+            cleanHelperService.validateCleanScheduleIsCanceled(date, cleanAreaName, schoolClassId);
         } catch (IllegalStateException e) {
             // 이미 존재하는 스케줄이 취소된 경우 복구
-            CleanSchedule cleanSchedule = getCleanSchedule(date, cleanAreaName, schoolClassName);
+            CleanSchedule cleanSchedule = getCleanSchedule(date, cleanAreaName, schoolClassId);
             cleanSchedule.setCanceled(false);
             return cleanSchedule;
         }
-        CleanArea area = cleanHelperService.getCleanAreaByNameAndClassName(cleanAreaName, schoolClassName);
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        CleanArea area = cleanHelperService.getCleanAreaByNameAndClassId(cleanAreaName, schoolClassId);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassById(schoolClassId);
         CleanSchedule cleanSchedule = new CleanSchedule(date, area, schoolClass);
         CleanSchedule save = cleanScheduleRepository.save(cleanSchedule);
         area.appendSchedule(save);
@@ -70,59 +70,59 @@ public class CleanScheduleGroupService {
     /**
      * 청소 스케줄을 가져오는 메소드
      */
-    public CleanSchedule getCleanSchedule(LocalDate date, String cleanAreaName, String schoolClassName) {
-        return cleanHelperService.getCleanScheduleByDateAndClassNameAndAreaName(date, cleanAreaName, schoolClassName);
+    public CleanSchedule getCleanSchedule(LocalDate date, String cleanAreaName, Long schoolClassId) {
+        return cleanHelperService.getCleanScheduleByDateAndAreaNameAndClassId(date, cleanAreaName, schoolClassId);
     }
 
     /**
      * 청소 스케줄을 취소하는 메소드
      */
-    public void cancelCleanSchedule(LocalDate date, String cleanAreaName, String schoolClassName) {
-        CleanSchedule cleanSchedule = getCleanSchedule(date, cleanAreaName, schoolClassName);
+    public void cancelCleanSchedule(LocalDate date, String cleanAreaName, Long schoolClassId) {
+        CleanSchedule cleanSchedule = getCleanSchedule(date, cleanAreaName, schoolClassId);
         cleanSchedule.setCanceled(true);
     }
 
     /**
      * 취소된 청소 스케줄을 복구하는 메소드
      */
-    public void restoreCleanSchedule(LocalDate date, String cleanAreaName, String schoolClassName) {
-        CleanSchedule cleanSchedule = getCleanSchedule(date, cleanAreaName, schoolClassName);
+    public void restoreCleanSchedule(LocalDate date, String cleanAreaName, Long schoolClassId) {
+        CleanSchedule cleanSchedule = getCleanSchedule(date, cleanAreaName, schoolClassId);
         cleanSchedule.setCanceled(false);
     }
 
     /**
      * 청소 스케줄을 삭제하는 메소드
      */
-    public void deleteCleanSchedule(LocalDate date, String cleanAreaName, String schoolClassName) {
-        CleanSchedule cleanSchedule = getCleanSchedule(date, cleanAreaName, schoolClassName);
-        cleanHelperService.getSchoolClassByName(schoolClassName).removeSchedule(cleanSchedule);
-        cleanHelperService.getCleanAreaByNameAndClassName(cleanAreaName, schoolClassName).removeSchedule(cleanSchedule);
+    public void deleteCleanSchedule(LocalDate date, String cleanAreaName, Long schoolClassId) {
+        CleanSchedule cleanSchedule = getCleanSchedule(date, cleanAreaName, schoolClassId);
+        cleanHelperService.getSchoolClassById(schoolClassId).removeSchedule(cleanSchedule);
+        cleanHelperService.getCleanAreaByNameAndClassId(cleanAreaName, schoolClassId).removeSchedule(cleanSchedule);
         cleanScheduleRepository.delete(cleanSchedule);
     }
 
     /**
      * 구역의 특정 날짜 이후의 스케줄을 가져오는 메소드
      */
-    public List<CleanSchedule> getScheduleByAreaNameAndSchoolClassName(String areaName, String schoolClassName, LocalDate date) {
-        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+    public List<CleanSchedule> getScheduleByAreaNameAndSchoolClassId(String areaName, Long schoolClassId, LocalDate date) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         return cleanScheduleRepository.findAllByDateGreaterThanEqualAndCleanArea(date, cleanArea);
     }
 
     /**
      * 반의 특정 날짜 이후의 스케줄을 가져오는 메소드
      */
-    public List<CleanSchedule> getScheduleBySchoolClassName(String schoolClassName, LocalDate date) {
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+    public List<CleanSchedule> getScheduleBySchoolClassId(Long schoolClassId, LocalDate date) {
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassById(schoolClassId);
         return cleanScheduleRepository.findAllByDateAfterAndSchoolClass(date, schoolClass);
     }
 
     /**
      * 취소되지 않은 마지막 청소 스케줄을 가져오는 메소드
      */
-    public CleanSchedule getLastCleanSchedule(String cleanAreaName, String schoolClassName) {
+    public CleanSchedule getLastCleanSchedule(String cleanAreaName, Long schoolClassId) {
         return cleanScheduleRepository.findTopBySchoolClassAndCleanAreaAndIsCanceledOrderByDateDesc(
-                cleanHelperService.getSchoolClassByName(schoolClassName),
-                cleanHelperService.getCleanAreaByNameAndClassName(cleanAreaName, schoolClassName),
+                cleanHelperService.getSchoolClassById(schoolClassId),
+                cleanHelperService.getCleanAreaByNameAndClassId(cleanAreaName, schoolClassId),
                 false
         ).orElse(null);
     }
@@ -130,9 +130,9 @@ public class CleanScheduleGroupService {
     /**
      * 청소 그룹을 생성하는 메소드
      */
-    public CleanGroup createGroup(String cleanAreaName, String schoolClassName, int memberCount) {
-        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(cleanAreaName, schoolClassName);
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+    public CleanGroup createGroup(String cleanAreaName, Long schoolClassId, int memberCount) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(cleanAreaName, schoolClassId);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassById(schoolClassId);
         CleanGroup cleanGroup = new CleanGroup(cleanArea, schoolClass, memberCount, new ArrayList<>(memberCount));
         CleanGroup save = cleanGroupRepository.save(cleanGroup);
         cleanArea.appendGroup(save);
@@ -170,16 +170,16 @@ public class CleanScheduleGroupService {
     /**
      * 구역 이름과 학급 이름으로 청소 그룹을 가져오는 메소드
      */
-    public List<CleanGroup> getGroupsByAreaNameAndClassName(String areaName, String schoolClassName) {
-        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+    public List<CleanGroup> getGroupsByAreaNameAndClassId(String areaName, Long schoolClassId) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         return cleanArea.getGroups();
     }
 
     /**
      * 구역 이름과 학급 이름으로 청소 그룹을 가져오는 메소드 (청소 여부)
      */
-    public List<CleanGroup> getGroupsByAreaNameAndClassNameAndIsCleaned(String areaName, String schoolClassName, boolean isCleaned) {
-        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+    public List<CleanGroup> getGroupsByAreaNameAndClassIdAndIsCleaned(String areaName, Long schoolClassId, boolean isCleaned) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         return cleanGroupRepository.findByIsCleanedAndCleanArea(isCleaned, cleanArea);
     }
 
@@ -208,11 +208,11 @@ public class CleanScheduleGroupService {
     /**
      * 랜덤으로 그룹들을 생성하는 메소드
      */
-    public void createGroupsByRandom(String areaName, String schoolClassName, List<CleanMember> members, double groupMemberCount) {
+    public void createGroupsByRandom(String areaName, Long schoolClassId, List<CleanMember> members, double groupMemberCount) {
         ArrayList<CleanMember> membersCopy = new ArrayList<>(members);
-        fillLastGroupByRandom(areaName, schoolClassName, membersCopy);
-        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
-        SchoolClass schoolClass = cleanHelperService.getSchoolClassByName(schoolClassName);
+        fillLastGroupByRandom(areaName, schoolClassId, membersCopy);
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
+        SchoolClass schoolClass = cleanHelperService.getSchoolClassById(schoolClassId);
         if (membersCopy.isEmpty()) {
             throw new IllegalArgumentException("리스트가 비어있습니다.");
         } else if (groupMemberCount < 1) {
@@ -229,8 +229,8 @@ public class CleanScheduleGroupService {
      * 랜덤으로 마지막 그룹을 채우는 메소드
      * WARNING: 추가할 멤버 수가 마지막 그룹의 멤버 수 보다 적을 경우 채우지 않음
      */
-    public void fillLastGroupByRandom(String areaName, String schoolClassName, List<CleanMember> members) {
-        CleanGroup lastGroup = getLastGroup(areaName, schoolClassName);
+    public void fillLastGroupByRandom(String areaName, Long schoolClassId, List<CleanMember> members) {
+        CleanGroup lastGroup = getLastGroup(areaName, schoolClassId);
         if (lastGroup != null && members.size() >= lastGroup.getMemberCount() - lastGroup.getMembers().size()) {
             int empty = lastGroup.getMemberCount() - lastGroup.getMembers().size();
             for (int i = 0; i < empty; i++) {
@@ -250,8 +250,8 @@ public class CleanScheduleGroupService {
     /**
      * 마지막 그룹을 가져오는 메소드 (청소 하지 않은 그룹)
      */
-    public CleanGroup getLastGroup(String areaName, String schoolClassName) {
-        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+    public CleanGroup getLastGroup(String areaName, Long schoolClassId) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         return cleanGroupRepository.findTopByCleanAreaAndIsCleanedOrderByIdDesc(
                 cleanArea, false
         ).orElse(null);
@@ -260,8 +260,8 @@ public class CleanScheduleGroupService {
     /**
      * 첫 그룹을 가져오는 메소드 (청소 하지 않은 그룹)
      */
-    public CleanGroup getFirstGroup(String areaName, String schoolClassName) {
-        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+    public CleanGroup getFirstGroup(String areaName, Long schoolClassId) {
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         return cleanGroupRepository.findTopByCleanAreaAndIsCleanedOrderByIdAsc(
                 cleanArea, false
         ).orElse(null);
@@ -271,7 +271,7 @@ public class CleanScheduleGroupService {
      * 청소 스케줄을 생성하는 메소드 (존재하거나 취소된 스케줄은 생성하지 않음)
      * date 이후 cycle 일 주기로 days 요일에 count 개의 스케줄을 생성
      */
-    public void createCleanSchedules(LocalDate date, String areaName, String schoolClassName, int cycle, Set<DayOfWeek> days, int count) {
+    public void createCleanSchedules(LocalDate date, String areaName, Long schoolClassId, int cycle, Set<DayOfWeek> days, int count) {
         cleanHelperService.validateCreateSchedule(date, cycle, days, count);
         int day = 1;
         LocalDate targetDate = date.plusDays(day);
@@ -279,7 +279,7 @@ public class CleanScheduleGroupService {
             targetDate = date.plusDays(day);
             if (days.contains(targetDate.getDayOfWeek())) {
                 try {
-                    createCleanSchedule(targetDate, areaName, schoolClassName);
+                    createCleanSchedule(targetDate, areaName, schoolClassId);
                     count--;
                 } catch (IllegalArgumentException | IllegalStateException e) {
                     // 이미 존재하거나 취소된 스케줄인 경우 다음 날짜로 넘어감
@@ -291,7 +291,7 @@ public class CleanScheduleGroupService {
             }
             day++;
         }
-        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassName(areaName, schoolClassName);
+        CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         cleanArea.setLastScheduledDate(targetDate);
     }
 }
