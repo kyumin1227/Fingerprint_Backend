@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/fingerprint/**").permitAll()
                         .requestMatchers("/api/clean/manager/**").hasRole("MANAGER")
+                        .requestMatchers("/api/admin/**").hasAnyRole("PROFESSOR", "ASSISTANT")
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

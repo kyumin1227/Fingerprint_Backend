@@ -25,6 +25,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+        // 로그인, 회원가입, 지문 등록 API는 해당 필터를 거치지 않도록 예외 처리
+        String path = request.getServletPath();
+        if (path.equals("/api/login") || path.equals("/api/register") || path.startsWith("/api/fingerprint")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Authorization 헤더에서 Bearer 토큰 추출
         String header = request.getHeader("Authorization");
         String token = null;
