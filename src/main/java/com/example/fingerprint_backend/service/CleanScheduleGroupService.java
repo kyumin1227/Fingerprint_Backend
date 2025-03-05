@@ -294,4 +294,12 @@ public class CleanScheduleGroupService {
         CleanArea cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(areaName, schoolClassId);
         cleanArea.setLastScheduledDate(targetDate);
     }
+
+    /**
+     *  특정 날짜의 청소 스케줄을 가져오는 메소드
+     *  isCanceled: 취소 여부
+     */
+    public List<CleanSchedule> getScheduleByDateAndIsCanceled(LocalDate localDate, boolean isCanceled, boolean isCompleted) {
+        return cleanScheduleRepository.findAllByDateAndIsCanceledAndIsCompleted(localDate, isCanceled, isCompleted);
+    }
 }

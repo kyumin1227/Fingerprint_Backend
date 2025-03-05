@@ -29,6 +29,22 @@ public class CleanScheduled {
     @Scheduled(cron = "0 0 12 * * ?")
     @Transactional
     /**
+     * 자동으로 청소 스케줄을 완료하는 메소드
+     */
+    public void completeScheduleIfNeeded() {
+        LocalDate today = LocalDate.now();
+        int minusDays = 0;
+
+        List<CleanSchedule> scheduleList = cleanScheduleGroupService.getScheduleByDateAndIsCanceled(today.minusDays(minusDays), false, false);
+
+        for (CleanSchedule schedule : scheduleList) {
+            cleanOperationService.completeCleaningSchedule(schedule.getDate(), schedule.getCleanArea().getName(), schedule.getSchoolClass().getId());
+        }
+    }
+
+    @Scheduled(cron = "0 5 12 * * ?")
+    @Transactional
+    /**
      * 자동으로 청소 스케줄을 생성하는 메소드
      */
     public void createScheduleIfNeeded() {
@@ -50,7 +66,7 @@ public class CleanScheduled {
         }
     }
 
-    @Scheduled(cron = "0 0 13 * * ?")
+    @Scheduled(cron = "0 10 12 * * ?")
     @Transactional
     /**
      * 자동으로 청소 그룹을 생성하는 메소드
@@ -67,27 +83,6 @@ public class CleanScheduled {
                         cleanArea.getMembers(),
                         cleanArea.getGroupSize()
                 );
-            }
-        }
-    }
-
-    @Scheduled(cron = "0 0 14 * * ?")
-    @Transactional
-    /**
-     * 자동으로 청소 스케줄을 완료하는 메소드
-     */
-    public void completeScheduleIfNeeded() {
-        LocalDate today = LocalDate.now();
-        int minusDays = 1;
-        List<CleanArea> areas = cleanAreaRepository.findAll();
-
-        for (CleanArea cleanArea : areas) {
-            List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId(cleanArea.getName(), cleanArea.getSchoolClass().getId(), today.minusDays(minusDays));
-            for (CleanSchedule schedule : schedules) {
-                if (schedule.isCanceled()) {
-                    continue;
-                }
-                cleanOperationService.completeCleaningSchedule(today.minusDays(minusDays), cleanArea.getName(), cleanArea.getSchoolClass().getId());
             }
         }
     }

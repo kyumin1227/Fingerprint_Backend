@@ -18,4 +18,5 @@ public interface CleanScheduleRepository extends JpaRepository<CleanSchedule, Lo
     List<CleanSchedule> findAllByDateAfterAndSchoolClass(LocalDate date, SchoolClass schoolClass);
 //  특정 날짜 이후, 구역에 해당하는 청소 스케줄을 가져오는 메소드
     List<CleanSchedule> findAllByDateGreaterThanEqualAndCleanArea(LocalDate dateAfter, CleanArea cleanArea);
+    List<CleanSchedule> findAllByDateAndIsCanceledAndIsCompleted(LocalDate date, boolean isCanceled, boolean isCompleted);
 }
