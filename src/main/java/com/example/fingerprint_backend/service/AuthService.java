@@ -3,6 +3,7 @@ package com.example.fingerprint_backend.service;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
 import com.example.fingerprint_backend.dto.LoginResponse;
 import com.example.fingerprint_backend.entity.MemberEntity;
+import com.example.fingerprint_backend.exception.UserNotRegisteredException;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.repository.SchoolClassRepository;
 import com.example.fingerprint_backend.types.MemberLanguage;
@@ -89,12 +90,12 @@ public class AuthService {
      *
      * @param email 이메일
      * @return 회원 정보
-     * @throws AuthenticationCredentialsNotFoundException 미등록 이메일인 경우
+     * @throws UserNotRegisteredException 미등록 이메일인 경우
      */
     public MemberEntity getMemberByEmail(String email) {
         System.out.println("email = " + email);
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("가입 필요: 학번 등록이 필요합니다."));
+                .orElseThrow(() -> new UserNotRegisteredException("가입 필요: 학번 등록이 필요합니다."));
     }
 
     /**
