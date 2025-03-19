@@ -151,6 +151,76 @@ public class CleanManagerController {
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "그룹 생성 성공", null));
     }
 
+//    TODO 그룹이 반에 속하는지 확인 필요
+//    TODO 학생이 반에 속하는지 확인 로직 함수화
+
+    /**
+     * 그룹에 학생을 추가하는 컨트롤러
+     */
+    @PostMapping("/groups/{groupId}/members")
+    public ResponseEntity<ApiResponse> addMembersToGroup(@AuthenticationPrincipal CustomUserDetails user,
+                                                         @PathVariable Long groupId,
+                                                         @RequestBody GroupMemberRequest request) {
+
+        CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(request.getStudentNumber());
+
+        if (!member.getSchoolClass().getId().equals(user.getClassId())) {
+            throw new IllegalStateException("해당 학생은 해당 반에 속해있지 않습니다.");
+        }
+
+        cleanScheduleGroupService.appendMemberToGroup(groupId, request.getStudentNumber());
+        CleanGroup group = cleanHelperService.getCleanGroupById(groupId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "그룹에 학생 추가 성공", group));
+    }
+
+    /**
+     * 그룹에 학생을 제거하는 컨트롤러
+     */
+    @DeleteMapping("/groups/{groupId}/members")
+    public ResponseEntity<ApiResponse> removeMembersToGroup(@AuthenticationPrincipal CustomUserDetails user,
+                                                         @PathVariable Long groupId,
+                                                         @RequestBody GroupMemberRequest request) {
+
+        CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(request.getStudentNumber());
+
+        if (!member.getSchoolClass().getId().equals(user.getClassId())) {
+            throw new IllegalStateException("해당 학생은 해당 반에 속해있지 않습니다.");
+        }
+
+        cleanScheduleGroupService.removeMemberFromGroup(groupId, member.getStudentNumber());
+        CleanGroup group = cleanHelperService.getCleanGroupById(groupId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "그룹에 학생 삭제 성공", group));
+    }
+
+    /**
+     * 그룹의 학생을 교환하는 컨트롤러
+     */
+    @Transactional
+    @PutMapping("/groups/swap")
+    public ResponseEntity<ApiResponse> swapMembersInGroup(@AuthenticationPrincipal CustomUserDetails user,
+                                                          @RequestBody SwapMembersRequest request) {
+
+        CleanMember originMember = cleanHelperService.getCleanMemberByStudentNumber(request.getOriginStudentNumber());
+        CleanMember targetMember = cleanHelperService.getCleanMemberByStudentNumber(request.getTargetStudentNumber());
+
+        if (!originMember.getSchoolClass().getId().equals(user.getClassId()) || !targetMember.getSchoolClass().getId().equals(user.getClassId())) {
+            throw new IllegalStateException("해당 학생은 해당 반에 속해있지 않습니다.");
+        }
+
+        cleanScheduleGroupService.removeMemberFromGroup(request.getOriginGroupId(), originMember.getStudentNumber());
+        cleanScheduleGroupService.removeMemberFromGroup(request.getTargetGroupId(), targetMember.getStudentNumber());
+        cleanScheduleGroupService.appendMemberToGroup(request.getOriginGroupId(), targetMember.getStudentNumber());
+        cleanScheduleGroupService.appendMemberToGroup(request.getTargetGroupId(), originMember.getStudentNumber());
+
+        CleanGroup originGroup = cleanHelperService.getCleanGroupById(request.getOriginGroupId());
+        CleanGroup targetGroup = cleanHelperService.getCleanGroupById(request.getTargetGroupId());
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "그룹의 학생 교환 성공", new CleanGroup[]{originGroup, targetGroup}));
+    }
+
+    /**
+     * 청소 스케줄을 완료 처리하는 컨트롤러
+     */
     @PostMapping("/complete")
     public ResponseEntity<ApiResponse> completeCleaningSchedule(@AuthenticationPrincipal CustomUserDetails user,
                                                                 @RequestBody ScheduleRequest request) {
