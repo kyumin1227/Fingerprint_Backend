@@ -6,5 +6,6 @@ import java.util.Optional;
 
 public interface CleanMemberRepository extends JpaRepository<CleanMember, String> {
     boolean existsByStudentNumber(String studentNumber);
+    boolean existsByStudentNumberAndSchoolClassId(String studentNumber, Long schoolClassId);
     Optional<CleanMember> findByStudentNumber(String studentNumber);
 }

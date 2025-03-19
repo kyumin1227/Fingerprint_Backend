@@ -47,6 +47,26 @@ public class CleanOperationService {
     }
 
     /**
+     * 스케줄과 그룹을 합쳐 청소 정보를 파싱하는 메소드
+     * @return 파싱된 청소 정보 리스트
+     */
+    public List<InfoResponse> appendParsingInfos(List<CleanGroup> groups, List<CleanSchedule> schedules, List<InfoResponse> infoResponses) {
+        cleanHelperService.validateCleanScheduleNotEmpty(schedules);
+        cleanHelperService.validateCleanGroupNotEmpty(groups);
+        ArrayList<CleanGroup> groupsCopy = new ArrayList<>(groups);
+        ArrayList<CleanSchedule> schedulesCopy = new ArrayList<>(schedules);
+        for (CleanSchedule schedule : schedulesCopy) {
+            if (schedule.isCanceled()) {
+                infoResponses.add(new InfoResponse(schedule.getDate()));
+            } else if (!groupsCopy.isEmpty()) {
+                CleanGroup group = groupsCopy.remove(0);
+                infoResponses.add(parsingInfo(group, schedule));
+            }
+        }
+        return infoResponses;
+    }
+
+    /**
      * 그룹과 스케줄을 합쳐 청소 정보를 파싱하는 메소드
      * @return 파싱된 청소 정보
      */
@@ -67,13 +87,19 @@ public class CleanOperationService {
      * @return 완료 처리 된 CleanGroup
      */
     @Transactional
-    public CleanGroup completeCleaningSchedule(LocalDate date, String areaName, String className) {
+    public CleanGroup completeCleaningSchedule(LocalDate date, String areaName, Long schoolClassId) {
         cleanHelperService.validateDateIsNotFuture(date);
-        CleanSchedule cleanSchedule = cleanHelperService.getCleanScheduleByDateAndClassNameAndAreaName(date, areaName, className);
+        CleanSchedule cleanSchedule = cleanHelperService.getCleanScheduleByDateAndAreaNameAndClassId(date, areaName, schoolClassId);
         cleanHelperService.validateScheduleComplete(cleanSchedule);
-        CleanGroup cleanGroup = cleanScheduleGroupService.getFirstGroup(areaName, className);
+        CleanGroup cleanGroup = cleanScheduleGroupService.getFirstGroup(areaName, schoolClassId);
         cleanGroup.setCleaned(true);
         cleanSchedule.completed();
         return cleanGroup;
+    }
+
+    public List<InfoResponse> sortInfoResponses(List<InfoResponse> infoResponses) {
+        return infoResponses.stream()
+                .sorted((o1, o2) -> o1.getDate().compareTo(o2.getDate()))
+                .toList();
     }
 }

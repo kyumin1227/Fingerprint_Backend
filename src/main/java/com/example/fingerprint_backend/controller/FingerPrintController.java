@@ -6,7 +6,6 @@ import com.example.fingerprint_backend.dto.CreateLogDto;
 import com.example.fingerprint_backend.entity.FingerPrintEntity;
 import com.example.fingerprint_backend.entity.LogEntity;
 import com.example.fingerprint_backend.service.FingerPrintService;
-import com.example.fingerprint_backend.service.KakaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

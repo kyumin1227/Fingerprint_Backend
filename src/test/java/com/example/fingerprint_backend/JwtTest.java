@@ -1,7 +1,6 @@
 package com.example.fingerprint_backend;
 
-import com.example.fingerprint_backend.service.JwtService;
-import com.example.fingerprint_backend.types.MemberRole;
+import com.example.fingerprint_backend.jwt.JWTUtil;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +13,12 @@ import org.springframework.test.context.ContextConfiguration;
 public class JwtTest {
 
     @Autowired
-    JwtService jwtService = new JwtService();
+    private JWTUtil JWTUtil;
 
     @Test
     void createJwt() {
 
-        String token = jwtService.generateToken("2423002", "kyumin1227@naver.com");
+        String token = JWTUtil.generateToken("2423002", "kyumin1227@naver.com");
         System.out.println(token);
     }
 }

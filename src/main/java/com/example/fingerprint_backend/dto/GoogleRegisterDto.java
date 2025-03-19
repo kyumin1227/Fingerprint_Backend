@@ -6,10 +6,7 @@ import lombok.Setter;
 @Getter @Setter
 public class GoogleRegisterDto {
 
-    private String credential;
-    private String email;
-    private String name;
-    private String kakao;
-    private String studentNum;
+    private String studentNumber;
+    private String className;
 
 }

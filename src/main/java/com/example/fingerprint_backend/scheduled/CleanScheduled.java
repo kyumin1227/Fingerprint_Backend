@@ -29,6 +29,22 @@ public class CleanScheduled {
     @Scheduled(cron = "0 0 12 * * ?")
     @Transactional
     /**
+     * 자동으로 청소 스케줄을 완료하는 메소드
+     */
+    public void completeScheduleIfNeeded() {
+        LocalDate today = LocalDate.now();
+        int minusDays = 0;
+
+        List<CleanSchedule> scheduleList = cleanScheduleGroupService.getScheduleByDateAndIsCanceled(today.minusDays(minusDays), false, false);
+
+        for (CleanSchedule schedule : scheduleList) {
+            cleanOperationService.completeCleaningSchedule(schedule.getDate(), schedule.getCleanArea().getName(), schedule.getSchoolClass().getId());
+        }
+    }
+
+    @Scheduled(cron = "0 5 12 * * ?")
+    @Transactional
+    /**
      * 자동으로 청소 스케줄을 생성하는 메소드
      */
     public void createScheduleIfNeeded() {
@@ -36,12 +52,12 @@ public class CleanScheduled {
         List<CleanArea> areas = cleanAreaRepository.findAll();
 
         for (CleanArea cleanArea : areas) {
-            List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName(cleanArea.getName(), cleanArea.getSchoolClass().getName(), today);
+            List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId(cleanArea.getName(), cleanArea.getSchoolClass().getId(), today);
             if (schedules.size() < cleanArea.getDisplay()) {
                 cleanScheduleGroupService.createCleanSchedules(
                         cleanArea.getLastScheduledDate(),
                         cleanArea.getName(),
-                        cleanArea.getSchoolClass().getName(),
+                        cleanArea.getSchoolClass().getId(),
                         cleanArea.getCycle(),
                         cleanArea.getDays(),
                         cleanArea.getDisplay() - schedules.size()
@@ -50,7 +66,7 @@ public class CleanScheduled {
         }
     }
 
-    @Scheduled(cron = "0 0 13 * * ?")
+    @Scheduled(cron = "0 10 12 * * ?")
     @Transactional
     /**
      * 자동으로 청소 그룹을 생성하는 메소드
@@ -59,35 +75,14 @@ public class CleanScheduled {
         List<CleanArea> areas = cleanAreaRepository.findAll();
 
         for (CleanArea cleanArea : areas) {
-            List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassNameAndIsCleaned(cleanArea.getName(), cleanArea.getSchoolClass().getName(), false);
+            List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassIdAndIsCleaned(cleanArea.getName(), cleanArea.getSchoolClass().getId(), false);
             while (groups.size() < cleanArea.getDisplay()) {
                 cleanScheduleGroupService.createGroupsByRandom(
                         cleanArea.getName(),
-                        cleanArea.getSchoolClass().getName(),
+                        cleanArea.getSchoolClass().getId(),
                         cleanArea.getMembers(),
                         cleanArea.getGroupSize()
                 );
-            }
-        }
-    }
-
-    @Scheduled(cron = "0 0 14 * * ?")
-    @Transactional
-    /**
-     * 자동으로 청소 스케줄을 완료하는 메소드
-     */
-    public void completeScheduleIfNeeded() {
-        LocalDate today = LocalDate.now();
-        int minusDays = 1;
-        List<CleanArea> areas = cleanAreaRepository.findAll();
-
-        for (CleanArea cleanArea : areas) {
-            List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassName(cleanArea.getName(), cleanArea.getSchoolClass().getName(), today.minusDays(minusDays));
-            for (CleanSchedule schedule : schedules) {
-                if (schedule.isCanceled()) {
-                    continue;
-                }
-                cleanOperationService.completeCleaningSchedule(today.minusDays(minusDays), cleanArea.getName(), cleanArea.getSchoolClass().getName());
             }
         }
     }

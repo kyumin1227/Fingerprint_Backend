@@ -1,11 +1,9 @@
 package com.example.fingerprint_backend.entity;
 
-import com.example.fingerprint_backend.types.CleanRole;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,43 +26,29 @@ public class CleanMember {
     @JsonBackReference
     private CleanArea cleanArea;
     @Column(nullable = false)
-    private String firstName;
-    @Column(nullable = false)
+    @Setter
     private String givenName;
-    @Enumerated(EnumType.STRING)
-    private CleanRole cleanRole = CleanRole.MEMBER;
+    @Column(nullable = false)
+    @Setter
+    private String familyName;
     @Setter
     private String profileImage;
     @Setter
     private Integer cleaningCount = 0;
+    @Setter
+    private Boolean isDeleted = false;
 
 
-    public CleanMember(String studentNumber, String firstName, String givenName, SchoolClass schoolClass) {
-        validateParameters(studentNumber, firstName, schoolClass);
+    public CleanMember(String studentNumber, String givenName, String familyName, SchoolClass schoolClass, CleanArea cleanArea) {
+        validateParameters(studentNumber, givenName, schoolClass);
         this.studentNumber = studentNumber;
-        this.firstName = firstName;
         this.givenName = givenName;
+        this.familyName = familyName;
         this.schoolClass = schoolClass;
-        this.cleanArea = schoolClass.getDefaultArea();
-    }
-
-    public CleanMember(String studentNumber, String firstName, String givenName, SchoolClass schoolClass, CleanRole cleanRole) {
-        validateParameters(studentNumber, firstName, schoolClass);
-        this.studentNumber = studentNumber;
-        this.firstName = firstName;
-        this.givenName = givenName;
-        this.schoolClass = schoolClass;
-        this.cleanRole = cleanRole;
-        this.cleanArea = schoolClass.getDefaultArea();
-    }
-
-    public void setCleanRole(CleanRole cleanRole) {
-        if (cleanRole == null) {
-            throw new IllegalStateException("역할은 null일 수 없습니다.");
-        }
-        this.cleanRole = cleanRole;
-        if (cleanRole.equals(CleanRole.MANAGER)) {
-            schoolClass.setManager(this);
+        if (cleanArea == null) {
+            this.cleanArea = schoolClass.getDefaultArea();
+        } else {
+            this.cleanArea = cleanArea;
         }
     }
 
@@ -88,6 +72,14 @@ public class CleanMember {
         if (cleanArea != null) {
             cleanArea.appendMember(this);
         }
+    }
+
+    public void deleteCleanMember() {
+        this.cleanArea.removeMember(this);
+        this.cleanArea = null;
+        this.schoolClass.removeCleanMember(this);
+        this.schoolClass = null;
+        this.isDeleted = true;
     }
 
     @Override

@@ -3,18 +3,18 @@ package com.example.fingerprint_backend.controller;
 import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.dto.clean.*;
 import com.example.fingerprint_backend.entity.*;
+import com.example.fingerprint_backend.jwt.CustomUserDetails;
 import com.example.fingerprint_backend.scheduled.CleanScheduled;
 import com.example.fingerprint_backend.service.CleanHelperService;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.service.CleanOperationService;
 import com.example.fingerprint_backend.service.CleanScheduleGroupService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -32,35 +32,59 @@ public class CleanManagerController {
     private final CleanHelperService cleanHelperService;
     private final CleanScheduled cleanScheduled;
 
-    @PostMapping("/class")
-    public ResponseEntity<ApiResponse> createClass(@RequestBody SchoolClassRequest request) {
-        String className = request.getClassName();
-        SchoolClass schoolClass = cleanManagementService.createSchoolClass(className);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "반 생성 성공", schoolClass));
-    }
-
     @PostMapping("/members")
-    public ResponseEntity<ApiResponse> createMember(@RequestBody MemberRequest request) {
+    public ResponseEntity<ApiResponse> createMember(@AuthenticationPrincipal CustomUserDetails user,
+                                                    @RequestBody MemberRequest request) {
+        CleanArea cleanArea = null;
+        if (request.getAreaName() != null) {
+            cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(request.getAreaName(), user.getClassId());
+        }
         CleanMember member = cleanManagementService.createMember(
                 request.getStudentNumber(),
-                request.getFirstName(),
                 request.getGivenName(),
-                request.getClassName(),
-                request.getRole()
+                request.getFamilyName(),
+                user.getClassId(),
+                cleanArea
         );
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 추가 성공", member));
     }
 
+    @PatchMapping("/members/{studentNumber}")
+    public ResponseEntity<ApiResponse> updateMember(@AuthenticationPrincipal CustomUserDetails user,
+                                                    @PathVariable String studentNumber,
+                                                    @RequestBody MemberRequest request) {
+        cleanHelperService.validateCleanMemberInSchoolClass(user.getClassId(), studentNumber);
+        cleanHelperService.validateCleanMemberExistsByStudentNumber(studentNumber);
+        CleanMember member = cleanManagementService.updateMember(
+                studentNumber,
+                request.getGivenName(),
+                request.getFamilyName(),
+                request.getAreaName()
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 수정 성공", member));
+    }
+
+    @DeleteMapping("/members/{studentNumber}")
+    public ResponseEntity<ApiResponse> deleteMember(@AuthenticationPrincipal CustomUserDetails user,
+                                                    @PathVariable String studentNumber) {
+        cleanHelperService.validateCleanMemberInSchoolClass(user.getClassId(), studentNumber);
+        cleanHelperService.validateCleanMemberExistsByStudentNumber(studentNumber);
+        cleanManagementService.deleteMember(studentNumber);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 삭제 성공", null));
+    }
+
     @PostMapping("/areas")
-    public ResponseEntity<ApiResponse> createArea(@RequestBody AreaRequest request) {
+    @Transactional
+    public ResponseEntity<ApiResponse> createArea(@AuthenticationPrincipal CustomUserDetails user,
+                                                  @RequestBody AreaRequest request) {
         CleanArea area = cleanManagementService.createArea(
                 request.getAreaName(),
-                request.getClassName(),
+                user.getClassId(),
                 request.getDaysOfWeek(),
                 request.getCycle()
         );
-        if (request.getIsDefault() != null && request.getIsDefault()) {
-            cleanManagementService.setDefaultArea(request.getAreaName(), request.getClassName());
+        if (request.getIsDefault()) {
+            cleanManagementService.setDefaultArea(request.getAreaName(), user.getClassId());
         }
         if (request.getStartDate() != null) {
             area.setLastScheduledDate(request.getStartDate());
@@ -79,11 +103,12 @@ public class CleanManagerController {
      * 스케줄을 생성하는 컨트롤러
      */
     @PostMapping("/schedules")
-    public ResponseEntity<ApiResponse> createSchedule(@RequestBody ScheduleRequest request) {
+    public ResponseEntity<ApiResponse> createSchedule(@AuthenticationPrincipal CustomUserDetails user,
+                                                      @RequestBody ScheduleRequest request) {
         cleanScheduleGroupService.createAndRestoreCleanSchedule(
                 request.getDate(),
                 request.getAreaName(),
-                request.getClassName()
+                user.getClassId()
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 스케줄 생성 성공", null));
@@ -93,12 +118,13 @@ public class CleanManagerController {
      * 자동으로 스케줄을 생성하는 컨트롤러 (주기, 요일, 갯수)
      */
     @PostMapping("/schedules/auto")
-    public ResponseEntity<ApiResponse> createScheduleAuto(@RequestBody ScheduleAutoRequest request) {
+    public ResponseEntity<ApiResponse> createScheduleAuto(@AuthenticationPrincipal CustomUserDetails user,
+                                                          @RequestBody ScheduleAutoRequest request) {
         Set<DayOfWeek> days = request.getDaysOfWeek().stream().map(DayOfWeek::valueOf).collect(Collectors.toSet());
         cleanScheduleGroupService.createCleanSchedules(
                 request.getDate(),
                 request.getAreaName(),
-                request.getClassName(),
+                user.getClassId(),
                 request.getCycle(),
                 days,
                 request.getCount()
@@ -110,14 +136,15 @@ public class CleanManagerController {
      * 랜덤으로 그룹을 생성하는 컨트롤러
      */
     @PostMapping("/groups/random")
-    public ResponseEntity<ApiResponse> createGroupsByRandom(@RequestBody GroupRequest request) {
-        List<CleanMember> members = cleanManagementService.getMembersBySchoolClassNameAndAreaName(
+    public ResponseEntity<ApiResponse> createGroupsByRandom(@AuthenticationPrincipal CustomUserDetails user,
+                                                            @RequestBody GroupRequest request) {
+        List<CleanMember> members = cleanManagementService.getMembersByAreaNameAndClassId(
                 request.getAreaName(),
-                request.getClassName()
+                user.getClassId()
         );
         cleanScheduleGroupService.createGroupsByRandom(
                 request.getAreaName(),
-                request.getClassName(),
+                user.getClassId(),
                 members,
                 (double) request.getGroupSize()
         );
@@ -125,11 +152,12 @@ public class CleanManagerController {
     }
 
     @PostMapping("/complete")
-    public ResponseEntity<ApiResponse> completeCleaningSchedule(@RequestBody ScheduleRequest request) {
+    public ResponseEntity<ApiResponse> completeCleaningSchedule(@AuthenticationPrincipal CustomUserDetails user,
+                                                                @RequestBody ScheduleRequest request) {
         CleanGroup completedGroup = cleanOperationService.completeCleaningSchedule(
                 request.getDate(),
                 request.getAreaName(),
-                request.getClassName()
+                user.getClassId()
         );
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 완료 처리 성공", completedGroup));
     }

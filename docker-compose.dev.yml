@@ -25,12 +25,6 @@ services:
     container_name: fingerprint_backend
     environment:
       GOOGLE_CLIENT_ID: 441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com
-      KAKAO_CLIENT_ID: c347a8b5a07e5dc6aa76a22c3ecf236b
-      ROLE_ADMIN: 0
-      ROLE_PROFESSOR: 1
-      ROLE_ASSISTANT: 2
-      ROLE_KEY: 3
-      ROLE_STUDENT: 4
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/fingerprint_db
       SPRING_DATASOURCE_USERNAME: default_user
       SPRING_DATASOURCE_PASSWORD: 1234
@@ -38,11 +32,13 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
       JWT_SECRET: secret
-      JWT_EXPIRATION: 36000
+      JWT_EXPIRATION: 360000000
+      TZ: Asia/Seoul
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app-network
 

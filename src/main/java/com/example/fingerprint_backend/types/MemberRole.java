@@ -1,5 +1,5 @@
 package com.example.fingerprint_backend.types;
 
 public enum MemberRole {
-    Student, Key, Professor, Assistant, Admin, None
+    STUDENT, MANAGER, SUB_MANAGER, PROFESSOR, ASSISTANT, NONE
 }
