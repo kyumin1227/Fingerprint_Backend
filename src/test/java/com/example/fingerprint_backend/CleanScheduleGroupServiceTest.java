@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 @SpringBootTest
-@ContextConfiguration(initializers = DotenvTestInitializer.class)
+//@ContextConfiguration(initializers = DotenvTestInitializer.class)
 @Transactional
 public class CleanScheduleGroupServiceTest {
 
