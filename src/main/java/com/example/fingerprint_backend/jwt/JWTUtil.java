@@ -1,12 +1,14 @@
 package com.example.fingerprint_backend.jwt;
 
 import com.example.fingerprint_backend.service.AccountService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 
@@ -14,24 +16,35 @@ import java.util.Date;
 public class JWTUtil {
 
     private final AccountService accountService;
+    private static final Logger log = LoggerFactory.getLogger(JWTUtil.class);
 
     public JWTUtil(AccountService accountService) {
         this.accountService = accountService;
     }
 
     @Value("${JWT_SECRET}")
-    private String jwtSecret;
+    private String JWT_SECRET;
 
     // JWT 만료 시간 (밀리초 단위)
     @Value("${JWT_EXPIRATION}")
-    private long jwtExpirationInMs;
+    private long JWT_EXPIRATION;
 
     public String generateToken(String studentNumber, String email) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
-        // 비밀 키 생성. 실제 운영에서는 키 관리에 신경쓰셔야 합니다.
-        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        return jwtBuild(studentNumber, email, JWT_EXPIRATION);
+    }
+
+    public String generateToken(String studentNumber, String email, long customJwtExpirationInMs) {
+        if (customJwtExpirationInMs <= 0) {
+            throw new IllegalArgumentException("만료 시간은 0보다 커야 합니다.");
+        }
+        return jwtBuild(studentNumber, email, customJwtExpirationInMs);
+    }
+
+    public String jwtBuild(String studentNumber, String email, long JWT_EXPIRATION) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
+        Key key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
 
         return Jwts.builder()
                 .setSubject(studentNumber)  // 토큰의 주체(subject)에 학번을 설정
@@ -45,12 +58,37 @@ public class JWTUtil {
     }
 
     public boolean validateToken(String token) {
+        Key key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
+
+        try {
+            Jwts.parser()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            log.warn("만료된 JWT 토큰입니다.");
+            return false;
+        } catch (UnsupportedJwtException e) {
+            log.warn("지원되지 않는 JWT 토큰입니다.");
+            return false;
+        } catch (MalformedJwtException e) {
+            log.warn("잘못된 JWT 토큰입니다.");
+            return false;
+        } catch (SignatureException e) {
+            log.warn("JWT 서명 검증에 실패했습니다.");
+            return false;
+        } catch (IllegalArgumentException e) {
+            log.warn("JWT 토큰이 비어있습니다.");
+            return false;
+        }
+
         return true;
     }
 
     public String getStudentNumberFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(jwtSecret.getBytes())
+                .setSigningKey(JWT_SECRET.getBytes())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -59,7 +97,7 @@ public class JWTUtil {
 
     public Long getClassIdFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(jwtSecret.getBytes())
+                .setSigningKey(JWT_SECRET.getBytes())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
