@@ -156,6 +156,7 @@ public class CleanScheduleGroupService {
         CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(studentNumber);
         CleanGroup cleanGroup = cleanHelperService.getCleanGroupById(groupId);
         cleanGroup.appendMember(member);
+        cleanGroupRepository.save(cleanGroup);
     }
 
     /**
