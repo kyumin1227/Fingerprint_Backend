@@ -26,14 +26,14 @@ public class CleanScheduled {
         this.cleanOperationService = cleanOperationService;
     }
 
-    @Scheduled(cron = "0 0 12 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     /**
      * 자동으로 청소 스케줄을 완료하는 메소드
      */
     public void completeScheduleIfNeeded() {
         LocalDate today = LocalDate.now();
-        int minusDays = 0;
+        int minusDays = 1;
 
         List<CleanSchedule> scheduleList = cleanScheduleGroupService.getScheduleByDateAndIsCanceled(today.minusDays(minusDays), false, false);
 
@@ -42,7 +42,7 @@ public class CleanScheduled {
         }
     }
 
-    @Scheduled(cron = "0 5 12 * * ?")
+    @Scheduled(cron = "0 0 1 * * ?")
     @Transactional
     /**
      * 자동으로 청소 스케줄을 생성하는 메소드
@@ -66,7 +66,7 @@ public class CleanScheduled {
         }
     }
 
-    @Scheduled(cron = "0 10 12 * * ?")
+    @Scheduled(cron = "0 0 2 * * ?")
     @Transactional
     /**
      * 자동으로 청소 그룹을 생성하는 메소드
