@@ -1,6 +1,7 @@
 package com.example.fingerprint_backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -14,8 +15,10 @@ public class LineEntity {
     private Long id;
     @OneToOne
     @JoinColumn(name = "student_number")
+    @Getter
     private MemberEntity member;
     @Column(unique = true, nullable = false)
+    @Getter
     private String lineId;
     private Boolean receiveLineMessage; // 라인 메시지 수신 여부
     private LocalDateTime createTime; // 생성 일자

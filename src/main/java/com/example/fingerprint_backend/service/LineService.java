@@ -1,8 +1,11 @@
 package com.example.fingerprint_backend.service;
 
+import com.example.fingerprint_backend.dto.message.LineWebhookRequest;
 import com.example.fingerprint_backend.entity.LineEntity;
 import com.example.fingerprint_backend.entity.MemberEntity;
+import com.example.fingerprint_backend.jwt.JWTUtil;
 import com.example.fingerprint_backend.repository.LineRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -11,9 +14,16 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @Transactional
 public class LineService {
+
+    private final JWTUtil jwtUtil;
+    private final GetService getService;
 
     @Value("${LINE_ACCESS_TOKEN}")
     private String LINE_ACCESS_TOKEN;
@@ -22,11 +32,24 @@ public class LineService {
     private final RestTemplate restTemplate;
     private final LineRepository lineRepository;
 
-    public LineService(RestTemplate restTemplate, LineRepository lineRepository) {
+    public LineService(JWTUtil jwtUtil, GetService getService, RestTemplate restTemplate, LineRepository lineRepository) {
+        this.jwtUtil = jwtUtil;
+        this.getService = getService;
         this.restTemplate = restTemplate;
         this.lineRepository = lineRepository;
     }
 
+    public void sendMessages(String lineId, String message) {
+        LineEntity lineEntity = lineRepository.findByLineId(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 라인 아이디가 존재하지 않습니다."));
+        sendReply(lineEntity.getLineId(), message);
+    }
+
+    /**
+     * 라인으로 답장을 보내는 메소드
+     * @param replyToken 라인에서 받은 토큰
+     * @param message 보낼 메시지
+     */
     public void sendReply(String replyToken, String message) {
         System.out.println("LINE_ACCESS_TOKEN = " + LINE_ACCESS_TOKEN);
         System.out.println(restTemplate);
@@ -35,26 +58,90 @@ public class LineService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + LINE_ACCESS_TOKEN);
 
-        String requestBody = "{"
-                + "\"replyToken\":\"" + replyToken + "\","
-                + "\"messages\":[{\"type\":\"text\",\"text\":\"" + message + "\"}]"
-                + "}";
+        try {
+            Map<String, Object> body = new HashMap<>();
+            body.put("replyToken", replyToken);
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+            Map<String, String> textMessage = new HashMap<>();
+            textMessage.put("type", "text");
+            textMessage.put("text", message);
 
-        restTemplate.postForObject(LINE_REPLY_URL, requestEntity, String.class);
+            body.put("messages", List.of(textMessage));
+
+            ObjectMapper mapper = new ObjectMapper();
+            String requestBody = mapper.writeValueAsString(body);
+
+            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+            restTemplate.postForObject(LINE_REPLY_URL, requestEntity, String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void lineMessageHandler(LineWebhookRequest request) {
+        String lineUserId = request.getEvents().get(0).getSource().getUserId();
+        String text = request.getEvents().get(0).getMessage().getText();
+        String replyToken = request.getEvents().get(0).getReplyToken();
+
+        if (!isLineIdExist(lineUserId)) {
+//            등록되지 않은 라인 아이디일 경우
+            if (!jwtUtil.validateToken(text)) {
+//                토큰이 유효하지 않을 경우
+                sendReply(replyToken, "등록되지 않은 계정입니다.\n계정 연결을 해주세요.\nhttps://bannote.org");
+                return;
+            }
+
+//            계정 연결
+            try {
+                String studentNumberFromToken = jwtUtil.getStudentNumberFromToken(text);
+                createLine(studentNumberFromToken, lineUserId);
+                sendReply(replyToken, "계정 연결이 완료되었습니다.");
+                return;
+            } catch (Exception e) {
+                sendReply(replyToken, "계정 연결에 실패했습니다.");
+                return;
+            }
+        };
+
+//        등록된 라인 아이디일 경우
+        LineEntity line = getLineByLineId(lineUserId);
+
+        if (text.equals("청소")) {
+            String studentNumber = line.getMember().getStudentNumber();
+            sendReply(replyToken, studentNumber + "의 청소 계획");
+            return;
+        }
+
+        sendReply(replyToken, "Message received");
+    }
+
+    /**
+     * 라인 아이디가 등록되지 않은 경우의 처리
+     * @param lineId 라인 아이디
+     * @param token 토큰 (메시지 내용)
+     */
+    public void guestUserHandler(String lineId, String token, String replyToken) {
+        if (!jwtUtil.validateToken(token)) {
+        }
     }
 
     /**
      * 유저의 라인 아이디를 데이터베이스에 저장
-     * @param token 유저의 토큰
+     * @param studentNumber 학번
      * @param lineId 라인 아이디
      */
-    public void createLine(String token, String lineId) {
-//        LineEntity lineEntity = new LineEntity(, lineId);
+    public void createLine(String studentNumber, String lineId) {
+        MemberEntity member = getService.getMemberByStudentNumber(studentNumber);
+        LineEntity lineEntity = new LineEntity(member, lineId);
+        lineRepository.save(lineEntity);
     }
 
     public boolean isLineIdExist(String lineId) {
         return lineRepository.existsByLineId(lineId);
+    }
+
+    public LineEntity getLineByLineId(String lineId) {
+        return lineRepository.findByLineId(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 라인 아이디가 존재하지 않습니다."));
     }
 }
