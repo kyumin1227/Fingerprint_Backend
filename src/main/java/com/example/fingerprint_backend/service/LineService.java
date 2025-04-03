@@ -95,8 +95,6 @@ public class LineService {
             guestUserHandler(lineUserId, text, replyToken);
             return;
         }
-        ;
-
 //        등록된 라인 아이디일 경우
         LineEntity line = getLineByLineId(lineUserId);
 
