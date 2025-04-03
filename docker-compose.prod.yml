@@ -5,14 +5,14 @@ services:
     image: mysql:latest
     container_name: fingerprint_db
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: fingerprint_db
-      MYSQL_USER: default_user  # SPRING_DATASOURCE_USERNAME
-      MYSQL_PASSWORD: 1234  # SPRING_DATASOURCE_PASSWORD
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}  # SPRING_DATASOURCE_USERNAME
+      MYSQL_PASSWORD: ${DB_PASSWORD}  # SPRING_DATASOURCE_PASSWORD
     volumes:
       - mysql-data:/var/lib/mysql
     ports:
-      - "3307:3306"
+      - "3306:3306"
     networks:
       - app-network
     healthcheck:
@@ -24,16 +24,17 @@ services:
     image: kyumin1227/fingerprint_backend_spring:latest
     container_name: fingerprint_backend
     environment:
-      GOOGLE_CLIENT_ID: 441788767782-183ndebp7adg7dsigjqofpj56bb7c3mp.apps.googleusercontent.com
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/fingerprint_db
-      SPRING_DATASOURCE_USERNAME: default_user
-      SPRING_DATASOURCE_PASSWORD: 1234
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
-      JWT_SECRET: secret
-      JWT_EXPIRATION: 36000000
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
       TZ: Asia/Seoul
+      LINE_ACCESS_TOKEN: ${LINE_ACCESS_TOKEN}
     ports:
       - "8080:8080"
     depends_on:

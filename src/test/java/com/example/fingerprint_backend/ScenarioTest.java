@@ -5,6 +5,7 @@ import com.example.fingerprint_backend.entity.CleanArea;
 import com.example.fingerprint_backend.entity.CleanGroup;
 import com.example.fingerprint_backend.entity.CleanMember;
 import com.example.fingerprint_backend.entity.SchoolClass;
+import com.example.fingerprint_backend.scheduled.CleanScheduled;
 import com.example.fingerprint_backend.service.CleanHelperService;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.service.CleanOperationService;
@@ -37,6 +38,8 @@ public class ScenarioTest {
     private CleanOperationService cleanOperationService;
     @Autowired
     private CleanHelperService cleanHelperService;
+    @Autowired
+    private CleanScheduled cleanScheduled;
 
     @DisplayName("학생 추가")
     @Test
@@ -235,5 +238,64 @@ public class ScenarioTest {
         assertThat(cleanHelperService.getCleanMemberByStudentNumber("2423002").getCleanArea().getName()).as("구역 변경").isEqualTo("창조관_406호");
         assertThat(area2.getMembers().size()).as("구역의 멤버 수").isEqualTo(1);
         assertThat(cleanScheduleGroupService.getGroupsByAreaNameAndClassId("창조관_405호", classId).get(0).getMembers().size()).as("그룹의 멤버 수").isEqualTo(0);
+    }
+
+    @DisplayName("청소 스케줄 자동 추가 1 (월요일, 스케줄 10개)")
+    @Test
+    void autoAppendSchedule_1() {
+        Long classId = cleanManagementService.createSchoolClass("2027_A").getId();
+        CleanArea area1 = cleanManagementService.createArea("창조관 405호", classId, Set.of(DayOfWeek.MONDAY), 1);
+        area1.setDisplay(10);
+        cleanScheduled.createScheduleIfNeeded();
+
+        cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId("창조관 405호", classId, LocalDate.now()).forEach(schedule -> {
+            System.out.println("schedule.getDate() = " + schedule.getDate());
+        });
+
+        assertThat(cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId("창조관 405호", classId, LocalDate.now()).size()).as("스케줄 수 10개").isEqualTo(10);
+    }
+
+    @DisplayName("청소 스케줄 자동 추가 2 (월요일, 스케줄 10개)")
+    @Test
+    void autoAppendSchedule_2() {
+        Long classId = cleanManagementService.createSchoolClass("2027_A").getId();
+        CleanArea area1 = cleanManagementService.createArea("창조관 405호", classId, Set.of(DayOfWeek.MONDAY), 1);
+        cleanScheduled.createScheduleIfNeeded();
+        area1.setDisplay(10);
+        area1.setDays(Set.of(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY));
+        cleanScheduled.createScheduleIfNeeded();
+
+        cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId("창조관 405호", classId, LocalDate.now()).forEach(schedule -> {
+            System.out.println("schedule.getDate() = " + schedule.getDate());
+        });
+
+        assertThat(cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId("창조관 405호", classId, LocalDate.now()).size()).as("스케줄 수 10개").isEqualTo(10);
+    }
+
+    @DisplayName("청소 그룹 자동 추가")
+    @Test
+    void autoAppendGroup() {
+        Long classId = cleanManagementService.createSchoolClass("2027_A").getId();
+        CleanArea area1 = cleanManagementService.createArea("창조관 405호", classId, Set.of(DayOfWeek.MONDAY), 1);
+        area1.setDisplay(3);
+        cleanManagementService.createMember("2423007", "민정", "김", classId, area1);
+        cleanManagementService.createMember("2423001", "혁일", "권", classId, area1);
+        cleanManagementService.createMember("2423002", "규민", "김", classId, area1);
+        cleanScheduled.createGroupIfNeeded();
+        cleanManagementService.createMember("2423003", "근형", "김", classId, area1);
+        area1.setDisplay(5);
+        cleanScheduled.createGroupIfNeeded();
+
+        cleanScheduleGroupService.getGroupsByAreaNameAndClassId("창조관 405호", classId).forEach(group -> {
+            System.out.println("group.getMembers() = " + group.getMembers());
+            group.getMembers().forEach(member -> {
+                System.out.println("member.getGivenName() = " + member.getGivenName());
+            });
+        });
+
+//        앞에 채웠기 때문에 3명
+        assertThat(cleanScheduleGroupService.getLastGroup("창조관 405호", classId).getMembers().size()).as("마지막 그룹의 멤버 수").isEqualTo(3);
+
+        assertThat(cleanScheduleGroupService.getGroupsByAreaNameAndClassIdAndIsCleaned("창조관 405호", classId, false).size()).as("그룹 수").isEqualTo(5);
     }
 }
