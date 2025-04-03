@@ -5,6 +5,7 @@ import com.example.fingerprint_backend.entity.LineEntity;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.jwt.JWTUtil;
 import com.example.fingerprint_backend.repository.LineRepository;
+import com.example.fingerprint_backend.types.LineCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,6 +79,10 @@ public class LineService {
         }
     }
 
+    /**
+     * 라인 메시지를 처리하는 메소드
+     * @param request 라인 웹훅 요청
+     */
     public void lineMessageHandler(LineWebhookRequest request) {
         String lineUserId = request.getEvents().get(0).getSource().getUserId();
         String text = request.getEvents().get(0).getMessage().getText();
@@ -95,7 +100,7 @@ public class LineService {
             try {
                 String studentNumberFromToken = jwtUtil.getStudentNumberFromToken(text);
                 createLine(studentNumberFromToken, lineUserId);
-                sendReply(replyToken, "계정 연결이 완료되었습니다.");
+                sendReply(replyToken, "학번: " + studentNumberFromToken + "번\n계정 연결이 완료되었습니다.");
                 return;
             } catch (Exception e) {
                 sendReply(replyToken, "계정 연결에 실패했습니다.");
@@ -106,13 +111,11 @@ public class LineService {
 //        등록된 라인 아이디일 경우
         LineEntity line = getLineByLineId(lineUserId);
 
-        if (text.equals("청소")) {
-            String studentNumber = line.getMember().getStudentNumber();
-            sendReply(replyToken, studentNumber + "의 청소 계획");
-            return;
-        }
+        String response = LineCommand.fromKeyword(text)
+                .map(cmd -> cmd.execute(line))
+                .orElse("지원하지 않는 명령어입니다.");
 
-        sendReply(replyToken, "Message received");
+        sendReply(replyToken, response);
     }
 
     /**
