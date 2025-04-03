@@ -1,0 +1,10 @@
+cloud:
+  aws:
+    s3:
+      image-bucket:
+        name: ${AWS_S3_IMAGE_BUCKET_NAME}
+      region:
+        static: ${AWS_REGION}
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
