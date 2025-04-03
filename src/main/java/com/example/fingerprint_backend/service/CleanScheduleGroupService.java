@@ -232,18 +232,25 @@ public class CleanScheduleGroupService {
      */
     public void fillLastGroupByRandom(String areaName, Long schoolClassId, List<CleanMember> members) {
         CleanGroup lastGroup = getLastGroup(areaName, schoolClassId);
-        if (lastGroup != null && members.size() >= lastGroup.getMemberCount() - lastGroup.getMembers().size()) {
-            int empty = lastGroup.getMemberCount() - lastGroup.getMembers().size();
-            for (int i = 0; i < empty; i++) {
-                int randomNum = (int) (Math.random() * members.size());
-                CleanMember remove = members.remove(randomNum);
-                try {
-                    lastGroup.appendMember(remove);
-                } catch (IllegalArgumentException e) {
+        if (lastGroup == null) {
+            // 마지막 그룹이 없는 경우
+            return;
+        }
+        int empty = lastGroup.getMemberCount() - lastGroup.getMembers().size();
+        int duplicateCount = 0;
+        for (int i = 0; i < empty; i++) {
+            if (members.size() - duplicateCount <= 0) {
+                break;
+            }
+            int randomNum = (int) (Math.random() * (members.size() - duplicateCount));
+            CleanMember remove = members.remove(randomNum);
+            try {
+                lastGroup.appendMember(remove);
+            } catch (IllegalArgumentException e) {
 //                    중복 멤버가 발생할 경우 다시 추가
-                    members.add(remove);
-                    i--;
-                }
+                members.add(remove);
+                i--;
+                duplicateCount++;
             }
         }
     }
@@ -297,8 +304,8 @@ public class CleanScheduleGroupService {
     }
 
     /**
-     *  특정 날짜의 청소 스케줄을 가져오는 메소드
-     *  isCanceled: 취소 여부
+     * 특정 날짜의 청소 스케줄을 가져오는 메소드
+     * isCanceled: 취소 여부
      */
     public List<CleanSchedule> getScheduleByDateAndIsCanceled(LocalDate localDate, boolean isCanceled, boolean isCompleted) {
         return cleanScheduleRepository.findAllByDateAndIsCanceledAndIsCompleted(localDate, isCanceled, isCompleted);

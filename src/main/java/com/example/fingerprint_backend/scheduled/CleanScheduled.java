@@ -75,8 +75,12 @@ public class CleanScheduled {
         List<CleanArea> areas = cleanAreaRepository.findAll();
 
         for (CleanArea cleanArea : areas) {
-            List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassIdAndIsCleaned(cleanArea.getName(), cleanArea.getSchoolClass().getId(), false);
-            while (groups.size() < cleanArea.getDisplay()) {
+            while (true) {
+                List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassIdAndIsCleaned(
+                        cleanArea.getName(), cleanArea.getSchoolClass().getId(), false);
+                if (groups.size() >= cleanArea.getDisplay()) {
+                    break;
+                }
                 cleanScheduleGroupService.createGroupsByRandom(
                         cleanArea.getName(),
                         cleanArea.getSchoolClass().getId(),
