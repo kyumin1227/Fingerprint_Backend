@@ -48,8 +48,9 @@ public class LineService {
 
     /**
      * 라인으로 답장을 보내는 메소드
+     *
      * @param replyToken 라인에서 받은 토큰
-     * @param message 보낼 메시지
+     * @param message    보낼 메시지
      */
     public void sendReply(String replyToken, String message) {
         System.out.println("LINE_ACCESS_TOKEN = " + LINE_ACCESS_TOKEN);
@@ -81,6 +82,7 @@ public class LineService {
 
     /**
      * 라인 메시지를 처리하는 메소드
+     *
      * @param request 라인 웹훅 요청
      */
     public void lineMessageHandler(LineWebhookRequest request) {
@@ -89,24 +91,11 @@ public class LineService {
         String replyToken = request.getEvents().get(0).getReplyToken();
 
         if (!isLineIdExist(lineUserId)) {
-//            등록되지 않은 라인 아이디일 경우
-            if (!jwtUtil.validateToken(text)) {
-//                토큰이 유효하지 않을 경우
-                sendReply(replyToken, "등록되지 않은 계정입니다.\n계정 연결을 해주세요.\nhttps://bannote.org");
-                return;
-            }
-
-//            계정 연결
-            try {
-                String studentNumberFromToken = jwtUtil.getStudentNumberFromToken(text);
-                createLine(studentNumberFromToken, lineUserId);
-                sendReply(replyToken, "학번: " + studentNumberFromToken + "번\n계정 연결이 완료되었습니다.");
-                return;
-            } catch (Exception e) {
-                sendReply(replyToken, "계정 연결에 실패했습니다.");
-                return;
-            }
-        };
+//          등록되지 않은 라인 아이디일 경우
+            guestUserHandler(lineUserId, text, replyToken);
+            return;
+        }
+        ;
 
 //        등록된 라인 아이디일 경우
         LineEntity line = getLineByLineId(lineUserId);
@@ -120,18 +109,32 @@ public class LineService {
 
     /**
      * 라인 아이디가 등록되지 않은 경우의 처리
-     * @param lineId 라인 아이디
-     * @param token 토큰 (메시지 내용)
+     *
+     * @param lineUserId 라인 아이디
+     * @param token      토큰 (메시지 내용)
+     * @param replyToken 라인 답장 토큰
      */
-    public void guestUserHandler(String lineId, String token, String replyToken) {
+    public void guestUserHandler(String lineUserId, String token, String replyToken) {
         if (!jwtUtil.validateToken(token)) {
+//                토큰이 유효하지 않을 경우
+            sendReply(replyToken, "등록되지 않은 계정입니다.\n계정 연결을 해주세요.\nhttps://bannote.org");
+            return;
+        }
+//            계정 연결
+        try {
+            String studentNumberFromToken = jwtUtil.getStudentNumberFromToken(token);
+            createLine(studentNumberFromToken, lineUserId);
+            sendReply(replyToken, "학번: " + studentNumberFromToken + "번\n계정 연결이 완료되었습니다.");
+        } catch (Exception e) {
+            sendReply(replyToken, "계정 연결에 실패했습니다.");
         }
     }
 
     /**
      * 유저의 라인 아이디를 데이터베이스에 저장
+     *
      * @param studentNumber 학번
-     * @param lineId 라인 아이디
+     * @param lineId        라인 아이디
      */
     public void createLine(String studentNumber, String lineId) {
         MemberEntity member = getService.getMemberByStudentNumber(studentNumber);
