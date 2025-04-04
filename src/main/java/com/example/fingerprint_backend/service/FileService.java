@@ -34,12 +34,12 @@ public class FileService {
      */
     public String storeFile(FileType fileType, MultipartFile file, String path, long maxSize) {
         validateFileSize(file, maxSize);
-        validateFileFormat(file.getOriginalFilename(), fileType);
-        String fileName = generateFileName(fileType.getExtensions().iterator().next());
-        System.out.println("fileName = " + fileName);
+        String extension = getExtension(file.getOriginalFilename());
+        validateFileFormat(extension, fileType);
+        String fileName = generateFileName(extension);
         uploadFile(file, path + fileName);
 
-        return fileName;
+        return path + fileName;
     }
 
     public void uploadFile(MultipartFile file, String key) {
@@ -70,6 +70,21 @@ public class FileService {
     }
 
     /**
+     * 파일 이름에서 확장자를 추출하는 메소드
+     *
+     * @param fileName - 파일 이름
+     * @return - 파일 확장자 (소문자)
+     * @throws FileException - 파일 이름이 유효하지 않은 경우
+     */
+    public String getExtension(String fileName) {
+        if (fileName == null || !fileName.contains(".")) {
+            throw new FileException("유효하지 않은 파일명입니다.");
+        }
+        return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+    }
+
+
+    /**
      * 파일의 크기를 검증하는 메소드
      *
      * @param file    - 확인할 파일
@@ -95,7 +110,8 @@ public class FileService {
      */
     public void validateFileFormat(String fileName, FileType fileType) {
         for (String extension : fileType.getExtensions()) {
-            if (fileName.toLowerCase().endsWith("." + extension)) {
+            if (fileName.toLowerCase().endsWith(extension)) {
+                System.out.println("파일 형식이 올바릅니다.");
                 return;
             }
         }

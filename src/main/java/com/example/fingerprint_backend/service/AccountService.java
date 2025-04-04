@@ -1,7 +1,10 @@
 package com.example.fingerprint_backend.service;
 
+import com.example.fingerprint_backend.entity.CleanMember;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.entity.SchoolClass;
+import com.example.fingerprint_backend.repository.CleanMemberRepository;
+import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.repository.SchoolClassRepository;
 import com.example.fingerprint_backend.types.MemberRole;
 import jakarta.transaction.Transactional;
@@ -16,7 +19,10 @@ import java.util.List;
 public class AccountService {
 
     private final GetService getService;
+    private final CleanHelperService cleanHelperService;
     private final SchoolClassRepository schoolClassRepository;
+    private final MemberRepository memberRepository;
+    private final CleanMemberRepository cleanMemberRepository;
 
     /**
      * 해당 멤버의 반을 설정하는 함수
@@ -64,5 +70,21 @@ public class AccountService {
             return null;
         }
         return schoolClass.getId();
+    }
+
+    /**
+     * 해당 학번의 프로필 이미지를 설정하는 함수 (기본 계정, 청소 계정 모두 설정)
+     */
+    public void setProfileImage(String studentNumber, String profileImage) {
+        MemberEntity member = getService.getMemberByStudentNumber(studentNumber);
+        member.setProfileImage(profileImage);
+        memberRepository.save(member);
+        try {
+            CleanMember cleanMember = cleanHelperService.getCleanMemberByStudentNumber(studentNumber);
+            cleanMember.setProfileImage(profileImage);
+            cleanMemberRepository.save(cleanMember);
+        } catch (IllegalArgumentException ignored) {
+            // 청소 계정이 없는 경우 무시
+        }
     }
 }
