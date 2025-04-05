@@ -1,11 +1,11 @@
 package com.example.fingerprint_backend.service;
 
+import com.example.fingerprint_backend.command.CommandService;
 import com.example.fingerprint_backend.dto.message.LineWebhookRequest;
 import com.example.fingerprint_backend.entity.LineEntity;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.jwt.JWTUtil;
 import com.example.fingerprint_backend.repository.LineRepository;
-import com.example.fingerprint_backend.types.LineCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +25,7 @@ public class LineService {
 
     private final JWTUtil jwtUtil;
     private final GetService getService;
+    private final CommandService commandService;
 
     @Value("${LINE_ACCESS_TOKEN}")
     private String LINE_ACCESS_TOKEN;
@@ -33,11 +34,12 @@ public class LineService {
     private final RestTemplate restTemplate;
     private final LineRepository lineRepository;
 
-    public LineService(JWTUtil jwtUtil, GetService getService, RestTemplate restTemplate, LineRepository lineRepository) {
+    public LineService(JWTUtil jwtUtil, GetService getService, RestTemplate restTemplate, LineRepository lineRepository, CommandService commandService) {
         this.jwtUtil = jwtUtil;
         this.getService = getService;
         this.restTemplate = restTemplate;
         this.lineRepository = lineRepository;
+        this.commandService = commandService;
     }
 
     public void sendMessages(String lineId, String message) {
@@ -98,11 +100,9 @@ public class LineService {
 //        등록된 라인 아이디일 경우
         LineEntity line = getLineByLineId(lineUserId);
 
-        String response = LineCommand.fromKeyword(text)
-                .map(cmd -> cmd.execute(line))
-                .orElse("지원하지 않는 명령어입니다.");
+        String replyMessage = commandService.getReply(text, line);
 
-        sendReply(replyToken, response);
+        sendReply(replyToken, replyMessage);
     }
 
     /**
