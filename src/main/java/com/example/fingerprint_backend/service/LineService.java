@@ -140,6 +140,12 @@ public class LineService {
         lineRepository.save(lineEntity);
     }
 
+    public void deleteLine(String lineId) {
+        LineEntity lineEntity = lineRepository.findByLineId(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 라인 아이디가 존재하지 않습니다."));
+        lineRepository.delete(lineEntity);
+    }
+
     public boolean isLineIdExist(String lineId) {
         return lineRepository.existsByLineId(lineId);
     }

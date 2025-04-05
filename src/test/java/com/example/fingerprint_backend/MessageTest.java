@@ -26,4 +26,14 @@ public class MessageTest {
 
         assertThat(Command).isEqualTo(MessageCommand.CLEAN);
     }
+
+    @DisplayName("메시지로 들어오는 키워드 변환 테스트")
+    @Test
+    void commandTest2() {
+        String keyword = "연결해제";
+        MessageCommand Command = MessageCommand.fromKeyword(keyword)
+                .orElseThrow();
+
+        assertThat(Command).isEqualTo(MessageCommand.DISCONNECT);
+    }
 }
