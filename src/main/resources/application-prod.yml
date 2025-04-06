@@ -1,3 +1,2 @@
 cors:
-  allowed-origins:
-    - https://bannote.org
+  allowed-origins: https://bannote.org, https://www.bannote.org
