@@ -1,0 +1,9 @@
+cloud:
+  aws:
+    s3:
+      image-bucket:
+        name: test-bucket
+      region: ap-northeast-1
+      credentials:
+        access-key: test-access-key
+        secret-key: test-secret-key

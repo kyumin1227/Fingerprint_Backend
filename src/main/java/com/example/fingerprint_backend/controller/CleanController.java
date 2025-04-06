@@ -32,29 +32,16 @@ public class CleanController {
     @GetMapping("")
     public ResponseEntity<ApiResponse> getCleanInfo(@RequestParam("classId") Long classId,
                                                     @RequestParam("areaName") String areaName) {
-        List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassIdAndIsCleaned(areaName, classId, false);
-        List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId(areaName, classId, LocalDate.now());
-        List<InfoResponse> infoResponses = cleanOperationService.parsingInfos(groups, schedules);
+        List<InfoResponse> cleanInfos = cleanOperationService.getCleanInfos(classId, areaName);
 
-        return ResponseEntity.ok(new ApiResponse(true, "청소 정보 조회 성공", infoResponses));
+        return ResponseEntity.ok(new ApiResponse(true, "청소 정보 조회 성공", cleanInfos));
     }
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponse> getCleanInfo(@RequestParam("classId") Long classId) {
-        List<CleanArea> cleanAreas = cleanHelperService.getCleanAreasBySchoolClassId(classId);
-        List<InfoResponse> infoResponses = new ArrayList<>();
-        cleanAreas.forEach(cleanArea -> {
-            List<CleanGroup> groups = cleanScheduleGroupService.getGroupsByAreaNameAndClassIdAndIsCleaned(cleanArea.getName(), classId, false);
-            List<CleanSchedule> schedules = cleanScheduleGroupService.getScheduleByAreaNameAndSchoolClassId(cleanArea.getName(), classId, LocalDate.now());
-            try {
-                cleanOperationService.appendParsingInfos(groups, schedules, infoResponses);
-            } catch (IllegalStateException e) {
-            }
-        });
+        List<InfoResponse> cleanInfos = cleanOperationService.getCleanInfos(classId);
 
-        List<InfoResponse> sortedInfoResponses = cleanOperationService.sortInfoResponses(infoResponses);
-
-        return ResponseEntity.ok(new ApiResponse(true, "청소 정보 조회 성공", sortedInfoResponses));
+        return ResponseEntity.ok(new ApiResponse(true, "청소 정보 조회 성공", cleanInfos));
     }
 
 }
