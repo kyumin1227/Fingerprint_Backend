@@ -14,7 +14,6 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -24,7 +23,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@ContextConfiguration(initializers = DotenvTestInitializer.class)
 @Transactional
 public class ScenarioTest {
 

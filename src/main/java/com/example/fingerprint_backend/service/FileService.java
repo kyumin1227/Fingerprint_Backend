@@ -111,7 +111,6 @@ public class FileService {
     public void validateFileFormat(String fileName, FileType fileType) {
         for (String extension : fileType.getExtensions()) {
             if (fileName.toLowerCase().endsWith(extension)) {
-                System.out.println("파일 형식이 올바릅니다.");
                 return;
             }
         }
