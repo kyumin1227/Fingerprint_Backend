@@ -10,7 +10,8 @@ import java.util.Optional;
 public enum MessageCommand {
     CLEAN(List.of("청소", "掃除", "clean")),
     HELLO(List.of("안녕", "こんにちは", "hello")),
-    DISCONNECT(List.of("연결해제", "切断", "disconnect"));
+    DISCONNECT(List.of("연결해제", "切断", "disconnect")),
+    CLEAN_INFO(List.of("청소정보", "청소일정", "掃除情報", "cleaninfo"));
 
     private final List<String> keywords;
 
@@ -20,7 +21,7 @@ public enum MessageCommand {
 
     public static Optional<MessageCommand> fromKeyword(String keyword) {
         return Arrays.stream(values())
-                .filter(cmd -> cmd.keywords.contains(keyword.toLowerCase()))
+                .filter(cmd -> cmd.keywords.contains(keyword.toLowerCase().replace(" ", "")))
                 .findFirst();
     }
 }
