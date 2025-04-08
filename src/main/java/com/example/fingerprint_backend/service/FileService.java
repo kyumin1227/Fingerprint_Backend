@@ -2,7 +2,6 @@ package com.example.fingerprint_backend.service;
 
 import com.example.fingerprint_backend.exception.FileException;
 import com.example.fingerprint_backend.types.FileType;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -14,9 +13,6 @@ import java.util.UUID;
 @Service
 public class FileService {
 
-    @Value("${cloud.aws.s3.image-bucket.name}")
-    private String bucketName;
-
     private final S3Client s3Client;
 
     public FileService(S3Client s3Client) {
@@ -26,23 +22,31 @@ public class FileService {
     /**
      * 파일을 S3에 업로드하는 메소드
      *
-     * @param fileType - 파일 형식
-     * @param file     - 업로드할 파일
-     * @param path     - S3에 저장할 경로 (예: "images/profile/{studentNumber}")
-     * @param maxSize  - 최대 파일 크기 (바이트 단위)
+     * @param fileType   - 파일 형식
+     * @param file       - 업로드할 파일
+     * @param path       - S3에 저장할 경로 (예: "images/profile/{studentNumber}")
+     * @param maxSize    - 최대 파일 크기 (바이트 단위)
+     * @param bucketName - S3 버킷 이름
      * @return - 업로드된 파일의 URL
      */
-    public String storeFile(FileType fileType, MultipartFile file, String path, long maxSize) {
+    public String storeFile(FileType fileType, MultipartFile file, String path, long maxSize, String bucketName) {
         validateFileSize(file, maxSize);
         String extension = getExtension(file.getOriginalFilename());
         validateFileFormat(extension, fileType);
         String fileName = generateFileName(extension);
-        uploadFile(file, path + fileName);
+        uploadFile(file, path + fileName, bucketName);
 
         return path + fileName;
     }
 
-    public void uploadFile(MultipartFile file, String key) {
+    /**
+     * 파일을 S3에 업로드하는 메소드
+     *
+     * @param file       - 업로드할 파일
+     * @param key        - S3에 저장할 경로 (예: "images/profile/{studentNumber}/{fileName}")
+     * @param bucketName - S3 버킷 이름
+     */
+    public void uploadFile(MultipartFile file, String key, String bucketName) {
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucketName) // TODO : 나중에 버킷이 추가 되면 확장자에 맞춰 버킷 이름을 변경해야 함
                 .key(key)
@@ -83,7 +87,6 @@ public class FileService {
         return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
     }
 
-
     /**
      * 파일의 크기를 검증하는 메소드
      *
@@ -119,6 +122,5 @@ public class FileService {
                 String.join(", ", fileType.getExtensions())
         ));
     }
-
 
 }
