@@ -37,6 +37,6 @@ public class MemberController {
         String url = fileService.storeFile(FileType.IMAGE, file, path, MAX_PROFILE_IMAGE_SIZE, IMAGE_BUCKET_NAME);
         accountService.setProfileImage(user.getUsername(), url);
 
-        return ResponseEntity.ok(new ApiResponse(true, "프로필 이미지 업데이트 성공", URL + url));
+        return ResponseEntity.ok(new ApiResponse(true, "프로필 이미지 업데이트 성공", url));
     }
 }
