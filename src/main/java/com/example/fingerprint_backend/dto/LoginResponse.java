@@ -1,8 +1,7 @@
 package com.example.fingerprint_backend.dto;
 
 import com.example.fingerprint_backend.entity.MemberEntity;
-import com.example.fingerprint_backend.entity.SchoolClass;
-import com.example.fingerprint_backend.types.MemberLanguage;
+import com.example.fingerprint_backend.types.LanguageType;
 import com.example.fingerprint_backend.types.MemberRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,7 @@ public class LoginResponse {
     private String name;
     private String givenName;
     private String familyName;
-    private MemberLanguage language;
+    private LanguageType language;
     private List<MemberRole> role;
     private String className;
     private String profileImage;

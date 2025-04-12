@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.entity;
 
-import com.example.fingerprint_backend.types.MemberLanguage;
+import com.example.fingerprint_backend.types.LanguageType;
 import com.example.fingerprint_backend.types.MemberRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class MemberEntity {
     private String givenName;
     private String familyName;
     @Enumerated(EnumType.STRING)
-    private MemberLanguage language;
+    private LanguageType language;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "member_roles", joinColumns = @JoinColumn(name = "member_student_number"))
     @Column(name = "role")
@@ -36,7 +36,7 @@ public class MemberEntity {
     private String profileImage;
     private LocalDateTime registerTime; // 가입 일자
 
-    public MemberEntity(String studentNumber, String email, String name, String givenName, String familyName, MemberLanguage language, String profileImage) {
+    public MemberEntity(String studentNumber, String email, String name, String givenName, String familyName, LanguageType language, String profileImage) {
         this.studentNumber = studentNumber;
         this.email = email;
         this.name = name;

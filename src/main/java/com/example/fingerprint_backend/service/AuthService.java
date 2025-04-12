@@ -6,7 +6,7 @@ import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.exception.UserNotRegisteredException;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.repository.SchoolClassRepository;
-import com.example.fingerprint_backend.types.MemberLanguage;
+import com.example.fingerprint_backend.types.LanguageType;
 import com.example.fingerprint_backend.types.MemberRole;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import jakarta.annotation.PostConstruct;
@@ -174,7 +174,7 @@ public class AuthService {
                 userInfo.getName(),
                 userInfo.getGivenName(),
                 userInfo.getFamilyName(),
-                MemberLanguage.KOREA,
+                LanguageType.KOREA,
                 userInfo.getProfileImage()
         );
 

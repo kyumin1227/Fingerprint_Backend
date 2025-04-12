@@ -1,5 +1,5 @@
 package com.example.fingerprint_backend.types;
 
-public enum MemberLanguage {
+public enum LanguageType {
     KOREA, JAPAN, ENGLISH
 }
