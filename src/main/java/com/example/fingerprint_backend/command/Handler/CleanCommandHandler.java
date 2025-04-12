@@ -48,4 +48,9 @@ public class CleanCommandHandler implements CommandHandler {
 
         return "예정된 청소가 없습니다.";
     }
+
+    @Override
+    public String getHelpMessage() {
+        return "청소: 자신의 다음 청소 예정을 표시합니다.";
+    }
 }

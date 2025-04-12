@@ -24,4 +24,11 @@ public class CleanInfoCommandHandler implements CommandHandler {
 
         return response.toString();
     }
+
+    @Override
+    public String getHelpMessage() {
+        return "청소 정보: 청소 정보의 URL을 표시합니다.";
+    }
+
+
 }

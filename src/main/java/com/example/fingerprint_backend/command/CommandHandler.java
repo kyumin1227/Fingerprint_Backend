@@ -12,4 +12,5 @@ public interface CommandHandler {
      * @return 답장할 메시지
      */
     String handleCommand(LineEntity line);
+    String getHelpMessage();
 }

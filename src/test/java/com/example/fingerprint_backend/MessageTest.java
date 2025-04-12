@@ -1,5 +1,7 @@
 package com.example.fingerprint_backend;
 
+import com.example.fingerprint_backend.command.Handler.CleanCommandHandler;
+import com.example.fingerprint_backend.command.Handler.HelpCommandHandler;
 import com.example.fingerprint_backend.service.LineService;
 import com.example.fingerprint_backend.command.MessageCommand;
 import jakarta.transaction.Transactional;
@@ -16,6 +18,9 @@ public class MessageTest {
 
     @Autowired
     private LineService lineService;
+
+    @Autowired
+    HelpCommandHandler helpCommandHandler;
 
     @DisplayName("메시지로 들어오는 키워드 변환 테스트")
     @Test
@@ -35,5 +40,12 @@ public class MessageTest {
                 .orElseThrow();
 
         assertThat(Command).isEqualTo(MessageCommand.DISCONNECT);
+    }
+
+    @Test
+    void name() {
+        String s = helpCommandHandler.handleCommand(null);
+
+        System.out.println(s);
     }
 }

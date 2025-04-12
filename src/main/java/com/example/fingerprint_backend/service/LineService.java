@@ -115,7 +115,7 @@ public class LineService {
     public void guestUserHandler(String lineUserId, String token, String replyToken) {
         if (!jwtUtil.validateToken(token)) {
 //                토큰이 유효하지 않을 경우
-            sendReply(replyToken, "등록되지 않은 계정입니다.\n계정 연결을 해주세요.\nhttps://bannote.org");
+            sendReply(replyToken, "등록되지 않은 계정입니다.\n토큰을 발급하여 계정 연결을 해주세요.\nhttps://bannote.org");
             return;
         }
 //            계정 연결
