@@ -3,15 +3,19 @@ package com.example.fingerprint_backend.controller;
 import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.dto.CreateFingerPrintDto;
 import com.example.fingerprint_backend.dto.CreateLogDto;
+import com.example.fingerprint_backend.entity.ClassClosingTime;
 import com.example.fingerprint_backend.entity.FingerPrintEntity;
 import com.example.fingerprint_backend.entity.LogEntity;
 import com.example.fingerprint_backend.service.FingerPrintService;
+import com.example.fingerprint_backend.service.LogService;
+import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,23 +23,19 @@ import java.util.List;
 public class FingerPrintController {
 
     private final FingerPrintService fingerPrintService;
+    private final LogService logService;
+    private final MemberQueryService memberQueryService;
 
     @GetMapping("/api/fingerprint/students/{stdNum}")
     public ResponseEntity<ApiResponse> check(@PathVariable String stdNum) {
 
-//        해당 학번의 유저가 가입되어 있는지 조회
-        Boolean exist = fingerPrintService.isMemberExist(stdNum);
-
-//        (스테이터스 코드 204 반환)
-        if (!exist) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse(false, "가입 되지 않은 학번입니다.", null));
-        }
+        memberQueryService.getMemberByStudentNumber(stdNum);
 
 //        해당 학번의 지문이 등록되어 있는지 조회
         Boolean fingerPrintExist = fingerPrintService.isFingerPrintExist(stdNum);
 
         if (fingerPrintExist) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "이미 지문 정보가 \n등록된 학번입니다.", null));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "이미 지문 정보가 등록된 학번입니다. \n 재등록은 관리자에게 문의 해주세요", null));
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 등록이 가능한 학번입니다.", null));
@@ -84,15 +84,36 @@ public class FingerPrintController {
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 데이터 삭제 완료", null));
     }
 
+    /**
+     * 지문 인식 시 로그 생성 API
+     *
+     * @param createLogDto - 학번, 행동 (등교, 하교, 외출 등)
+     * @throws IllegalArgumentException - 학번이 존재하지 않을 경우, 1분 이내 중복 로그 발생 시
+     */
     @PostMapping("/api/fingerprint/logs")
     public ResponseEntity<ApiResponse> createLog(@RequestBody CreateLogDto createLogDto) {
 
-        System.out.println("createLogDto.getStd_num() = " + createLogDto.getStd_num());
-        System.out.println("createLogDto.getAction() = " + createLogDto.getAction());
-        LogEntity savedLog = fingerPrintService.createLog(createLogDto);
+        LogEntity savedLog = logService.createLog(
+                createLogDto.getStd_num(),
+                createLogDto.getAction()
+        );
 
+        String message = String.format("학번 %s의 \n\"%s\" 로그가 등록되었습니다.", savedLog.getStudentNumber(), savedLog.getAction());
 
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, message, savedLog));
+    }
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "로그 등록: 로그가 등록되었습니다", savedLog));
+    /**
+     * 문 닫힘 API
+     *
+     * @param closingMember - 문 닫힘 담당자 학번
+     * @throws IllegalArgumentException - 열쇠 담당자가 아닐 경우, 학번이 존재하지 않을 경우
+     */
+    @GetMapping("/api/fingerprint/close")
+    public ResponseEntity<ApiResponse> close(@RequestBody String closingMember) {
+
+        ClassClosingTime closingTime = logService.createClosingTime(LocalDateTime.now(), closingMember);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "성공적으로 문을 닫았습니다.", closingTime));
     }
 }

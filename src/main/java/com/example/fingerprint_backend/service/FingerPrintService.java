@@ -1,10 +1,8 @@
 package com.example.fingerprint_backend.service;
 
 import com.example.fingerprint_backend.dto.CreateFingerPrintDto;
-import com.example.fingerprint_backend.dto.CreateLogDto;
 import com.example.fingerprint_backend.entity.*;
 import com.example.fingerprint_backend.repository.FingerPrintRepository;
-import com.example.fingerprint_backend.repository.LogRepository;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,6 @@ import java.util.Optional;
 public class FingerPrintService {
 
     private final FingerPrintRepository fingerPrintRepository;
-    private final LogRepository logRepository;
     private final MemberRepository memberRepository;
 
     /**
@@ -97,23 +94,6 @@ public class FingerPrintService {
         List<FingerPrintEntity> all = fingerPrintRepository.findAll();
 
         return all;
-    }
-
-    /**
-     * 지문 인식 시
-     * @param createLogDto
-     * @return
-     */
-    public LogEntity createLog(CreateLogDto createLogDto) {
-
-        LogEntity logEntity = new LogEntity();
-        logEntity.setAction(createLogDto.getAction());
-        logEntity.setStudentNumber(createLogDto.getStd_num());
-        logEntity.setEventTime(LocalDateTime.now());
-
-        LogEntity saved = logRepository.save(logEntity);
-
-        return saved;
     }
 
 }
