@@ -2,10 +2,8 @@ package com.example.fingerprint_backend.controller;
 
 import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.dto.message.LineWebhookRequest;
-import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.jwt.CustomUserDetails;
 import com.example.fingerprint_backend.jwt.JWTUtil;
-import com.example.fingerprint_backend.service.GetService;
 import com.example.fingerprint_backend.service.LineService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,6 @@ public class MessageController {
 
     private final JWTUtil jwtUtil;
     private final LineService lineService;
-    private final GetService getService;
 
     @GetMapping("")
     public ResponseEntity<ApiResponse> createJwtToken(@AuthenticationPrincipal CustomUserDetails user) {

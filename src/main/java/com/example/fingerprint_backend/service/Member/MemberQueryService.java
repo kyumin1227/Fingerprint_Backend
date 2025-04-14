@@ -1,15 +1,15 @@
-package com.example.fingerprint_backend.service;
+package com.example.fingerprint_backend.service.Member;
 
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GetService {
+public class MemberQueryService {
 
     private final MemberRepository memberRepository;
 
-    public GetService(MemberRepository memberRepository) {
+    public MemberQueryService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 

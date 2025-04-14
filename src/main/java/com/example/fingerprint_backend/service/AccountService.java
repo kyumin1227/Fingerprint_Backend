@@ -6,6 +6,7 @@ import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.repository.CleanMemberRepository;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.repository.SchoolClassRepository;
+import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.example.fingerprint_backend.types.MemberRole;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final GetService getService;
+    private final MemberQueryService memberQueryService;
     private final CleanHelperService cleanHelperService;
     private final SchoolClassRepository schoolClassRepository;
     private final MemberRepository memberRepository;
@@ -46,8 +47,8 @@ public class AccountService {
     @Transactional
     public void transferRole(String requesterStudentNumber, String targetStudentNumber, MemberRole memberRole) {
 
-        MemberEntity requester = getService.getMemberByStudentNumber(requesterStudentNumber);
-        MemberEntity target = getService.getMemberByStudentNumber(targetStudentNumber);
+        MemberEntity requester = memberQueryService.getMemberByStudentNumber(requesterStudentNumber);
+        MemberEntity target = memberQueryService.getMemberByStudentNumber(targetStudentNumber);
 
         requester.removeRole(memberRole);
         target.addRole(memberRole);
@@ -57,14 +58,14 @@ public class AccountService {
      * 해당 학번의 Role을 반환하는 함수
      */
     public List<MemberRole> getRole(String studentNumber) {
-        return getService.getMemberByStudentNumber(studentNumber).getRoles();
+        return memberQueryService.getMemberByStudentNumber(studentNumber).getRoles();
     }
 
     /**
      * 해당 학번의 반 ID를 반환하는 함수
      */
     public Long getClassId(String studentNumber) {
-        MemberEntity member = getService.getMemberByStudentNumber(studentNumber);
+        MemberEntity member = memberQueryService.getMemberByStudentNumber(studentNumber);
         SchoolClass schoolClass = member.getSchoolClass();
         if (schoolClass == null) {
             return null;
@@ -76,7 +77,7 @@ public class AccountService {
      * 해당 학번의 프로필 이미지를 설정하는 함수 (기본 계정, 청소 계정 모두 설정)
      */
     public void setProfileImage(String studentNumber, String profileImage) {
-        MemberEntity member = getService.getMemberByStudentNumber(studentNumber);
+        MemberEntity member = memberQueryService.getMemberByStudentNumber(studentNumber);
         member.setProfileImage(profileImage);
         memberRepository.save(member);
         try {

@@ -6,6 +6,7 @@ import com.example.fingerprint_backend.entity.LineEntity;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.jwt.JWTUtil;
 import com.example.fingerprint_backend.repository.LineRepository;
+import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,7 @@ import java.util.Map;
 public class LineService {
 
     private final JWTUtil jwtUtil;
-    private final GetService getService;
+    private final MemberQueryService memberQueryService;
     private final CommandService commandService;
 
     @Value("${LINE_ACCESS_TOKEN}")
@@ -34,9 +35,9 @@ public class LineService {
     private final RestTemplate restTemplate;
     private final LineRepository lineRepository;
 
-    public LineService(JWTUtil jwtUtil, GetService getService, RestTemplate restTemplate, LineRepository lineRepository, CommandService commandService) {
+    public LineService(JWTUtil jwtUtil, MemberQueryService memberQueryService, RestTemplate restTemplate, LineRepository lineRepository, CommandService commandService) {
         this.jwtUtil = jwtUtil;
-        this.getService = getService;
+        this.memberQueryService = memberQueryService;
         this.restTemplate = restTemplate;
         this.lineRepository = lineRepository;
         this.commandService = commandService;
@@ -135,7 +136,7 @@ public class LineService {
      * @param lineId        라인 아이디
      */
     public void createLine(String studentNumber, String lineId) {
-        MemberEntity member = getService.getMemberByStudentNumber(studentNumber);
+        MemberEntity member = memberQueryService.getMemberByStudentNumber(studentNumber);
         LineEntity lineEntity = new LineEntity(member, lineId);
         lineRepository.save(lineEntity);
     }
