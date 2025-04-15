@@ -109,7 +109,7 @@ public class FingerPrintController {
      * @param closingMember - 문 닫힘 담당자 학번
      * @throws IllegalArgumentException - 열쇠 담당자가 아닐 경우, 학번이 존재하지 않을 경우
      */
-    @GetMapping("/api/fingerprint/close")
+    @PostMapping("/api/fingerprint/close")
     public ResponseEntity<ApiResponse> close(@RequestBody String closingMember) {
 
         ClassClosingTime closingTime = logService.createClosingTime(LocalDateTime.now(), closingMember);
