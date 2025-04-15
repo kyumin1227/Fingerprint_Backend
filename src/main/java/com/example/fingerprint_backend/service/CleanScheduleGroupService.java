@@ -2,6 +2,7 @@ package com.example.fingerprint_backend.service;
 
 import com.example.fingerprint_backend.entity.*;
 import com.example.fingerprint_backend.repository.CleanGroupRepository;
+import com.example.fingerprint_backend.repository.CleanRecordRepository;
 import com.example.fingerprint_backend.repository.CleanScheduleRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,14 @@ public class CleanScheduleGroupService {
     private final CleanScheduleRepository cleanScheduleRepository;
     private final CleanGroupRepository cleanGroupRepository;
     private final CleanHelperService cleanHelperService;
+    private final CleanRecordRepository cleanRecordRepository;
 
     @Autowired
-    public CleanScheduleGroupService(CleanScheduleRepository cleanScheduleRepository, CleanGroupRepository cleanGroupRepository, CleanHelperService cleanHelperService) {
+    public CleanScheduleGroupService(CleanScheduleRepository cleanScheduleRepository, CleanGroupRepository cleanGroupRepository, CleanHelperService cleanHelperService, CleanRecordRepository cleanRecordRepository) {
         this.cleanScheduleRepository = cleanScheduleRepository;
         this.cleanGroupRepository = cleanGroupRepository;
         this.cleanHelperService = cleanHelperService;
+        this.cleanRecordRepository = cleanRecordRepository;
     }
 
     /**
@@ -310,4 +313,13 @@ public class CleanScheduleGroupService {
     public List<CleanSchedule> getScheduleByDateAndIsCanceled(LocalDate localDate, boolean isCanceled, boolean isCompleted) {
         return cleanScheduleRepository.findAllByDateAndIsCanceledAndIsCompleted(localDate, isCanceled, isCompleted);
     }
+
+    public CleanRecord createCleanRecord(CleanSchedule schedule, CleanGroup group) {
+        CleanRecord cleanRecord = new CleanRecord(schedule, group);
+        return cleanRecordRepository.save(cleanRecord);
+    }
+
+//    public int incrementCleanCount(CleanMember member, CleanArea area) {
+//
+//    }
 }

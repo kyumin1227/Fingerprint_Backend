@@ -295,4 +295,24 @@ public class CleanScheduleGroupServiceTest {
 
         assertThat(infoResponses.size()).as("정보 수").isEqualTo(4);
     }
+
+    @DisplayName("청소 기록 및 카운트 확인")
+    @Test
+    void checkCleanRecord() {
+        cleanScheduleGroupService.createCleanSchedule(date, "창조관 405호", classId);
+        CleanGroup group = cleanScheduleGroupService.createGroup("창조관 405호", classId, 4);
+        cleanScheduleGroupService.appendMemberToGroup(group.getId(), member0.getStudentNumber());
+        cleanScheduleGroupService.appendMemberToGroup(group.getId(), member1.getStudentNumber());
+        cleanScheduleGroupService.appendMemberToGroup(group.getId(), member2.getStudentNumber());
+        cleanScheduleGroupService.appendMemberToGroup(group.getId(), member3.getStudentNumber());
+
+        CleanRecord cleanRecord = cleanOperationService.completeCleaning(date, "창조관 405호", classId);
+
+        assertThat(cleanRecord.getCleanSchedule().getDate()).as("청소 스케줄 날짜 확인").isEqualTo(date);
+        assertThat(cleanRecord.getCleanGroup().getId()).as("청소 그룹 ID 확인").isEqualTo(group.getId());
+        assertThat(cleanRecord.getCleanGroup().getMembers().size()).as("청소 그룹 멤버 수 확인").isEqualTo(4);
+
+        CleanCountPerArea cleanCountPerArea = cleanHelperService.getCleanCountPerArea(member0.getStudentNumber(), area1.getId());
+        assertThat(cleanCountPerArea.getCleanCount()).as("청소 횟수 확인").isEqualTo(1);
+    }
 }

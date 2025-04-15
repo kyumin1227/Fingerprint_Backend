@@ -38,7 +38,7 @@ public class CleanScheduled {
         List<CleanSchedule> scheduleList = cleanScheduleGroupService.getScheduleByDateAndIsCanceled(today.minusDays(minusDays), false, false);
 
         for (CleanSchedule schedule : scheduleList) {
-            cleanOperationService.completeCleaningSchedule(schedule.getDate(), schedule.getCleanArea().getName(), schedule.getSchoolClass().getId());
+            cleanOperationService.completeCleaning(schedule.getDate(), schedule.getCleanArea().getName(), schedule.getSchoolClass().getId());
         }
     }
 

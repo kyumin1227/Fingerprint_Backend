@@ -178,8 +178,8 @@ public class CleanManagerController {
      */
     @DeleteMapping("/groups/{groupId}/members")
     public ResponseEntity<ApiResponse> removeMembersToGroup(@AuthenticationPrincipal CustomUserDetails user,
-                                                         @PathVariable Long groupId,
-                                                         @RequestBody GroupMemberRequest request) {
+                                                            @PathVariable Long groupId,
+                                                            @RequestBody GroupMemberRequest request) {
 
         CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(request.getStudentNumber());
 
@@ -224,11 +224,11 @@ public class CleanManagerController {
     @PostMapping("/complete")
     public ResponseEntity<ApiResponse> completeCleaningSchedule(@AuthenticationPrincipal CustomUserDetails user,
                                                                 @RequestBody ScheduleRequest request) {
-        CleanGroup completedGroup = cleanOperationService.completeCleaningSchedule(
+        CleanRecord cleanRecord = cleanOperationService.completeCleaning(
                 request.getDate(),
                 request.getAreaName(),
                 user.getClassId()
         );
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 완료 처리 성공", completedGroup));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 완료 처리 성공", cleanRecord.getCleanGroup()));
     }
 }

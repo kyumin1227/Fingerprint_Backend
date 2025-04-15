@@ -1,9 +1,7 @@
 package com.example.fingerprint_backend.service;
 
 import com.example.fingerprint_backend.dto.clean.InfoResponse;
-import com.example.fingerprint_backend.entity.CleanArea;
-import com.example.fingerprint_backend.entity.CleanGroup;
-import com.example.fingerprint_backend.entity.CleanSchedule;
+import com.example.fingerprint_backend.entity.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,18 +84,45 @@ public class CleanOperationService {
     }
 
     /**
-     * 특정 날짜의 청소 스케줄을 완료하는 메소드
+     * 특정 날짜와 구역, 반으로 청소를 완료 처리하는 메소드
      *
      * @return 완료 처리 된 CleanGroup
      */
     @Transactional
-    public CleanGroup completeCleaningSchedule(LocalDate date, String areaName, Long schoolClassId) {
+    public CleanRecord completeCleaning(LocalDate date, String areaName, Long schoolClassId) {
+        CleanSchedule cleanSchedule = completeCleanSchedule(date, areaName, schoolClassId);
+        CleanGroup cleanGroup = completeCleanGroup(areaName, schoolClassId);
+        return cleanScheduleGroupService.createCleanRecord(cleanSchedule, cleanGroup);
+    }
+
+    /**
+     * 청소 스케줄을 완료 처리 하는 메소드
+     *
+     * @return 완료 처리 된 CleanSchedule
+     */
+    public CleanSchedule completeCleanSchedule(LocalDate date, String areaName, Long schoolClassId) {
         cleanHelperService.validateDateIsNotFuture(date);
         CleanSchedule cleanSchedule = cleanHelperService.getCleanScheduleByDateAndAreaNameAndClassId(date, areaName, schoolClassId);
         cleanHelperService.validateScheduleComplete(cleanSchedule);
+        cleanSchedule.completed();
+        return cleanSchedule;
+    }
+
+    /**
+     * 청소 그룹을 완료 처리 하는 메소드
+     *
+     * @return 완료 처리 된 CleanGroup
+     */
+    public CleanGroup completeCleanGroup(String areaName, Long schoolClassId) {
         CleanGroup cleanGroup = cleanScheduleGroupService.getFirstGroup(areaName, schoolClassId);
         cleanGroup.setCleaned(true);
-        cleanSchedule.completed();
+        cleanGroup.getMembers().forEach(member -> {
+            CleanCountPerArea cleanCount = cleanHelperService.getOrNewCleanCountPerArea(
+                    member.getStudentNumber(),
+                    cleanGroup.getCleanArea().getId()
+            );
+            cleanCount.increment();
+        });
         return cleanGroup;
     }
 
