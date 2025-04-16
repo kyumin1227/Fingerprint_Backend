@@ -28,7 +28,7 @@ public class LineService {
     private final MemberQueryService memberQueryService;
     private final CommandService commandService;
 
-    @Value("${LINE_ACCESS_TOKEN}")
+    @Value("${custom.line.access-token}")
     private String LINE_ACCESS_TOKEN;
 
     private final String LINE_REPLY_URL = "https://api.line.me/v2/bot/message/reply";

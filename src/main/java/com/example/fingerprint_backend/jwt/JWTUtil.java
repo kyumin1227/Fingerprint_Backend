@@ -22,11 +22,11 @@ public class JWTUtil {
         this.accountService = accountService;
     }
 
-    @Value("${JWT_SECRET}")
+    @Value("${custom.jwt.secret}")
     private String JWT_SECRET;
 
     // JWT 만료 시간 (밀리초 단위)
-    @Value("${JWT_EXPIRATION}")
+    @Value("${custom.jwt.expiration}")
     private long JWT_EXPIRATION;
 
     public String generateToken(String studentNumber, String email) {

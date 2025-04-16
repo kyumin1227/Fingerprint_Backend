@@ -1,4 +1,4 @@
-cloud:
+custom:
   aws:
     s3:
       image-bucket:
@@ -7,3 +7,13 @@ cloud:
       credentials:
         access-key: test-access-key
         secret-key: test-secret-key
+
+  jwt:
+    secret: test-secret-key
+    expiration: 3600
+
+  line:
+    access-token: test-line-access-token
+
+  google:
+    client-id: test-google-client-id

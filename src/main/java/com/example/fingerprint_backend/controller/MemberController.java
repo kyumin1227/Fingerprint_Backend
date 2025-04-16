@@ -21,7 +21,7 @@ public class MemberController {
     private static final Long MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024L; // 5MB
     private static final String URL = "https://bannote.org/";
 
-    @Value("${cloud.aws.s3.image-bucket.name}")
+    @Value("${custom.aws.s3.image-bucket.name}")
     private String IMAGE_BUCKET_NAME;
 
     public MemberController(FileService fileService, AccountService accountService) {

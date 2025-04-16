@@ -24,7 +24,7 @@ services:
     image: kyumin1227/fingerprint_backend_spring:latest
     container_name: fingerprint_backend
     environment:
-      SPRING_PROFILES_ACTIVE: prod,aws
+      SPRING_PROFILES_ACTIVE: prod,custom
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}

@@ -32,7 +32,7 @@ public class AuthService {
     final private MemberRepository memberRepository;
     private final SchoolClassRepository schoolClassRepository;
 
-    @Value("${GOOGLE_CLIENT_ID}")
+    @Value("${custom.google.client-id}")
     private String googleClientId;
 
     private GoogleIdTokenVerifier verifier;
