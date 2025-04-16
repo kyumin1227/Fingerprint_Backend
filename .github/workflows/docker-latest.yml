@@ -38,7 +38,7 @@ jobs:
           docker run -d \
             --name mysql-test \
             -e MYSQL_ROOT_PASSWORD=root \
-            -e MYSQL_DATABASE=bannote_db \
+            -e MYSQL_DATABASE=fingerprint_db_test \
             -e MYSQL_USER=test \
             -e MYSQL_PASSWORD=test \
             -p 3306:3306 \
@@ -61,7 +61,7 @@ jobs:
           done
 
       - name: Build with Gradle (workflow profile)
-        run: ./gradlew build -Pspring.profiles.active=workflow
+        run: ./gradlew build
 
       - name: Cleanup MySQL container
         if: always()
