@@ -33,15 +33,39 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Start Docker Compose for testing
-        run: docker-compose -f docker-compose.workflow.yml up -d
+      - name: Run MySQL container for tests
+        run: |
+          docker run -d \
+            --name mysql-test \
+            -e MYSQL_ROOT_PASSWORD=root \
+            -e MYSQL_DATABASE=bannote_db \
+            -e MYSQL_USER=test \
+            -e MYSQL_PASSWORD=test \
+            -p 3306:3306 \
+            --health-cmd="mysqladmin ping --silent" \
+            --health-interval=10s \
+            --health-timeout=5s \
+            --health-retries=5 \
+            mysql:latest
+
+      - name: Wait for MySQL to be healthy
+        run: |
+          for i in {1..10}; do
+            status=$(docker inspect --format='{{.State.Health.Status}}' mysql-test)
+            echo "MySQL container status: $status"
+            if [ "$status" == "healthy" ]; then
+              echo "MySQL is healthy!"
+              break
+            fi
+            sleep 5
+          done
 
       - name: Build with Gradle (workflow profile)
         run: ./gradlew build -Pspring.profiles.active=workflow
 
-      - name: Stop Docker Compose services
+      - name: Cleanup MySQL container
         if: always()
-        run: docker-compose -f docker-compose.workflow.yml down
+        run: docker rm -f mysql-test
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
