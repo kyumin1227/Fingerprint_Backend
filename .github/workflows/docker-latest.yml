@@ -55,10 +55,12 @@ jobs:
             echo "MySQL container status: $status"
             if [ "$status" == "healthy" ]; then
               echo "MySQL is healthy!"
-              break
+              exit 0
             fi
             sleep 5
           done
+          echo "MySQL did not become healthy in time." >&2
+          exit 1
 
       - name: Build with Gradle (workflow profile)
         run: ./gradlew build
@@ -100,6 +102,8 @@ jobs:
           images: |
             docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
             ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw, value=${{ steps.tag.outputs.TAG_NAME }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

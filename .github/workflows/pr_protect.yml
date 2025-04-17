@@ -53,10 +53,12 @@ jobs:
             echo "MySQL container status: $status"
             if [ "$status" == "healthy" ]; then
               echo "MySQL is healthy!"
-              break
+              exit 0
             fi
             sleep 5
           done
+          echo "MySQL did not become healthy in time." >&2
+          exit 1
 
       - name: Build with Gradle (workflow profile)
         run: ./gradlew test --scan
