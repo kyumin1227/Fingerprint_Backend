@@ -2,6 +2,7 @@ package com.example.fingerprint_backend.domain.fingerprint.entity;
 
 import com.example.fingerprint_backend.entity.LogEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -10,11 +11,13 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class AttendanceCycle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String studentNumber;
     private LocalDateTime attendTime;
     private LocalDateTime leaveTime;
 
@@ -24,7 +27,8 @@ public class AttendanceCycle {
             inverseJoinColumns = @JoinColumn(name = "log_id"))
     private List<LogEntity> logEntities = new ArrayList<>();
 
-    public AttendanceCycle(LocalDateTime attendTime) {
+    public AttendanceCycle(String studentNumber, LocalDateTime attendTime) {
+        this.studentNumber = studentNumber;
         this.attendTime = attendTime;
     }
 

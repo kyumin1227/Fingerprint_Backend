@@ -110,4 +110,17 @@ public class LogService {
                 });
     }
 
+    /**
+     * 해당 시간 이후의 문 닫힘 시간을 반환하는 함수
+     *
+     * @param classId   반 ID
+     * @param checkTime 확인할 시간
+     * @return 해당 시간 이후의 문 닫힘 객체
+     * @throws IllegalArgumentException - 해당 시간 이후의 문 닫힘 시간이 없을 경우
+     */
+    public ClassClosingTime getClassClosingTimeByTimeAfter(Long classId, LocalDateTime checkTime) {
+        return classClosingTimeRepository.findBySchoolClassIdAndClosingTimeAfter(classId, checkTime)
+                .orElseThrow(() -> new IllegalArgumentException("해당 시간 이후의 문 닫힘 시간이 없습니다."));
+    }
+
 }
