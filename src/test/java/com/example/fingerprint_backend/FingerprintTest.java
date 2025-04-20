@@ -1,12 +1,12 @@
 package com.example.fingerprint_backend;
 
-import com.example.fingerprint_backend.entity.ClassClosingTime;
-import com.example.fingerprint_backend.entity.LogEntity;
+import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
+import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.repository.SchoolClassRepository;
-import com.example.fingerprint_backend.service.LogService;
+import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
 import com.example.fingerprint_backend.types.LogAction;
 import com.example.fingerprint_backend.types.MemberRole;
 import jakarta.transaction.Transactional;

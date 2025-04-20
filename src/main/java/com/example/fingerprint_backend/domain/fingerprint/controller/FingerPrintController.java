@@ -1,13 +1,13 @@
-package com.example.fingerprint_backend.controller;
+package com.example.fingerprint_backend.domain.fingerprint.controller;
 
 import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.dto.CreateFingerPrintDto;
 import com.example.fingerprint_backend.dto.CreateLogDto;
-import com.example.fingerprint_backend.entity.ClassClosingTime;
-import com.example.fingerprint_backend.entity.FingerPrintEntity;
-import com.example.fingerprint_backend.entity.LogEntity;
-import com.example.fingerprint_backend.service.FingerPrintService;
-import com.example.fingerprint_backend.service.LogService;
+import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
+import com.example.fingerprint_backend.domain.fingerprint.entity.FingerPrintEntity;
+import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
+import com.example.fingerprint_backend.domain.fingerprint.service.FingerPrintService;
+import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;

@@ -1,4 +1,4 @@
-package com.example.fingerprint_backend.entity;
+package com.example.fingerprint_backend.domain.fingerprint.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,8 +1,9 @@
-package com.example.fingerprint_backend.service;
+package com.example.fingerprint_backend.domain.fingerprint.service;
 
+import com.example.fingerprint_backend.domain.fingerprint.entity.FingerPrintEntity;
 import com.example.fingerprint_backend.dto.CreateFingerPrintDto;
 import com.example.fingerprint_backend.entity.*;
-import com.example.fingerprint_backend.repository.FingerPrintRepository;
+import com.example.fingerprint_backend.domain.fingerprint.repository.FingerPrintRepository;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

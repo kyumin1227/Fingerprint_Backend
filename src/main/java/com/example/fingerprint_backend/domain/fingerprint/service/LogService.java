@@ -1,10 +1,10 @@
-package com.example.fingerprint_backend.service;
+package com.example.fingerprint_backend.domain.fingerprint.service;
 
-import com.example.fingerprint_backend.entity.ClassClosingTime;
-import com.example.fingerprint_backend.entity.LogEntity;
+import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
+import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
 import com.example.fingerprint_backend.entity.MemberEntity;
-import com.example.fingerprint_backend.repository.ClassClosingTimeRepository;
-import com.example.fingerprint_backend.repository.LogRepository;
+import com.example.fingerprint_backend.domain.fingerprint.repository.ClassClosingTimeRepository;
+import com.example.fingerprint_backend.domain.fingerprint.repository.LogRepository;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.example.fingerprint_backend.service.Member.MemberValidator;
 import com.example.fingerprint_backend.types.LogAction;

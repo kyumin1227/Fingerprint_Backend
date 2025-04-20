@@ -1,4 +1,4 @@
-package com.example.fingerprint_backend.entity;
+package com.example.fingerprint_backend.domain.fingerprint.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,7 +6,6 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.orm.jpa.hibernate.SpringJtaPlatform;
 
 import java.time.LocalDateTime;
 

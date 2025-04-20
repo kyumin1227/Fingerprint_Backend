@@ -1,6 +1,6 @@
-package com.example.fingerprint_backend.repository;
+package com.example.fingerprint_backend.domain.fingerprint.repository;
 
-import com.example.fingerprint_backend.entity.LogEntity;
+import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
 import com.example.fingerprint_backend.types.LogAction;
 import org.springframework.data.jpa.repository.JpaRepository;
 

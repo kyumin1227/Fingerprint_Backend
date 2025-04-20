@@ -9,7 +9,6 @@ import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.AuthService;
 import com.example.fingerprint_backend.service.CleanManagementService;
-import com.example.fingerprint_backend.service.LogService;
 import com.example.fingerprint_backend.types.MemberRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
