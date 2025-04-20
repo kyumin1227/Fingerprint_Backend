@@ -2,6 +2,7 @@ package com.example.fingerprint_backend.domain.fingerprint.service;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
 import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
+import com.example.fingerprint_backend.domain.fingerprint.exception.LogException;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.domain.fingerprint.repository.ClassClosingTimeRepository;
 import com.example.fingerprint_backend.domain.fingerprint.repository.LogRepository;
@@ -33,7 +34,7 @@ public class LogService {
      *
      * @param studentNumber - 학번
      * @param action        - 로그 액션
-     * @throws IllegalArgumentException - 학번이 존재하지 않을 경우, 1분 이내 중복 로그 발생 시
+     * @throws LogException - 학번이 존재하지 않을 경우, 1분 이내 중복 로그 발생 시
      */
     public LogEntity createLog(String studentNumber, LogAction action) {
 
@@ -55,7 +56,7 @@ public class LogService {
      * @param studentNumber - 학번
      * @param action        - 로그 액션
      * @param eventTime     - 로그 발생 시간
-     * @throws IllegalArgumentException - 이미 등록된 로그일 경우
+     * @throws LogException - 이미 등록된 로그일 경우
      */
     public void checkDuplicateLog(String studentNumber, LogAction action, LocalDateTime eventTime) {
 
@@ -63,7 +64,7 @@ public class LogService {
 
         logRepository.findByStudentNumberAndActionAndEventTimeAfter(studentNumber, action, checkTime)
                 .ifPresent(log -> {
-                    throw new IllegalArgumentException("이미 등록된 로그입니다.");
+                    throw new LogException("이미 등록된 로그입니다.");
                 });
     }
 
@@ -73,15 +74,15 @@ public class LogService {
      * @param closingMember - 문 닫힘 담당자 학번
      * @param closingTime   - 문 닫힘 시간
      * @return - 문 닫힘 시간 등록된 객체
-     * @throws IllegalArgumentException - 열쇠 담당자가 아닐 경우, 학번이 존재하지 않을 경우
+     * @throws LogException - 열쇠 담당자가 아닐 경우, 학번이 존재하지 않을 경우
      * @throws IllegalStateException    - 5분 이내에 문을 닫았을 경우
      */
     public ClassClosingTime createClosingTime(LocalDateTime closingTime, String closingMember) {
 
         try {
             memberValidator.validateMemberInRole(closingMember, MemberRole.KEY);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("열쇠 담당자만 문을 닫을 수 있습니다.");
+        } catch (LogException e) {
+            throw new LogException("열쇠 담당자만 문을 닫을 수 있습니다.");
         }
 
         MemberEntity member = memberQueryService.getMemberByStudentNumber(closingMember);
@@ -98,7 +99,7 @@ public class LogService {
      *
      * @param classId     - 반 ID
      * @param closingTime - 로그 발생 시간
-     * @throws IllegalArgumentException - 5분 이내에 문을 닫았을 경우
+     * @throws LogException - 5분 이내에 문을 닫았을 경우
      */
     public void checkDuplicateClose(Long classId, LocalDateTime closingTime) {
 
@@ -106,7 +107,7 @@ public class LogService {
 
         classClosingTimeRepository.findBySchoolClassIdAndClosingTimeAfter(classId, checkTime)
                 .ifPresent(log -> {
-                    throw new IllegalArgumentException("이미 문이 닫혀있습니다.");
+                    throw new LogException("이미 문이 닫혀있습니다.");
                 });
     }
 
@@ -116,11 +117,11 @@ public class LogService {
      * @param classId   반 ID
      * @param checkTime 확인할 시간
      * @return 해당 시간 이후의 문 닫힘 객체
-     * @throws IllegalArgumentException - 해당 시간 이후의 문 닫힘 시간이 없을 경우
+     * @throws LogException - 해당 시간 이후의 문 닫힘 시간이 없을 경우
      */
     public ClassClosingTime getClassClosingTimeByTimeAfter(Long classId, LocalDateTime checkTime) {
         return classClosingTimeRepository.findBySchoolClassIdAndClosingTimeAfter(classId, checkTime)
-                .orElseThrow(() -> new IllegalArgumentException("해당 시간 이후의 문 닫힘 시간이 없습니다."));
+                .orElseThrow(() -> new LogException("해당 시간 이후의 문 닫힘 시간이 없습니다."));
     }
 
 }

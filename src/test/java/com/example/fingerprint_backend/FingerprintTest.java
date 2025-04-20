@@ -2,6 +2,7 @@ package com.example.fingerprint_backend;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
 import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
+import com.example.fingerprint_backend.domain.fingerprint.exception.LogException;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.repository.MemberRepository;
@@ -87,7 +88,7 @@ public class FingerprintTest {
         // then
         assertThatCode(() -> {
             logService.createLog(studentNumber, logAction);
-        }).isInstanceOf(IllegalArgumentException.class)
+        }).isInstanceOf(LogException.class)
                 .hasMessage("이미 등록된 로그입니다.");
     }
 
@@ -144,7 +145,7 @@ public class FingerprintTest {
             logService.createClosingTime(closingTime, closingMember);
         })
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("열쇠 담당자만 문을 닫을 수 있습니다.");
+                .hasMessage("해당 권한이 없습니다.");
     }
 
     @DisplayName("5분 이내에 문을 연속으로 닫을 경우 오류 발생")
@@ -174,7 +175,7 @@ public class FingerprintTest {
         assertThatCode(() -> {
             logService.createClosingTime(closingTime, closingMember);
         })
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(LogException.class)
                 .hasMessage("이미 문이 닫혀있습니다.");
     }
 

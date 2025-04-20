@@ -2,6 +2,7 @@ package com.example.fingerprint_backend.domain.fingerprint.service;
 
 import com.example.fingerprint_backend.TestMemberFactory;
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
+import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
 import com.example.fingerprint_backend.dto.LoginResponse;
@@ -9,6 +10,7 @@ import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.AuthService;
 import com.example.fingerprint_backend.service.CleanManagementService;
+import com.example.fingerprint_backend.types.LogAction;
 import com.example.fingerprint_backend.types.MemberRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -163,34 +165,73 @@ class CycleServiceTest {
         assertThat(latestCycle).isNull();
     }
 
-    @DisplayName("등교 없이 하교")
+    @DisplayName("하교만 등록")
     @Test
-    void error1() {
+    void success7() {
         // given
+        cycleCommandService.closeAttendanceCycle("2423002", date1);
 
         // when
-        assertThatCode(() -> cycleCommandService.closeAttendanceCycle("2423002", date1))
-                .isInstanceOf(CycleException.class)
-                .hasMessage("하교 처리할 등교 기록이 없습니다.");
+        AttendanceCycle latestCycle = cycleQueryService.getLatestCycle("2423002");
 
+        // then
+        assertThat(latestCycle.getAttendTime()).isEqualTo(date1);
     }
 
-    @DisplayName("등교 후 문 닫음 이후 하교")
+    @DisplayName("외출만 등록")
     @Test
-    void error2() {
+    void success8() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
-        logService.createClosingTime(date2, "2423007");
+        cycleCommandService.createOutingCycle("2423002", date1, LogAction.식사);
 
         // when
-        assertThatCode(() -> cycleCommandService.closeAttendanceCycle("2423002", date2.plusMinutes(20)))
-                .isInstanceOf(CycleException.class)
-                .hasMessage("하교 처리할 등교 기록이 없습니다.");
+        AttendanceCycle latestOpenCycle = cycleQueryService.getLatestOpenCycle("2423002");
+        OutingCycle latestOpenOutingCycle = cycleQueryService.getLatestOpenOutingCycle("2423002");
+
+        // then
+        assertThat(latestOpenCycle.getAttendTime()).as("등교 시간").isEqualTo(date1);
+        assertThat(latestOpenCycle.getLeaveTime()).as("하교 시간").isNull();
+        assertThat(latestOpenOutingCycle.getOutingStartTime()).as("외출 시작 시간").isEqualTo(date1);
+        assertThat(latestOpenOutingCycle.getOutingEndTime()).as("외출 종료 시간").isNull();
+    }
+
+    @DisplayName("복귀만 등록")
+    @Test
+    void success9() {
+        // given
+        cycleCommandService.closeOutingCycle("2423002", date1);
+
+        // when
+        AttendanceCycle latestCycle = cycleQueryService.getLatestCycle("2423002");
+        OutingCycle latestOutingCycle = cycleQueryService.getLatestOutingCycle("2423002");
+
+        // then
+        assertThat(latestCycle.getAttendTime()).as("등교 시간").isEqualTo(date1);
+        assertThat(latestCycle.getLeaveTime()).as("하교 시간").isNull();
+        assertThat(latestOutingCycle.getOutingStartTime()).as("외출 시작 시간").isEqualTo(date1);
+        assertThat(latestOutingCycle.getOutingEndTime()).as("외출 종료 시간").isEqualTo(date1);
+    }
+
+    @DisplayName("재하교")
+    @Test
+    void success10() {
+        // given
+        cycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleCommandService.closeAttendanceCycle("2423002", date2);
+
+        // when
+        cycleCommandService.closeAttendanceCycle("2423002", date3);
+
+        // then
+        AttendanceCycle latestCycle = cycleQueryService.getLatestCycle("2423002");
+        assertThat(latestCycle.getAttendTime()).as("등교 시간").isEqualTo(date3);
+        assertThat(latestCycle.getLeaveTime()).as("하교 시간").isEqualTo(date3);
+
     }
 
     @DisplayName("등교 시간 보다 빠른 시간에 하교")
     @Test
-    void error3() {
+    void error1() {
         // given
         cycleCommandService.createAttendanceCycle("2423002", date1);
 
@@ -199,28 +240,6 @@ class CycleServiceTest {
                 .isInstanceOf(CycleException.class)
                 .hasMessage("등교 보다 이른 하교 시간입니다.");
 
-    }
-
-    @DisplayName("학생이 존재하지 않는 경우")
-    @Test
-    void error5() {
-        // given
-        assertThatCode(() -> cycleCommandService.createAttendanceCycle("2423003", date1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("해당 학번의 학생이 존재하지 않습니다.");
-    }
-
-    @DisplayName("하교 재시도")
-    @Test
-    void error6() {
-        // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
-        cycleCommandService.closeAttendanceCycle("2423002", date2);
-
-        // when
-        assertThatCode(() -> cycleCommandService.closeAttendanceCycle("2423002", date3))
-                .isInstanceOf(CycleException.class)
-                .hasMessage("하교 처리할 등교 기록이 없습니다.");
     }
 
 }
