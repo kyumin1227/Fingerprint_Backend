@@ -108,6 +108,12 @@ public class CycleCommandService {
      */
     public OutingCycle createOutingCycle(String studentNumber, LocalDateTime outingStartTime, LogAction reason) {
 
+        OutingCycle latestOpenOutingCycle = cycleQueryService.getLatestOpenOutingCycle(studentNumber);
+
+        if (latestOpenOutingCycle != null) {
+            latestOpenOutingCycle.setOutingEndTime(latestOpenOutingCycle.getOutingStartTime());
+        }
+
         OutingCycle outingCycle = new OutingCycle(studentNumber, outingStartTime, reason);
 
         OutingCycle outingCycleWithAttendCycle = addOutingCycle(studentNumber, outingCycle);

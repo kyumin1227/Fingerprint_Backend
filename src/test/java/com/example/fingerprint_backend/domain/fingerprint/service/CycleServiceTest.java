@@ -229,6 +229,24 @@ class CycleServiceTest {
 
     }
 
+    @DisplayName("재외출")
+    @Test
+    void success11() {
+        // given
+        cycleCommandService.createOutingCycle("2423002", date1, LogAction.식사);
+        OutingCycle firstOutingCycle = cycleQueryService.getLatestOutingCycle("2423002");
+
+        // when
+        cycleCommandService.createOutingCycle("2423002", date3, LogAction.식사);
+
+        // then
+        OutingCycle latestOpenOutingCycle = cycleQueryService.getLatestOpenOutingCycle("2423002");
+        assertThat(firstOutingCycle.getOutingStartTime()).as("첫 외출 시작 시간").isEqualTo(date1);
+        assertThat(firstOutingCycle.getOutingEndTime()).as("첫 외출 종료 시간").isEqualTo(date1);
+        assertThat(latestOpenOutingCycle.getOutingStartTime()).as("외출 시작 시간").isEqualTo(date3);
+        assertThat(latestOpenOutingCycle.getOutingEndTime()).isNull();
+    }
+
     @DisplayName("등교 시간 보다 빠른 시간에 하교")
     @Test
     void error1() {
@@ -242,4 +260,41 @@ class CycleServiceTest {
 
     }
 
+    @DisplayName("등교 보다 빠른 시간에 외출")
+    @Test
+    void error2() {
+        // given
+        cycleCommandService.createAttendanceCycle("2423002", date1);
+
+        // when
+        assertThatCode(() -> cycleCommandService.createOutingCycle("2423002", date1.minusMinutes(1), LogAction.식사))
+                .isInstanceOf(CycleException.class)
+                .hasMessage("등교 시간보다 이른 외출입니다.");
+    }
+
+    @DisplayName("등교 보다 빠른 시간에 복귀")
+    @Test
+    void error3() {
+        // given
+        cycleCommandService.createAttendanceCycle("2423002", date2);
+
+        // when
+        assertThatCode(() -> cycleCommandService.closeOutingCycle("2423002", date1.minusMinutes(1)))
+                .isInstanceOf(CycleException.class)
+                .hasMessage("등교 시간보다 이른 외출입니다.");
+
+    }
+
+    @DisplayName("외출 보다 빠른 시간에 복귀")
+    @Test
+    void error4() {
+        // given
+        cycleCommandService.createOutingCycle("2423002", date1, LogAction.식사);
+
+        // when
+        assertThatCode(() -> cycleCommandService.closeOutingCycle("2423002", date1.minusMinutes(1)))
+                .isInstanceOf(CycleException.class)
+                .hasMessage("외출 종료 시간이 외출 시작 시간보다 이릅니다.");
+
+    }
 }
