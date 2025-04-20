@@ -7,6 +7,7 @@ import com.example.fingerprint_backend.entity.ClassClosingTime;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.service.LogService;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
+import com.example.fingerprint_backend.types.LogAction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,18 +15,20 @@ import java.time.LocalDateTime;
 
 @Service
 @Transactional
-public class AttendanceCycleCommandService {
+public class CycleCommandService {
 
     private final MemberQueryService memberQueryService;
     private final AttendanceCycleRepository attendanceCycleRepository;
-    private final AttendanceCycleQueryService attendanceCycleQueryService;
+    private final CycleQueryService cycleQueryService;
     private final LogService logService;
+    private final OutingCycleRepository outingCycleRepository;
 
-    public AttendanceCycleCommandService(MemberQueryService memberQueryService, AttendanceCycleRepository attendanceCycleRepository, AttendanceCycleQueryService attendanceCycleQueryService, LogService logService) {
+    public CycleCommandService(MemberQueryService memberQueryService, AttendanceCycleRepository attendanceCycleRepository, CycleQueryService cycleQueryService, LogService logService, OutingCycleRepository outingCycleRepository) {
         this.memberQueryService = memberQueryService;
         this.attendanceCycleRepository = attendanceCycleRepository;
-        this.attendanceCycleQueryService = attendanceCycleQueryService;
+        this.cycleQueryService = cycleQueryService;
         this.logService = logService;
+        this.outingCycleRepository = outingCycleRepository;
     }
 
     /**
@@ -34,19 +37,19 @@ public class AttendanceCycleCommandService {
      * @param studentNumber 학생 번호
      * @param attendTime    출석 시간
      */
-    public void create(String studentNumber, LocalDateTime attendTime) {
+    public AttendanceCycle createAttendanceCycle(String studentNumber, LocalDateTime attendTime) {
         memberQueryService.getMemberByStudentNumber(studentNumber);
 
 //        만약 이전에 하교를 하지 않았다면, 해당 출석 주기의 하교 시간을 출석 시간으로 설정
 //        즉 체류 시간을 0으로 설정합니다.
-        AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestOpenCycle(studentNumber);
+        AttendanceCycle latestOpenCycle = cycleQueryService.getLatestOpenCycle(studentNumber);
         if (latestOpenCycle != null) {
             latestOpenCycle.setLeaveTime(latestOpenCycle.getAttendTime());
         }
 
 //        출석 주기를 생성합니다.
         AttendanceCycle attendanceCycle = new AttendanceCycle(studentNumber, attendTime);
-        attendanceCycleRepository.save(attendanceCycle);
+        return attendanceCycleRepository.save(attendanceCycle);
     }
 
     /**
@@ -54,14 +57,14 @@ public class AttendanceCycleCommandService {
      *
      * @param studentNumber 학생 번호
      * @param leaveTime     하교 시간
-     * @throws AttendanceCycleException 하교 처리할 등교 기록이 없을 경우
+     * @throws CycleException 하교 처리할 등교 기록이 없을 경우
      */
-    public void close(String studentNumber, LocalDateTime leaveTime) {
+    public AttendanceCycle closeAttendanceCycle(String studentNumber, LocalDateTime leaveTime) {
         MemberEntity member = memberQueryService.getMemberByStudentNumber(studentNumber);
 
-        AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestOpenCycle(studentNumber);
+        AttendanceCycle latestOpenCycle = cycleQueryService.getLatestOpenCycle(studentNumber);
         if (latestOpenCycle == null) {
-            throw new AttendanceCycleException("하교 처리할 등교 기록이 없습니다.");
+            throw new CycleException("하교 처리할 등교 기록이 없습니다.");
         }
 
 //        등교와 하교 사이에 문이 닫힌 시간이 존재하는지 확인
@@ -69,7 +72,7 @@ public class AttendanceCycleCommandService {
             ClassClosingTime classClosingTime = logService.getClassClosingTimeByTimeAfter(member.getSchoolClass().getId(), latestOpenCycle.getAttendTime());
 
             if (leaveTime.isAfter(classClosingTime.getClosingTime().plusMinutes(10))) {
-                throw new AttendanceCycleException("하교 처리할 등교 기록이 없습니다.");
+                throw new CycleException("하교 처리할 등교 기록이 없습니다.");
             }
 
         } catch (IllegalArgumentException ignored) {
@@ -77,5 +80,7 @@ public class AttendanceCycleCommandService {
         }
 
         latestOpenCycle.setLeaveTime(leaveTime);
+
+        return latestOpenCycle;
     }
 }
