@@ -4,6 +4,8 @@ import com.example.fingerprint_backend.TestMemberFactory;
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleCommandService;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleQueryService;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
 import com.example.fingerprint_backend.dto.LoginResponse;
 import com.example.fingerprint_backend.entity.MemberEntity;

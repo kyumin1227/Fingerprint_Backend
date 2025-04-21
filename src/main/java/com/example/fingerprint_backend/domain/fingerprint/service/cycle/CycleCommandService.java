@@ -1,4 +1,4 @@
-package com.example.fingerprint_backend.domain.fingerprint.service;
+package com.example.fingerprint_backend.domain.fingerprint.service.cycle;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
@@ -7,6 +7,7 @@ import com.example.fingerprint_backend.domain.fingerprint.exception.LogException
 import com.example.fingerprint_backend.domain.fingerprint.repository.AttendanceCycleRepository;
 import com.example.fingerprint_backend.domain.fingerprint.repository.OutingCycleRepository;
 import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
+import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.example.fingerprint_backend.types.LogAction;
@@ -25,7 +26,9 @@ public class CycleCommandService {
     private final LogService logService;
     private final OutingCycleRepository outingCycleRepository;
 
-    public CycleCommandService(MemberQueryService memberQueryService, AttendanceCycleRepository attendanceCycleRepository, CycleQueryService cycleQueryService, LogService logService, OutingCycleRepository outingCycleRepository) {
+    public CycleCommandService(MemberQueryService memberQueryService,
+            AttendanceCycleRepository attendanceCycleRepository, CycleQueryService cycleQueryService,
+            LogService logService, OutingCycleRepository outingCycleRepository) {
         this.memberQueryService = memberQueryService;
         this.attendanceCycleRepository = attendanceCycleRepository;
         this.cycleQueryService = cycleQueryService;
@@ -41,14 +44,14 @@ public class CycleCommandService {
      */
     public AttendanceCycle createAttendanceCycle(String studentNumber, LocalDateTime attendTime) {
 
-//        만약 이전에 하교를 하지 않았다면, 해당 출석 주기의 하교 시간을 출석 시간으로 설정
-//        즉 체류 시간을 0으로 설정합니다.
+        // 만약 이전에 하교를 하지 않았다면, 해당 출석 주기의 하교 시간을 출석 시간으로 설정
+        // 즉 체류 시간을 0으로 설정합니다.
         AttendanceCycle latestOpenCycle = cycleQueryService.getLatestOpenCycle(studentNumber);
         if (latestOpenCycle != null) {
             latestOpenCycle.setLeaveTime(latestOpenCycle.getAttendTime());
         }
 
-//        출석 주기를 생성합니다.
+        // 출석 주기를 생성합니다.
         AttendanceCycle attendanceCycle = new AttendanceCycle(studentNumber, attendTime);
         return attendanceCycleRepository.save(attendanceCycle);
     }
@@ -68,9 +71,10 @@ public class CycleCommandService {
             openAttendCycle = createAttendanceCycle(studentNumber, leaveTime);
         }
 
-//        등교와 하교 사이에 문이 닫힌 시간이 존재하는지 확인
+        // 등교와 하교 사이에 문이 닫힌 시간이 존재하는지 확인
         try {
-            ClassClosingTime classClosingTime = logService.getClassClosingTimeByTimeAfter(member.getSchoolClass().getId(), openAttendCycle.getAttendTime());
+            ClassClosingTime classClosingTime = logService
+                    .getClassClosingTimeByTimeAfter(member.getSchoolClass().getId(), openAttendCycle.getAttendTime());
 
             if (leaveTime.isAfter(classClosingTime.getClosingTime().plusMinutes(10))) {
                 openAttendCycle = createAttendanceCycle(studentNumber, leaveTime);
@@ -89,7 +93,7 @@ public class CycleCommandService {
         AttendanceCycle openCycle = cycleQueryService.getLatestOpenCycle(studentNumber);
 
         if (openCycle == null) {
-//            열려있는 등교 사이클이 없는 경우
+            // 열려있는 등교 사이클이 없는 경우
             openCycle = createAttendanceCycle(studentNumber, outingCycle.getOutingStartTime());
         }
 
@@ -133,11 +137,14 @@ public class CycleCommandService {
         OutingCycle outingCycle = cycleQueryService.getLatestOpenOutingCycle(studentNumber);
 
         if (outingCycle == null) {
-//            열려있는 외출 사이클이 없는 경우
+            // 열려있는 외출 사이클이 없는 경우
             outingCycle = createOutingCycle(studentNumber, outingEndTime, LogAction.기타);
         }
 
         outingCycle.setOutingEndTime(outingEndTime);
+
+        // TODO : 외출 종료 시점에 통계 업데이트를 하는 이벤트 발생
+        // 시작 날짜, 끝나는 날짜, 학번을 넘겨서 해당되는 통계만 업데이트
 
         return outingCycle;
     }

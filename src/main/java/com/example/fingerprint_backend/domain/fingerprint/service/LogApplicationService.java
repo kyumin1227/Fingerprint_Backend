@@ -1,5 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.service;
 
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleCommandService;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleQueryService;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.example.fingerprint_backend.types.LogAction;
 import org.springframework.stereotype.Service;

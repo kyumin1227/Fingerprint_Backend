@@ -1,4 +1,4 @@
-package com.example.fingerprint_backend.domain.fingerprint.service;
+package com.example.fingerprint_backend.domain.fingerprint.service.cycle;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
