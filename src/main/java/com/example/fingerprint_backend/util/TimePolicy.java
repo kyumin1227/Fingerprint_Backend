@@ -1,9 +1,12 @@
 package com.example.fingerprint_backend.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+@UtilityClass
 public class TimePolicy {
 
     private static final LocalTime START_TIME = LocalTime.of(6, 0); // 06:00
