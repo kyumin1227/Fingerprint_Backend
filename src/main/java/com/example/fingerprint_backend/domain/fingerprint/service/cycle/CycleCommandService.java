@@ -2,6 +2,7 @@ package com.example.fingerprint_backend.domain.fingerprint.service.cycle;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
+import com.example.fingerprint_backend.domain.fingerprint.event.AttendanceCycleCloseEvent;
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
 import com.example.fingerprint_backend.domain.fingerprint.exception.LogException;
 import com.example.fingerprint_backend.domain.fingerprint.repository.AttendanceCycleRepository;
@@ -11,6 +12,7 @@ import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.example.fingerprint_backend.types.LogAction;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,15 +27,17 @@ public class CycleCommandService {
     private final CycleQueryService cycleQueryService;
     private final LogService logService;
     private final OutingCycleRepository outingCycleRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public CycleCommandService(MemberQueryService memberQueryService,
-            AttendanceCycleRepository attendanceCycleRepository, CycleQueryService cycleQueryService,
-            LogService logService, OutingCycleRepository outingCycleRepository) {
+                               AttendanceCycleRepository attendanceCycleRepository, CycleQueryService cycleQueryService,
+                               LogService logService, OutingCycleRepository outingCycleRepository, ApplicationEventPublisher applicationEventPublisher) {
         this.memberQueryService = memberQueryService;
         this.attendanceCycleRepository = attendanceCycleRepository;
         this.cycleQueryService = cycleQueryService;
         this.logService = logService;
         this.outingCycleRepository = outingCycleRepository;
+        this.eventPublisher = applicationEventPublisher;
     }
 
     /**
@@ -85,6 +89,8 @@ public class CycleCommandService {
         }
 
         openAttendCycle.setLeaveTime(leaveTime);
+
+        eventPublisher.publishEvent(new AttendanceCycleCloseEvent(openAttendCycle));
 
         return openAttendCycle;
     }
