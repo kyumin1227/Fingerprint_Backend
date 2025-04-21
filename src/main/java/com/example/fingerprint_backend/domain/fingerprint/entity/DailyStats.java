@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend.domain.fingerprint.entity;
 
+import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @Table(name = "daily_stats", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "student_number", "effective_date" })
 })
-public class DailyStats extends BaseStats {
+public class DailyStats {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,8 +38,28 @@ public class DailyStats extends BaseStats {
 
     @Builder
     public DailyStats(String studentNumber, LocalDate effectiveDate) {
+        if (studentNumber == null || studentNumber.isEmpty()) {
+            throw new StatsException("학생 번호는 비어있을 수 없습니다.");
+        }
+        if (effectiveDate == null) {
+            throw new StatsException("유효한 날짜가 아닙니다.");
+        }
         this.studentNumber = studentNumber;
         this.effectiveDate = effectiveDate;
         this.dayOfWeek = effectiveDate.getDayOfWeek();
+    }
+
+    public void updateStayDuration(Long stayDuration) {
+        if (stayDuration < 0) {
+            throw new StatsException("체류 시간은 음수를 더할 수 없습니다.");
+        }
+        this.stayDuration += stayDuration;
+    }
+
+    public void updateOutDuration(Long outDuration) {
+        if (outDuration < 0) {
+            throw new StatsException("외출 시간은 음수를 더할 수 없습니다.");
+        }
+        this.outDuration += outDuration;
     }
 }
