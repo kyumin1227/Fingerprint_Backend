@@ -134,7 +134,7 @@ class DailyStatsServiceTest {
                 .hasMessage("일일 통계를 찾을 수 없습니다.");
     }
 
-    @DisplayName("체류 시간 음수 업데이트")
+    @DisplayName("체류 시간 음수값 예외")
     @Test
     void error2() {
         // given
@@ -147,5 +147,20 @@ class DailyStatsServiceTest {
         assertThatCode(() -> dailyStatsCommandService.updateStayDuration("2423002", date1, -100L))
                 .isInstanceOf(StatsException.class)
                 .hasMessage("체류 시간은 음수를 더할 수 없습니다.");
+    }
+
+    @DisplayName("체류 시간 초과 예외")
+    @Test
+    void error3() {
+        // given
+        LocalDate date1 = TimePolicy.getLocalDate(dateTime1);
+
+        // when
+        dailyStatsCommandService.createDailyStats("2423002", date1);
+
+        // then
+        assertThatCode(() -> dailyStatsCommandService.updateStayDuration("2423002", date1, 25 * 60 * 60 * 1000L))
+                .isInstanceOf(StatsException.class)
+                .hasMessage("체류 시간은 24시간을 초과할 수 없습니다.");
     }
 }

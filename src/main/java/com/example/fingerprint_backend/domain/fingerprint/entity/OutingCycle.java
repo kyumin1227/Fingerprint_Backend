@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
@@ -48,6 +49,18 @@ public class OutingCycle {
             throw new CycleException("외출 종료 시간이 외출 시작 시간보다 이릅니다.");
         }
         this.outingEndTime = outingEndTime;
+    }
+
+    /**
+     * 외출 사이클의 총 외출 시간을 계산합니다.
+     *
+     * @return 총 외출 시간 (밀리초 단위)
+     */
+    public Long getTotalOutingDuration() {
+        if (outingEndTime == null) {
+            return 0L;
+        }
+        return Duration.between(outingStartTime, outingEndTime).toMillis();
     }
 
 }

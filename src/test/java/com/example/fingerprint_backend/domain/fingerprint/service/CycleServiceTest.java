@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -72,6 +73,7 @@ class CycleServiceTest {
 
     @DisplayName("정상적으로 등교 후 하교")
     @Test
+    @DirtiesContext
     void success1() {
         // given
         cycleCommandService.createAttendanceCycle("2423002", date1);

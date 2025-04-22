@@ -50,6 +50,32 @@ public class StatsApplicationService {
     }
 
     /**
+     * 주어진 외출 사이클에 해당하는 DailyStats를 가져오거나 생성합니다.
+     *
+     * @param outingCycle 외출 사이클
+     * @return DailyStats 리스트
+     */
+    public List<DailyStats> getOrCreateDailyStatsInRange(
+            OutingCycle outingCycle
+    ) {
+
+        String studentNumber = outingCycle.getStudentNumber();
+        LocalDate startDate = TimePolicy.getLocalDate(outingCycle.getOutingStartTime());
+        LocalDate endDate = TimePolicy.getLocalDate(outingCycle.getOutingEndTime());
+
+        List<DailyStats> dailyStatsList = new ArrayList<>();
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate(studentNumber, date);
+            if (dailyStats == null) {
+                dailyStats = dailyStatsCommandService.createDailyStats(studentNumber, date);
+            }
+            dailyStatsList.add(dailyStats);
+        }
+
+        return dailyStatsList;
+    }
+
+    /**
      * 출석 사이클에서 해당 날짜에 대한 체류 시간을 계산합니다.
      *
      * @param attendanceCycle 출석 사이클

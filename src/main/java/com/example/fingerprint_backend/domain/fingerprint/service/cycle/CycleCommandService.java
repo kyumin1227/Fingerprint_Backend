@@ -3,6 +3,7 @@ package com.example.fingerprint_backend.domain.fingerprint.service.cycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
 import com.example.fingerprint_backend.domain.fingerprint.event.AttendanceCycleCloseEvent;
+import com.example.fingerprint_backend.domain.fingerprint.event.OutingCycleCloseEvent;
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
 import com.example.fingerprint_backend.domain.fingerprint.exception.LogException;
 import com.example.fingerprint_backend.domain.fingerprint.repository.AttendanceCycleRepository;
@@ -149,8 +150,7 @@ public class CycleCommandService {
 
         outingCycle.setOutingEndTime(outingEndTime);
 
-        // TODO : 외출 종료 시점에 통계 업데이트를 하는 이벤트 발생
-        // 시작 날짜, 끝나는 날짜, 학번을 넘겨서 해당되는 통계만 업데이트
+        eventPublisher.publishEvent(new OutingCycleCloseEvent(outingCycle));
 
         return outingCycle;
     }

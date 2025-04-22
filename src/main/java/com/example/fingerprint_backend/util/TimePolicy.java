@@ -43,4 +43,18 @@ public class TimePolicy {
         return date.plusDays(1).atTime(START_TIME);
     }
 
+    /**
+     * 밀리초를 시:분 형식의 문자열로 변환합니다.
+     *
+     * @param millis 변환할 밀리초
+     * @return 변환된 문자열 (예: "02시간 30분")
+     */
+    public static String convertMillisToTimeString(long millis) {
+        long seconds = millis / 1000;
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+
+        return String.format("%02d시간 %02d분", hours, minutes);
+    }
+
 }

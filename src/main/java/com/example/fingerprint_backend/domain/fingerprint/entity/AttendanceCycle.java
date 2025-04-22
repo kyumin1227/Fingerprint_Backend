@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,5 +60,29 @@ public class AttendanceCycle {
         }
         this.outingCycles.add(outingCycle);
         outingCycle.setAttendanceCycle(this);
+    }
+
+    /**
+     * 출석 사이클의 총 체류 시간을 계산합니다.
+     *
+     * @return 총 체류 시간 (밀리초 단위, 체류 시간 - 외출 시간)
+     */
+    public Long getTotalStayDuration() {
+        if (leaveTime == null) {
+            return 0L;
+        }
+
+        return Duration.between(attendTime, leaveTime).toMillis() - getTotalOutingDuration();
+    }
+
+    /**
+     * 출석 사이클의 총 외출 시간을 계산합니다.
+     *
+     * @return 총 외출 시간 (밀리초 단위)
+     */
+    public Long getTotalOutingDuration() {
+        return outingCycles.stream()
+                .mapToLong(OutingCycle::getTotalOutingDuration)
+                .sum();
     }
 }
