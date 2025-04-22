@@ -50,4 +50,26 @@ public class DatePolicy {
         LocalDate date = TimePolicy.getLocalDate(dateTime);
         return getMonthStartDate(date);
     }
+
+    /**
+     * 늦은 날짜 반환
+     *
+     * @param dateTime1 비교 날짜
+     * @param dateTime2 비교 날짜
+     * @return LocalDateTime (더 늦은 날짜)
+     */
+    public static LocalDateTime max(LocalDateTime dateTime1, LocalDateTime dateTime2) {
+        return dateTime1.isAfter(dateTime2) ? dateTime1 : dateTime2;
+    }
+
+    /**
+     * 빠른 날짜 반환
+     *
+     * @param dateTime1 비교 날짜
+     * @param dateTime2 비교 날짜
+     * @return LocalDateTime (더 빠른 날짜)
+     */
+    public static LocalDateTime min(LocalDateTime dateTime1, LocalDateTime dateTime2) {
+        return dateTime1.isBefore(dateTime2) ? dateTime1 : dateTime2;
+    }
 }

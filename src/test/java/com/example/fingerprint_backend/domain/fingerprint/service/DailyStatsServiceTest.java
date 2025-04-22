@@ -1,7 +1,9 @@
-package com.example.fingerprint_backend.domain.fingerprint.service.stats;
+package com.example.fingerprint_backend.domain.fingerprint.service;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.DailyStats;
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
+import com.example.fingerprint_backend.domain.fingerprint.service.stats.DailyStatsCommandService;
+import com.example.fingerprint_backend.domain.fingerprint.service.stats.DailyStatsQueryService;
 import com.example.fingerprint_backend.util.TimePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
