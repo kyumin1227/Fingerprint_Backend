@@ -1,5 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.entity;
 
+import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -9,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Entity
 @Getter
@@ -17,8 +20,38 @@ import java.time.LocalDate;
         @UniqueConstraint(columnNames = {"student_number", "start_date"})
 })
 public class MonthlyStats extends BaseStats {
+
+    @Column(nullable = false)
+    private Long maxDuration;
+
     @Builder
     public MonthlyStats(String studentNumber, LocalDate startDate) {
         super(studentNumber, startDate);
+        int days = YearMonth.of(startDate.getYear(), startDate.getMonthValue()).lengthOfMonth();
+        this.maxDuration = days * 24 * 60 * 60 * 1000L; // 해당 월의 일수에 따라 최대 시간 설정
+    }
+
+    /**
+     * 체류 시간 업데이트
+     *
+     * @param stayDuration 추가할 체류 시간 (밀리초 단위)
+     */
+    public void updateTotalStayDuration(Long stayDuration) {
+        if (super.getTotalStayDuration() + stayDuration > maxDuration) {
+            throw new StatsException("체류 시간은 해당 월의 최대 시간을 초과할 수 없습니다.");
+        }
+        super.updateTotalStayDuration(stayDuration);
+    }
+
+    /**
+     * 외출 시간 업데이트
+     *
+     * @param outDuration 추가할 외출 시간 (밀리초 단위)
+     */
+    public void updateTotalOutDuration(Long outDuration) {
+        if (super.getTotalOutDuration() + outDuration > maxDuration) {
+            throw new StatsException("외출 시간은 해당 월의 최대 시간을 초과할 수 없습니다.");
+        }
+        super.updateTotalOutDuration(outDuration);
     }
 }

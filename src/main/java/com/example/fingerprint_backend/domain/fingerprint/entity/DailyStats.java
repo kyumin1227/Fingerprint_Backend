@@ -49,7 +49,7 @@ public class DailyStats {
         this.dayOfWeek = effectiveDate.getDayOfWeek();
     }
 
-    private static final Long MAX_STAY_DURATION = 24 * 60 * 60 * 1000L; // 24시간
+    private static final Long MAX_DURATION = 24 * 60 * 60 * 1000L; // 24시간
 
     /**
      * 체류 시간 업데이트
@@ -60,7 +60,7 @@ public class DailyStats {
         if (stayDuration < 0) {
             throw new StatsException("체류 시간은 음수를 더할 수 없습니다.");
         }
-        if (this.stayDuration + stayDuration > MAX_STAY_DURATION) {
+        if (this.stayDuration + stayDuration > MAX_DURATION) {
             throw new StatsException("체류 시간은 24시간을 초과할 수 없습니다.");
         }
         this.stayDuration += stayDuration;
@@ -75,7 +75,7 @@ public class DailyStats {
         if (outDuration < 0) {
             throw new StatsException("외출 시간은 음수를 더할 수 없습니다.");
         }
-        if (this.outDuration + outDuration > MAX_STAY_DURATION) {
+        if (this.outDuration + outDuration > MAX_DURATION) {
             throw new StatsException("외출 시간은 24시간을 초과할 수 없습니다.");
         }
         this.outDuration += outDuration;
