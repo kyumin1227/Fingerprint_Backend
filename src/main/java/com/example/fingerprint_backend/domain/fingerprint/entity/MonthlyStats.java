@@ -21,14 +21,22 @@ import java.time.YearMonth;
 })
 public class MonthlyStats extends BaseStats {
 
-    @Column(nullable = false)
-    private Long maxDuration;
-
     @Builder
     public MonthlyStats(String studentNumber, LocalDate startDate) {
         super(studentNumber, startDate);
-        int days = YearMonth.of(startDate.getYear(), startDate.getMonthValue()).lengthOfMonth();
-        this.maxDuration = days * 24 * 60 * 60 * 1000L; // 해당 월의 일수에 따라 최대 시간 설정
+        if (startDate.getDayOfMonth() != 1) {
+            throw new StatsException("월간 통계는 해당 월의 첫 날부터 시작해야 합니다.");
+        }
+    }
+
+    /**
+     * 해당 월의 최대 시간 (밀리초 단위)
+     *
+     * @return 해당 월의 최대 시간 (밀리초 단위)
+     */
+    public long getMaxDuration() {
+        return YearMonth.of(getStartDate().getYear(), getStartDate().getMonthValue()).lengthOfMonth()
+                * 24 * 60 * 60 * 1000L;
     }
 
     /**
@@ -37,7 +45,7 @@ public class MonthlyStats extends BaseStats {
      * @param stayDuration 추가할 체류 시간 (밀리초 단위)
      */
     public void updateTotalStayDuration(Long stayDuration) {
-        if (super.getTotalStayDuration() + stayDuration > maxDuration) {
+        if (super.getTotalStayDuration() + stayDuration > getMaxDuration()) {
             throw new StatsException("체류 시간은 해당 월의 최대 시간을 초과할 수 없습니다.");
         }
         super.updateTotalStayDuration(stayDuration);
@@ -49,7 +57,7 @@ public class MonthlyStats extends BaseStats {
      * @param outDuration 추가할 외출 시간 (밀리초 단위)
      */
     public void updateTotalOutDuration(Long outDuration) {
-        if (super.getTotalOutDuration() + outDuration > maxDuration) {
+        if (super.getTotalOutDuration() + outDuration > getMaxDuration()) {
             throw new StatsException("외출 시간은 해당 월의 최대 시간을 초과할 수 없습니다.");
         }
         super.updateTotalOutDuration(outDuration);

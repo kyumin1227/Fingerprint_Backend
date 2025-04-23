@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 @Entity
@@ -24,6 +25,9 @@ public class WeeklyStats extends BaseStats {
     @Builder
     public WeeklyStats(String studentNumber, LocalDate startDate) {
         super(studentNumber, startDate);
+        if (!startDate.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
+            throw new StatsException("주간 통계는 월요일부터 시작해야 합니다.");
+        }
     }
 
     /**

@@ -1,13 +1,10 @@
 package com.example.fingerprint_backend.domain.fingerprint.service.stats;
 
-import com.example.fingerprint_backend.domain.fingerprint.entity.DailyStats;
-import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
+import com.example.fingerprint_backend.domain.fingerprint.entity.*;
 import com.example.fingerprint_backend.util.DatePolicy;
 import com.example.fingerprint_backend.util.TimePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 
 import java.sql.Time;
 import java.time.Duration;
@@ -22,6 +19,10 @@ public class StatsApplicationService {
 
     private final DailyStatsCommandService dailyStatsCommandService;
     private final DailyStatsQueryService dailyStatsQueryService;
+    private final WeeklyStatsQueryService weeklyStatsQueryService;
+    private final WeeklyStatsCommandService weeklyStatsCommandService;
+    private final MonthlyStatsQueryService monthlyStatsQueryService;
+    private final MonthlyStatsCommandService monthlyStatsCommandService;
 
     /**
      * 주어진 출석 사이클에 해당하는 DailyStats를 가져오거나 생성합니다.
@@ -73,6 +74,37 @@ public class StatsApplicationService {
         }
 
         return dailyStatsList;
+    }
+
+    /**
+     * 주어진 학생 번호와 날짜에 해당하는 WeeklyStats를 가져오거나 생성합니다.
+     *
+     * @param studentNumber 학생 번호
+     * @param date          날짜
+     * @return WeeklyStats
+     */
+    public WeeklyStats getOrCreateWeeklyStats(String studentNumber, LocalDate date) {
+
+        LocalDate weekStartDate = DatePolicy.getWeekStartDate(date);
+
+        return weeklyStatsQueryService.getWeeklyStatsByStudentNumberAndDate(studentNumber, weekStartDate)
+                .orElseGet(() -> weeklyStatsCommandService.createWeeklyStats(studentNumber, weekStartDate));
+    }
+
+    /**
+     * 주어진 학생 번호와 날짜에 해당하는 MonthlyStats를 가져오거나 생성합니다.
+     *
+     * @param studentNumber 학생 번호
+     * @param date          날짜
+     * @return MonthlyStats
+     */
+    public MonthlyStats getOrCreateMonthlyStats(String studentNumber, LocalDate date) {
+
+        LocalDate monthStartDate = DatePolicy.getMonthStartDate(date);
+
+        return monthlyStatsQueryService.getMonthlyStatsByStudentNumberAndDate(studentNumber, monthStartDate)
+                .orElseGet(() -> monthlyStatsCommandService.createMonthlyStats(studentNumber, monthStartDate));
+
     }
 
     /**
