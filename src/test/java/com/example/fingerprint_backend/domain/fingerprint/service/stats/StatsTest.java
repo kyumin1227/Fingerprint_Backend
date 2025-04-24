@@ -41,7 +41,7 @@ public class StatsTest {
 
         // when
         WeeklyStats weeklyStats = new WeeklyStats(studentNumber, date);
-        weeklyStats.updateTotalStayDuration(maxStayDuration);
+        weeklyStats.setTotalStayDuration(maxStayDuration);
 
         // then
         assertThat(weeklyStats.getStartDate()).as("startDate").isEqualTo(date);
@@ -58,7 +58,7 @@ public class StatsTest {
 
         // when
         WeeklyStats weeklyStats = new WeeklyStats(studentNumber, date);
-        weeklyStats.updateTotalOutDuration(maxOutDuration);
+        weeklyStats.setTotalOutDuration(maxOutDuration);
 
         // then
         assertThat(weeklyStats.getStartDate()).as("startDate").isEqualTo(date);
@@ -88,7 +88,7 @@ public class StatsTest {
 
         // when
         WeeklyStats weeklyStats = new WeeklyStats(studentNumber, date);
-        assertThatCode(() -> weeklyStats.updateTotalStayDuration(stayDuration))
+        assertThatCode(() -> weeklyStats.setTotalStayDuration(stayDuration))
                 .isInstanceOf(StatsException.class)
                 .hasMessageContaining("체류 시간은 7일을 초과할 수 없습니다.");
     }
@@ -103,7 +103,7 @@ public class StatsTest {
 
         // when
         WeeklyStats weeklyStats = new WeeklyStats(studentNumber, date);
-        assertThatCode(() -> weeklyStats.updateTotalOutDuration(outDuration))
+        assertThatCode(() -> weeklyStats.setTotalOutDuration(outDuration))
                 .isInstanceOf(StatsException.class)
                 .hasMessageContaining("외출 시간은 7일을 초과할 수 없습니다.");
     }
@@ -118,7 +118,7 @@ public class StatsTest {
 
         // when
         WeeklyStats weeklyStats = new WeeklyStats(studentNumber, date);
-        assertThatCode(() -> weeklyStats.updateTotalStayDuration(stayDuration))
+        assertThatCode(() -> weeklyStats.setTotalStayDuration(stayDuration))
                 .isInstanceOf(StatsException.class)
                 .hasMessageContaining("체류 시간은 음수를 더할 수 없습니다.");
     }

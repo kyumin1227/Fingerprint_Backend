@@ -4,7 +4,7 @@ import com.example.fingerprint_backend.domain.fingerprint.entity.DailyStats;
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.DailyStatsCommandService;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.DailyStatsQueryService;
-import com.example.fingerprint_backend.util.TimePolicy;
+import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ class DailyStatsServiceTest {
         dailyStatsCommandService.createDailyStats("2423002", date1);
 
         // then
-        DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", date1);
+        DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", date1).get();
         assertThat(dailyStats.getEffectiveDate()).as("effectiveDate").isEqualTo(date1);
         assertThat(dailyStats.getStudentNumber()).as("studentNumber").isEqualTo("2423002");
         assertThat(dailyStats.getDayOfWeek()).as("dayOfWeek").isEqualTo(DayOfWeek.MONDAY);
@@ -66,7 +66,7 @@ class DailyStatsServiceTest {
         dailyStatsCommandService.createDailyStats("2423002", date1);
 
         // then
-        DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", date2);
+        DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", date2).get();
         assertThat(dailyStats).as("dailyStats").isNull();
     }
 
@@ -94,11 +94,11 @@ class DailyStatsServiceTest {
         LocalDate date1 = TimePolicy.getLocalDate(dateTime1);
 
         // when
-        dailyStatsCommandService.createDailyStats("2423002", date1);
-        dailyStatsCommandService.updateStayDuration("2423002", date1, 100L);
+        DailyStats dailyStats_create = dailyStatsCommandService.createDailyStats("2423002", date1);
+        dailyStatsCommandService.updateStayDuration(dailyStats_create, 100L);
 
         // then
-        DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", date1);
+        DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", date1).get();
         assertThat(dailyStats.getStayDuration()).as("stayDuration").isEqualTo(100L);
     }
 
@@ -113,7 +113,7 @@ class DailyStatsServiceTest {
         dailyStatsCommandService.updateOutDuration(dailyStats, 100L);
 
         // then
-        DailyStats updateStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", date1);
+        DailyStats updateStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", date1).get();
         assertThat(updateStats.getOutDuration()).as("outDuration").isEqualTo(100L);
 
     }
@@ -126,10 +126,10 @@ class DailyStatsServiceTest {
         LocalDate date2 = TimePolicy.getLocalDate(dateTime2);
 
         // when
-        dailyStatsCommandService.createDailyStats("2423002", date1);
+        DailyStats dailyStats = dailyStatsCommandService.createDailyStats("2423002", date1);
 
         // then
-        assertThatCode(() -> dailyStatsCommandService.updateStayDuration("2423002", date2, 100L))
+        assertThatCode(() -> dailyStatsCommandService.updateStayDuration(dailyStats, 100L))
                 .isInstanceOf(StatsException.class)
                 .hasMessage("일일 통계를 찾을 수 없습니다.");
     }
@@ -141,10 +141,10 @@ class DailyStatsServiceTest {
         LocalDate date1 = TimePolicy.getLocalDate(dateTime1);
 
         // when
-        dailyStatsCommandService.createDailyStats("2423002", date1);
+        DailyStats dailyStats = dailyStatsCommandService.createDailyStats("2423002", date1);
 
         // then
-        assertThatCode(() -> dailyStatsCommandService.updateStayDuration("2423002", date1, -100L))
+        assertThatCode(() -> dailyStatsCommandService.updateStayDuration(dailyStats, -100L))
                 .isInstanceOf(StatsException.class)
                 .hasMessage("체류 시간은 음수를 더할 수 없습니다.");
     }
@@ -156,10 +156,10 @@ class DailyStatsServiceTest {
         LocalDate date1 = TimePolicy.getLocalDate(dateTime1);
 
         // when
-        dailyStatsCommandService.createDailyStats("2423002", date1);
+        DailyStats dailyStats = dailyStatsCommandService.createDailyStats("2423002", date1);
 
         // then
-        assertThatCode(() -> dailyStatsCommandService.updateStayDuration("2423002", date1, 25 * 60 * 60 * 1000L))
+        assertThatCode(() -> dailyStatsCommandService.updateStayDuration(dailyStats, 25 * 60 * 60 * 1000L))
                 .isInstanceOf(StatsException.class)
                 .hasMessage("체류 시간은 24시간을 초과할 수 없습니다.");
     }

@@ -3,7 +3,6 @@ package com.example.fingerprint_backend.domain.fingerprint.service;
 import com.example.fingerprint_backend.TestMemberFactory;
 import com.example.fingerprint_backend.domain.fingerprint.entity.DailyStats;
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
-import com.example.fingerprint_backend.domain.fingerprint.listener.AttendanceCycleCloseEventHandler;
 import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleCommandService;
 import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleQueryService;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.DailyStatsQueryService;
@@ -15,7 +14,7 @@ import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.AuthService;
 import com.example.fingerprint_backend.service.CleanManagementService;
 import com.example.fingerprint_backend.types.MemberRole;
-import com.example.fingerprint_backend.util.TimePolicy;
+import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,8 +59,6 @@ public class CycleStatsIntegrationTest {
     @Autowired
     private AuthService authService;
     @Autowired
-    private AttendanceCycleCloseEventHandler attendanceCycleCloseEventHandler;
-    @Autowired
     private StatsApplicationService statsApplicationService;
 
     @BeforeEach
@@ -90,7 +87,7 @@ public class CycleStatsIntegrationTest {
         cycleCommandService.closeAttendanceCycle("2423002", dateTime1.plusHours(2));
 
         // then
-        DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime1));
+        DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime1)).get();
 
         assertThat(dailyStats.getStayDuration()).as("체류 시간").isEqualTo(2 * 60 * 60 * 1000L); // 2시간
 
@@ -107,9 +104,9 @@ public class CycleStatsIntegrationTest {
         cycleCommandService.closeAttendanceCycle("2423002", dateTime.plusDays(2).plusHours(3)); // 51시간
 
         // then
-        DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime));
-        DailyStats dailyStats2 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime.plusDays(1)));
-        DailyStats dailyStats3 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime.plusDays(2)));
+        DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime)).get();
+        DailyStats dailyStats2 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime.plusDays(1))).get();
+        DailyStats dailyStats3 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime.plusDays(2))).get();
 
         assertThat(dailyStats1.getStayDuration()).as("1일 체류 시간").isEqualTo(15 * 60 * 60 * 1000L); // 15시간
         assertThat(dailyStats2.getStayDuration()).as("2일 체류 시간").isEqualTo(24 * 60 * 60 * 1000L); // 24시간
@@ -127,7 +124,7 @@ public class CycleStatsIntegrationTest {
         cycleCommandService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
 
         // then
-        DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime));
+        DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime)).get();
 
         assertThatCode(() -> dailyStats1.updateStayDuration(12 * 60 * 60 * 1000L + 1)) // 1ms 초과
                 .as("체류 시간 초과 예외")
@@ -146,7 +143,7 @@ public class CycleStatsIntegrationTest {
         cycleCommandService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
 
         // then
-        DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime));
+        DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime)).get();
 
         assertThatCode(() -> dailyStats1.updateStayDuration(-10 * 60 * 60 * 1000L))
                 .as("체류 시간 음수값 예외")
