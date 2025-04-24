@@ -1,6 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.controller;
 
 import com.example.fingerprint_backend.ApiResponse;
+import com.example.fingerprint_backend.domain.fingerprint.service.LogApplicationService;
 import com.example.fingerprint_backend.dto.CreateFingerPrintDto;
 import com.example.fingerprint_backend.dto.CreateLogDto;
 import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
@@ -25,6 +26,7 @@ public class FingerPrintController {
     private final FingerPrintService fingerPrintService;
     private final LogService logService;
     private final MemberQueryService memberQueryService;
+    private final LogApplicationService logApplicationService;
 
     @GetMapping("/api/fingerprint/students/{stdNum}")
     public ResponseEntity<ApiResponse> check(@PathVariable String stdNum) {
@@ -93,14 +95,20 @@ public class FingerPrintController {
     @PostMapping("/api/fingerprint/logs")
     public ResponseEntity<ApiResponse> createLog(@RequestBody CreateLogDto createLogDto) {
 
-        LogEntity savedLog = logService.createLog(
+//        LogEntity savedLog = logService.createLog(
+//                createLogDto.getStd_num(),
+//                createLogDto.getAction()
+//        );
+//
+//        String message = String.format("학번 %s의 \n\"%s\" 로그가 등록되었습니다.", savedLog.getStudentNumber(), savedLog.getAction());
+
+        logApplicationService.routeLog(
                 createLogDto.getStd_num(),
                 createLogDto.getAction()
         );
 
-        String message = String.format("학번 %s의 \n\"%s\" 로그가 등록되었습니다.", savedLog.getStudentNumber(), savedLog.getAction());
-
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, message, savedLog));
+//        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, message, savedLog));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "로그 등록에 성공하였습니다.", null));
     }
 
     /**

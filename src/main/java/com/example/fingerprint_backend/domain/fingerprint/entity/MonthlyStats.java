@@ -1,6 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.entity;
 
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
+import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -69,5 +70,16 @@ public class MonthlyStats extends BaseStats {
             throw new StatsException("출석 횟수는 해당 월의 최대 시간을 초과할 수 없습니다.");
         }
         super.setTotalAttendCount(totalAttendCount);
+    }
+
+    /**
+     * 월간 통계의 마지막 날짜를 반환합니다.
+     *
+     * @return 월간 통계의 마지막 날짜 (해당 월의 마지막 날)
+     */
+    @Override
+    public LocalDate getEndDate() {
+        LocalDate startDate = super.getStartDate();
+        return DatePolicy.getMonthEndDate(startDate);
     }
 }

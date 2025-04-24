@@ -1,6 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.entity;
 
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
+import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -67,5 +68,16 @@ public class WeeklyStats extends BaseStats {
             throw new StatsException("출석 횟수는 7일을 초과할 수 없습니다.");
         }
         super.setTotalAttendCount(attendCount);
+    }
+
+    /**
+     * 주간 통계의 마지막 날짜를 반환합니다.
+     *
+     * @return 주간 통계의 마지막 날짜 (일요일)
+     */
+    @Override
+    public LocalDate getEndDate() {
+        LocalDate startDate = super.getStartDate();
+        return DatePolicy.getDateOfWeekDay(startDate, DayOfWeek.SUNDAY);
     }
 }

@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class AttendanceCycleCloseEvent {
+public class DailyStatsUpdateEvent {
 
     private final AttendanceCycle attendanceCycle;
 

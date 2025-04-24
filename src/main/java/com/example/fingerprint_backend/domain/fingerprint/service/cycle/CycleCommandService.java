@@ -2,7 +2,7 @@ package com.example.fingerprint_backend.domain.fingerprint.service.cycle;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
-import com.example.fingerprint_backend.domain.fingerprint.event.AttendanceCycleCloseEvent;
+import com.example.fingerprint_backend.domain.fingerprint.event.DailyStatsUpdateEvent;
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
 import com.example.fingerprint_backend.domain.fingerprint.exception.LogException;
 import com.example.fingerprint_backend.domain.fingerprint.repository.AttendanceCycleRepository;
@@ -17,10 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
 public class CycleCommandService {
+
+//    TODO - 출석 사이클과 외출 사이클을 분리
 
     private final MemberQueryService memberQueryService;
     private final AttendanceCycleRepository attendanceCycleRepository;
@@ -76,21 +79,21 @@ public class CycleCommandService {
         }
 
         // 등교와 하교 사이에 문이 닫힌 시간이 존재하는지 확인
-        try {
-            ClassClosingTime classClosingTime = logService
-                    .getClassClosingTimeByTimeAfter(member.getSchoolClass().getId(), openAttendCycle.getAttendTime());
-
-            if (leaveTime.isAfter(classClosingTime.getClosingTime().plusMinutes(10))) {
-                openAttendCycle = createAttendanceCycle(studentNumber, leaveTime);
-            }
-
-        } catch (LogException ignored) {
-
-        }
+//        try {
+//            ClassClosingTime classClosingTime = logService
+//                    .getClassClosingTimeByTimeAfter(member.getSchoolClass().getId(), openAttendCycle.getAttendTime());
+//
+//            if (leaveTime.isAfter(classClosingTime.getClosingTime().plusMinutes(10))) {
+//                openAttendCycle = createAttendanceCycle(studentNumber, leaveTime);
+//            }
+//
+//        } catch (LogException ignored) {
+//
+//        }
 
         openAttendCycle.setLeaveTime(leaveTime);
 
-        eventPublisher.publishEvent(new AttendanceCycleCloseEvent(openAttendCycle));
+        eventPublisher.publishEvent(new DailyStatsUpdateEvent(openAttendCycle));
 
         return openAttendCycle;
     }
@@ -150,5 +153,16 @@ public class CycleCommandService {
         outingCycle.setOutingEndTime(outingEndTime);
 
         return outingCycle;
+    }
+
+    /**
+     * 외출 사이클들을 종료 합니다.
+     *
+     * @param outingCycleList
+     */
+    private void closeAllOutingCycles(List<OutingCycle> outingCycleList) {
+        for (OutingCycle outingCycle : outingCycleList) {
+            outingCycle.setOutingEndTime(LocalDateTime.now());
+        }
     }
 }

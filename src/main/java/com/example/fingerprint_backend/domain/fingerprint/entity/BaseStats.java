@@ -102,4 +102,11 @@ public abstract class BaseStats {
         }
         this.avgLeaveTime = avgLeaveTime;
     }
+
+    /**
+     * 통계의 마지막 날짜를 반환합니다.
+     *
+     * @return 마지막 날짜
+     */
+    abstract public LocalDate getEndDate();
 }

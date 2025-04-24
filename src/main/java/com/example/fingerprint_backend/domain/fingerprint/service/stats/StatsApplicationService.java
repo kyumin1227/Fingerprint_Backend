@@ -1,17 +1,27 @@
 package com.example.fingerprint_backend.domain.fingerprint.service.stats;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.*;
-import com.example.fingerprint_backend.util.DatePolicy;
-import com.example.fingerprint_backend.util.TimePolicy;
+import com.example.fingerprint_backend.domain.fingerprint.event.MonthlyStatsUpdateEvent;
+import com.example.fingerprint_backend.domain.fingerprint.event.WeeklyStatsUpdateEvent;
+import com.example.fingerprint_backend.domain.fingerprint.repository.DailyStatsRepository;
+import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
+import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
+import com.example.fingerprint_backend.domain.fingerprint.util.StatsCalculator;
+import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
+import com.example.fingerprint_backend.domain.fingerprint.vo.StatsUpdateValue;
+import com.example.fingerprint_backend.types.LogAction;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +33,47 @@ public class StatsApplicationService {
     private final WeeklyStatsCommandService weeklyStatsCommandService;
     private final MonthlyStatsQueryService monthlyStatsQueryService;
     private final MonthlyStatsCommandService monthlyStatsCommandService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final LogService logService;
+    private final DailyStatsRepository dailyStatsRepository;
+
+
+    /**
+     * 출석 사이클 종료 시 일일 통계 업데이트
+     *
+     * @param attendanceCycle 출석 사이클
+     * @param dailyStatsList  일일 통계 리스트
+     */
+    public void updateDailyStats(AttendanceCycle attendanceCycle, List<DailyStats> dailyStatsList) {
+
+        Set<LocalDate> weeklyDates = new HashSet<>();
+        Set<LocalDate> monthlyDates = new HashSet<>();
+        String studentNumber = attendanceCycle.getStudentNumber();
+
+        for (DailyStats dailyStats : dailyStatsList) {
+
+            Long durationTime = StatsCalculator.getDailyDurationTimeForCycle(attendanceCycle, dailyStats.getEffectiveDate());
+            dailyStats.updateStayDuration(durationTime);
+            dailyStats.updateOutDuration(attendanceCycle.getTotalOutingDuration());
+
+            weeklyDates.add(DatePolicy.getDateOfWeekDay(dailyStats.getEffectiveDate(), DayOfWeek.MONDAY));
+            monthlyDates.add(DatePolicy.getMonthStartDate(dailyStats.getEffectiveDate()));
+        }
+
+//        일일 통계 업데이트 저장
+        dailyStatsRepository.saveAllAndFlush(dailyStatsList);
+
+        weeklyDates.forEach(date -> {
+                    applicationEventPublisher.publishEvent(new WeeklyStatsUpdateEvent(studentNumber, date));
+                }
+        );
+
+        monthlyDates.forEach(date -> {
+                    applicationEventPublisher.publishEvent(new MonthlyStatsUpdateEvent(studentNumber, date));
+                }
+        );
+
+    }
 
     /**
      * 주어진 출석 사이클에 해당하는 DailyStats를 가져오거나 생성합니다.
@@ -30,7 +81,7 @@ public class StatsApplicationService {
      * @param attendanceCycle 출석 사이클
      * @return DailyStats 리스트
      */
-    public List<DailyStats> getOrCreateDailyStatsInRange(
+    public List<DailyStats> getOrCreateDailyStatsInCycle(
             AttendanceCycle attendanceCycle
     ) {
 
@@ -40,10 +91,7 @@ public class StatsApplicationService {
 
         List<DailyStats> dailyStatsList = new ArrayList<>();
         for (LocalDate date = attendDate; !date.isAfter(leaveDate); date = date.plusDays(1)) {
-            DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate(studentNumber, date);
-            if (dailyStats == null) {
-                dailyStats = dailyStatsCommandService.createDailyStats(studentNumber, date);
-            }
+            DailyStats dailyStats = dailyStatsCommandService.getOrCreateDailyStats(studentNumber, date);
             dailyStatsList.add(dailyStats);
         }
 
@@ -51,103 +99,80 @@ public class StatsApplicationService {
     }
 
     /**
-     * 주어진 외출 사이클에 해당하는 DailyStats를 가져오거나 생성합니다.
+     * WeeklyStats, MonthlyStats 업데이트
      *
-     * @param outingCycle 외출 사이클
-     * @return DailyStats 리스트
+     * @param stats            BaseStats
+     * @param statsUpdateValue 업데이트 값 (체류 시간, 외출 시간, 출석 횟수, 평균 등교 시간, 평균 하교 시간)
      */
-    public List<DailyStats> getOrCreateDailyStatsInRange(
-            OutingCycle outingCycle
-    ) {
+    public void setStats(BaseStats stats, StatsUpdateValue statsUpdateValue) {
 
-        String studentNumber = outingCycle.getStudentNumber();
-        LocalDate startDate = TimePolicy.getLocalDate(outingCycle.getOutingStartTime());
-        LocalDate endDate = TimePolicy.getLocalDate(outingCycle.getOutingEndTime());
-
-        List<DailyStats> dailyStatsList = new ArrayList<>();
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate(studentNumber, date);
-            if (dailyStats == null) {
-                dailyStats = dailyStatsCommandService.createDailyStats(studentNumber, date);
-            }
-            dailyStatsList.add(dailyStats);
-        }
-
-        return dailyStatsList;
+        stats.setTotalStayDuration(statsUpdateValue.stayDuration());
+        stats.setTotalOutDuration(statsUpdateValue.outDuration());
+        stats.setTotalAttendCount(statsUpdateValue.attendCount());
+        stats.setAvgAttendTime(statsUpdateValue.averageAttendTime());
+        stats.setAvgLeaveTime(statsUpdateValue.averageLeaveTime());
     }
 
     /**
-     * 주어진 학생 번호와 날짜에 해당하는 WeeklyStats를 가져오거나 생성합니다.
+     * 주간 통계 업데이트
      *
-     * @param studentNumber 학생 번호
+     * @param studentNumber 학번
      * @param date          날짜
-     * @return WeeklyStats
+     * @return 주간 통계
      */
-    public WeeklyStats getOrCreateWeeklyStats(String studentNumber, LocalDate date) {
+    public WeeklyStats updateWeeklyStats(String studentNumber, LocalDate date) {
 
-        LocalDate weekStartDate = DatePolicy.getDateOfWeekDay(date, DayOfWeek.MONDAY);
+        WeeklyStats weeklyStats = weeklyStatsCommandService.getOrCreateWeeklyStats(studentNumber, date);
+        List<DailyStats> dailyStatsForWeek = dailyStatsQueryService.getDailyStatsForWeek(studentNumber, date);
+        List<LogEntity> attendLogs = logService.getLogsInRangeByStudentNumberAndAction(
+                studentNumber,
+                LogAction.등교,
+                TimePolicy.getStartDateTime(weeklyStats.getStartDate()),
+                TimePolicy.getEndDateTime(weeklyStats.getEndDate()));
+        List<LogEntity> leaveLogs = logService.getLogsInRangeByStudentNumberAndAction(
+                studentNumber,
+                LogAction.하교,
+                TimePolicy.getStartDateTime(weeklyStats.getStartDate()),
+                TimePolicy.getEndDateTime(weeklyStats.getEndDate()));
 
-        return weeklyStatsQueryService.getWeeklyStatsByStudentNumberAndDate(studentNumber, weekStartDate)
-                .orElseGet(() -> weeklyStatsCommandService.createWeeklyStats(studentNumber, weekStartDate));
+        // 업데이트 값 계산
+        StatsUpdateValue statsUpdateValue = StatsCalculator.calculateStatsUpdateValue(dailyStatsForWeek, attendLogs, leaveLogs);
+
+        setStats(weeklyStats, statsUpdateValue);
+
+        return weeklyStats;
+
     }
 
     /**
-     * 주어진 학생 번호와 날짜에 해당하는 MonthlyStats를 가져오거나 생성합니다.
+     * 월간 통계 업데이트
      *
-     * @param studentNumber 학생 번호
+     * @param studentNumber 학번
      * @param date          날짜
-     * @return MonthlyStats
+     * @return 월간 통계
      */
-    public MonthlyStats getOrCreateMonthlyStats(String studentNumber, LocalDate date) {
+    public MonthlyStats updateMonthlyStats(String studentNumber, LocalDate date) {
 
-        LocalDate monthStartDate = DatePolicy.getMonthStartDate(date);
+        MonthlyStats monthlyStats = monthlyStatsCommandService.getOrCreateMonthlyStats(studentNumber, date);
+        List<DailyStats> dailyStatsForMonth = dailyStatsQueryService.getDailyStatsForMonth(studentNumber, date);
+        List<LogEntity> attendLogs = logService.getLogsInRangeByStudentNumberAndAction(
+                studentNumber,
+                LogAction.등교,
+                TimePolicy.getStartDateTime(monthlyStats.getStartDate()),
+                TimePolicy.getEndDateTime(monthlyStats.getEndDate()));
+        List<LogEntity> leaveLogs = logService.getLogsInRangeByStudentNumberAndAction(
+                studentNumber,
+                LogAction.하교,
+                TimePolicy.getStartDateTime(monthlyStats.getStartDate()),
+                TimePolicy.getEndDateTime(monthlyStats.getEndDate()));
 
-        return monthlyStatsQueryService.getMonthlyStatsByStudentNumberAndDate(studentNumber, monthStartDate)
-                .orElseGet(() -> monthlyStatsCommandService.createMonthlyStats(studentNumber, monthStartDate));
+        // 업데이트 값 계산
+        StatsUpdateValue statsUpdateValue = StatsCalculator.calculateStatsUpdateValue(dailyStatsForMonth, attendLogs, leaveLogs);
+
+        setStats(monthlyStats, statsUpdateValue);
+
+        return monthlyStats;
 
     }
 
-    /**
-     * 출석 사이클에서 해당 날짜에 대한 체류 시간을 계산합니다.
-     *
-     * @param attendanceCycle 출석 사이클
-     * @param date            계산 날짜
-     * @return Long 체류 시간 (밀리초 단위)
-     */
-    public Long getDailyDurationTimeForCycle(AttendanceCycle attendanceCycle, LocalDate date) {
-
-        LocalDateTime start = DatePolicy.max(
-                attendanceCycle.getAttendTime(),
-                TimePolicy.getStartDateTime(date)
-        );
-
-        LocalDateTime end = DatePolicy.min(
-                attendanceCycle.getLeaveTime(),
-                TimePolicy.getEndDateTime(date)
-        );
-
-        return Math.max(0, Duration.between(start, end).toMillis());
-    }
-
-    /**
-     * 외출 사이클에서 해당 날짜에 대한 외출 시간을 계산합니다.
-     *
-     * @param outingCycle 외출 사이클
-     * @param date        계산 날짜
-     * @return Long 외출 시간 (밀리초 단위)
-     */
-    public Long getDailyOutingTimeForCycle(OutingCycle outingCycle, LocalDate date) {
-
-        LocalDateTime start = DatePolicy.max(
-                outingCycle.getOutingStartTime(),
-                TimePolicy.getStartDateTime(date)
-        );
-
-        LocalDateTime end = DatePolicy.min(
-                outingCycle.getOutingEndTime(),
-                TimePolicy.getEndDateTime(date)
-        );
-
-        return Math.max(0, Duration.between(start, end).toMillis());
-    }
 }

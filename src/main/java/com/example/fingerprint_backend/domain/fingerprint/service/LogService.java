@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 로그와 문 닫힘을 관리하는 서비스
@@ -32,9 +33,9 @@ public class LogService {
     /**
      * 지문 인식 시 로그 생성
      *
-     * @param studentNumber - 학번
-     * @param action        - 로그 액션
-     * @throws LogException - 학번이 존재하지 않을 경우, 1분 이내 중복 로그 발생 시
+     * @param studentNumber 학번
+     * @param action        로그 액션
+     * @throws LogException 학번이 존재하지 않을 경우, 1분 이내 중복 로그 발생 시
      */
     public LogEntity createLog(String studentNumber, LogAction action) {
 
@@ -53,10 +54,10 @@ public class LogService {
     /**
      * 로그 중복 확인
      *
-     * @param studentNumber - 학번
-     * @param action        - 로그 액션
-     * @param eventTime     - 로그 발생 시간
-     * @throws LogException - 이미 등록된 로그일 경우
+     * @param studentNumber 학번
+     * @param action        로그 액션
+     * @param eventTime     로그 발생 시간
+     * @throws LogException 이미 등록된 로그일 경우
      */
     public void checkDuplicateLog(String studentNumber, LogAction action, LocalDateTime eventTime) {
 
@@ -69,13 +70,31 @@ public class LogService {
     }
 
     /**
+     * 학생 번호, 액션, 시작 시간, 종료 시간으로 로그 조회
+     *
+     * @param studentNumber 학번
+     * @param action        로그 액션
+     * @param startTime     시작 시간
+     * @param endTime       종료 시간
+     * @return 해당 조건에 맞는 로그 리스트
+     */
+    public List<LogEntity> getLogsInRangeByStudentNumberAndAction(
+            String studentNumber,
+            LogAction action,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    ) {
+        return logRepository.findByStudentNumberAndActionAndEventTimeBetween(studentNumber, action, startTime, endTime);
+    }
+
+    /**
      * 문 닫힘 시간 등록
      *
-     * @param closingMember - 문 닫힘 담당자 학번
-     * @param closingTime   - 문 닫힘 시간
-     * @return - 문 닫힘 시간 등록된 객체
-     * @throws LogException - 열쇠 담당자가 아닐 경우, 학번이 존재하지 않을 경우
-     * @throws IllegalStateException    - 5분 이내에 문을 닫았을 경우
+     * @param closingMember 문 닫힘 담당자 학번
+     * @param closingTime   문 닫힘 시간
+     * @return 문 닫힘 시간 등록된 객체
+     * @throws LogException          열쇠 담당자가 아닐 경우, 학번이 존재하지 않을 경우
+     * @throws IllegalStateException 5분 이내에 문을 닫았을 경우
      */
     public ClassClosingTime createClosingTime(LocalDateTime closingTime, String closingMember) {
 
@@ -97,9 +116,9 @@ public class LogService {
     /**
      * 문닫음 중복 확인
      *
-     * @param classId     - 반 ID
-     * @param closingTime - 로그 발생 시간
-     * @throws LogException - 5분 이내에 문을 닫았을 경우
+     * @param classId     반 ID
+     * @param closingTime 로그 발생 시간
+     * @throws LogException 5분 이내에 문을 닫았을 경우
      */
     public void checkDuplicateClose(Long classId, LocalDateTime closingTime) {
 
@@ -117,7 +136,7 @@ public class LogService {
      * @param classId   반 ID
      * @param checkTime 확인할 시간
      * @return 해당 시간 이후의 문 닫힘 객체
-     * @throws LogException - 해당 시간 이후의 문 닫힘 시간이 없을 경우
+     * @throws LogException 해당 시간 이후의 문 닫힘 시간이 없을 경우
      */
     public ClassClosingTime getClassClosingTimeByTimeAfter(Long classId, LocalDateTime checkTime) {
         return classClosingTimeRepository.findBySchoolClassIdAndClosingTimeAfter(classId, checkTime)
