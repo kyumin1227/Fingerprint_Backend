@@ -1,10 +1,9 @@
 package com.example.fingerprint_backend.domain.fingerprint.service;
 
 import com.example.fingerprint_backend.TestMemberFactory;
-import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.DailyStats;
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
-import com.example.fingerprint_backend.domain.fingerprint.listener.CycleCloseEventHandler;
+import com.example.fingerprint_backend.domain.fingerprint.listener.AttendanceCycleCloseEventHandler;
 import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleCommandService;
 import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleQueryService;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.DailyStatsQueryService;
@@ -15,7 +14,6 @@ import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.AuthService;
 import com.example.fingerprint_backend.service.CleanManagementService;
-import com.example.fingerprint_backend.types.LogAction;
 import com.example.fingerprint_backend.types.MemberRole;
 import com.example.fingerprint_backend.util.TimePolicy;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.AsyncConfigurer;
-import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -65,7 +60,7 @@ public class CycleStatsIntegrationTest {
     @Autowired
     private AuthService authService;
     @Autowired
-    private CycleCloseEventHandler cycleCloseEventHandler;
+    private AttendanceCycleCloseEventHandler attendanceCycleCloseEventHandler;
     @Autowired
     private StatsApplicationService statsApplicationService;
 
@@ -119,41 +114,6 @@ public class CycleStatsIntegrationTest {
         assertThat(dailyStats1.getStayDuration()).as("1일 체류 시간").isEqualTo(15 * 60 * 60 * 1000L); // 15시간
         assertThat(dailyStats2.getStayDuration()).as("2일 체류 시간").isEqualTo(24 * 60 * 60 * 1000L); // 24시간
         assertThat(dailyStats3.getStayDuration()).as("3일 체류 시간").isEqualTo(12 * 60 * 60 * 1000L); // 12시간
-    }
-
-    @DisplayName("외출 사이클을 통한 통계 생성 (2일)")
-    @Test
-    void success3() {
-        // given
-        LocalDateTime dateTime = LocalDateTime.of(2025, 4, 22, 20, 5, 0);
-        String studentNumber = "2423001";
-
-        // when
-        cycleCommandService.createOutingCycle(studentNumber, dateTime, LogAction.식사);
-        cycleCommandService.closeOutingCycle(studentNumber, dateTime.plusHours(15)); // 15시간
-
-        // then
-//        일일 통계
-        DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate(studentNumber, TimePolicy.getLocalDate(dateTime));
-        DailyStats dailyStats2 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate(studentNumber, TimePolicy.getLocalDate(dateTime.plusDays(1)));
-
-        assertThat(dailyStats1.getOutDuration()).as("1일 외출 시간").isEqualTo(10 * 60 * 60 * 1000L - 5 * 60 * 1000L); // 9시간 55분
-        assertThat(dailyStats2.getOutDuration()).as("2일 외출 시간").isEqualTo(5 * 60 * 60 * 1000L + 5 * 60 * 1000L); // 5시간 5분
-        assertThat(dailyStats1.getStayDuration()).as("1일 체류 시간").isEqualTo(0L); // 0시간
-        assertThat(dailyStats2.getStayDuration()).as("2일 체류 시간").isEqualTo(0L); // 24시간
-
-//        출석 사이클
-        AttendanceCycle latestOpenCycle = cycleQueryService.getLatestOpenCycle(studentNumber);
-        assertThat(latestOpenCycle.getAttendTime()).as("등교 시간").isEqualTo(dateTime);
-        assertThat(latestOpenCycle.getTotalStayDuration()).as("체류 시간").isEqualTo(0L);
-
-//        외출 사이클
-        assertThat(latestOpenCycle.getOutingCycles()).as("외출 사이클").hasSize(1);
-        assertThat(latestOpenCycle.getOutingCycles().get(0).getOutingStartTime()).as("외출 시작 시간").isEqualTo(dateTime);
-        assertThat(latestOpenCycle.getOutingCycles().get(0).getOutingEndTime()).as("외출 종료 시간").isEqualTo(dateTime.plusHours(15));
-        assertThat(latestOpenCycle.getOutingCycles().get(0).getReason()).as("외출 사유").isEqualTo(LogAction.식사);
-        assertThat(latestOpenCycle.getOutingCycles().get(0).getTotalOutingDuration()).as("외출 시간").isEqualTo(15 * 60 * 60 * 1000L);
-
     }
 
     @DisplayName("체류 시간 초과 예외 (경계값)")

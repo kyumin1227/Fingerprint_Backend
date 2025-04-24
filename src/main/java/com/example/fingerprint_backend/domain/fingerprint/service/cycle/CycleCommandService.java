@@ -3,7 +3,6 @@ package com.example.fingerprint_backend.domain.fingerprint.service.cycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
 import com.example.fingerprint_backend.domain.fingerprint.event.AttendanceCycleCloseEvent;
-import com.example.fingerprint_backend.domain.fingerprint.event.OutingCycleCloseEvent;
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
 import com.example.fingerprint_backend.domain.fingerprint.exception.LogException;
 import com.example.fingerprint_backend.domain.fingerprint.repository.AttendanceCycleRepository;
@@ -149,8 +148,6 @@ public class CycleCommandService {
         }
 
         outingCycle.setOutingEndTime(outingEndTime);
-
-        eventPublisher.publishEvent(new OutingCycleCloseEvent(outingCycle));
 
         return outingCycle;
     }
