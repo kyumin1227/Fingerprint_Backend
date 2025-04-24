@@ -1,7 +1,6 @@
 package com.example.fingerprint_backend.domain.fingerprint.entity;
 
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -34,32 +33,41 @@ public class MonthlyStats extends BaseStats {
      *
      * @return 해당 월의 최대 시간 (밀리초 단위)
      */
-    public long getMaxDuration() {
-        return YearMonth.of(getStartDate().getYear(), getStartDate().getMonthValue()).lengthOfMonth()
-                * 24 * 60 * 60 * 1000L;
+    public Integer getMaxDays() {
+        return YearMonth.of(getStartDate().getYear(), getStartDate().getMonthValue()).lengthOfMonth();
     }
 
     /**
-     * 체류 시간 업데이트
+     * 총 체류 시간 재설정
      *
-     * @param stayDuration 추가할 체류 시간 (밀리초 단위)
+     * @param stayDuration 총 체류 시간 (밀리초 단위)
      */
-    public void updateTotalStayDuration(Long stayDuration) {
-        if (super.getTotalStayDuration() + stayDuration > getMaxDuration()) {
+    @Override
+    public void setTotalStayDuration(Long stayDuration) {
+        if (stayDuration > getMaxDays() * 24 * 60 * 60 * 1000L) {
             throw new StatsException("체류 시간은 해당 월의 최대 시간을 초과할 수 없습니다.");
         }
-        super.updateTotalStayDuration(stayDuration);
+        super.setTotalStayDuration(stayDuration);
     }
 
     /**
-     * 외출 시간 업데이트
+     * 총 외출 시간 재설정
      *
-     * @param outDuration 추가할 외출 시간 (밀리초 단위)
+     * @param outDuration 총 외출 시간 (밀리초 단위)
      */
-    public void updateTotalOutDuration(Long outDuration) {
-        if (super.getTotalOutDuration() + outDuration > getMaxDuration()) {
+    @Override
+    public void setTotalOutDuration(Long outDuration) {
+        if (outDuration > getMaxDays() * 24 * 60 * 60 * 1000L) {
             throw new StatsException("외출 시간은 해당 월의 최대 시간을 초과할 수 없습니다.");
         }
-        super.updateTotalOutDuration(outDuration);
+        super.setTotalOutDuration(outDuration);
+    }
+
+    @Override
+    public void setTotalAttendCount(Integer totalAttendCount) {
+        if (getTotalAttendCount() > getMaxDays()) {
+            throw new StatsException("출석 횟수는 해당 월의 최대 시간을 초과할 수 없습니다.");
+        }
+        super.setTotalAttendCount(totalAttendCount);
     }
 }

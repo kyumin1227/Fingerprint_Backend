@@ -35,32 +35,71 @@ public abstract class BaseStats {
     @Column(nullable = false)
     private LocalTime avgLeaveTime = LocalTime.MIDNIGHT;
 
+    @Column(nullable = false)
+    private Integer totalAttendCount = 0;
+
     protected BaseStats(String studentNumber, LocalDate startDate) {
         this.studentNumber = studentNumber;
         this.startDate = startDate;
     }
 
     /**
-     * 체류 시간 업데이트
+     * 총 체류 시간 재설정
      *
-     * @param stayDuration 추가할 체류 시간 (밀리초 단위)
+     * @param stayDuration 총 체류 시간 (밀리초 단위)
      */
-    public void updateTotalStayDuration(Long stayDuration) {
+    public void setTotalStayDuration(Long stayDuration) {
         if (stayDuration < 0) {
-            throw new StatsException("체류 시간은 음수를 더할 수 없습니다.");
+            throw new StatsException("체류 시간은 음수일 수 없습니다.");
         }
-        this.totalStayDuration += stayDuration;
+        this.totalStayDuration = stayDuration;
     }
 
     /**
-     * 외출 시간 업데이트
+     * 총 외출 시간 재설정
      *
-     * @param outDuration 추가할 외출 시간 (밀리초 단위)
+     * @param outDuration 총 외출 시간 (밀리초 단위)
      */
-    public void updateTotalOutDuration(Long outDuration) {
+    public void setTotalOutDuration(Long outDuration) {
         if (outDuration < 0) {
-            throw new StatsException("외출 시간은 음수를 더할 수 없습니다.");
+            throw new StatsException("외출 시간은 음수일 수 없습니다.");
         }
-        this.totalOutDuration += outDuration;
+        this.totalOutDuration = outDuration;
+    }
+
+    /**
+     * 출석 횟수 재설정
+     *
+     * @param attendCount 출석 횟수
+     */
+    public void setTotalAttendCount(Integer attendCount) {
+        if (attendCount < 0) {
+            throw new StatsException("출석 횟수는 음수일 수 없습니다.");
+        }
+        this.totalAttendCount = attendCount;
+    }
+
+    /**
+     * 평균 출석 시간 재설정
+     *
+     * @param avgAttendTime 평균 출석 시간
+     */
+    public void setAvgAttendTime(LocalTime avgAttendTime) {
+        if (avgAttendTime == null) {
+            throw new StatsException("평균 출석 시간은 null일 수 없습니다.");
+        }
+        this.avgAttendTime = avgAttendTime;
+    }
+
+    /**
+     * 평균 퇴실 시간 재설정
+     *
+     * @param avgLeaveTime 평균 퇴실 시간
+     */
+    public void setAvgLeaveTime(LocalTime avgLeaveTime) {
+        if (avgLeaveTime == null) {
+            throw new StatsException("평균 퇴실 시간은 null일 수 없습니다.");
+        }
+        this.avgLeaveTime = avgLeaveTime;
     }
 }
