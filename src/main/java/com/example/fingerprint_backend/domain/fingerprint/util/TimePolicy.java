@@ -1,4 +1,4 @@
-package com.example.fingerprint_backend.util;
+package com.example.fingerprint_backend.domain.fingerprint.util;
 
 import lombok.experimental.UtilityClass;
 
