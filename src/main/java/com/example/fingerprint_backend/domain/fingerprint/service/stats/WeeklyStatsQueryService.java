@@ -2,7 +2,7 @@ package com.example.fingerprint_backend.domain.fingerprint.service.stats;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.WeeklyStats;
 import com.example.fingerprint_backend.domain.fingerprint.repository.WeeklyStatsRepository;
-import com.example.fingerprint_backend.util.DatePolicy;
+import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

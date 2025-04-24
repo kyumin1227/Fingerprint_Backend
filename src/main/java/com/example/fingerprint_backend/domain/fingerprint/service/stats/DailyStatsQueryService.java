@@ -2,12 +2,17 @@ package com.example.fingerprint_backend.domain.fingerprint.service.stats;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.DailyStats;
 import com.example.fingerprint_backend.domain.fingerprint.repository.DailyStatsRepository;
+import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
+import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -41,9 +46,8 @@ public class DailyStatsQueryService {
     /**
      * 학번과 날짜로 일일 통계를 가져오는 메소드
      */
-    public DailyStats getDailyStatsByStudentNumberAndDate(String studentNumber, LocalDate date) {
-        return dailyStatsRepository.findByStudentNumberAndEffectiveDate(studentNumber, date)
-                .orElse(null);
+    public Optional<DailyStats> getDailyStatsByStudentNumberAndDate(String studentNumber, LocalDate date) {
+        return dailyStatsRepository.findByStudentNumberAndEffectiveDate(studentNumber, date);
     }
 
     /**
@@ -51,6 +55,49 @@ public class DailyStatsQueryService {
      */
     public List<DailyStats> getDailyStatsByStudentNumberAndDateRange(String studentNumber, LocalDate startDate, LocalDate endDate) {
         return dailyStatsRepository.findByStudentNumberAndEffectiveDateBetween(studentNumber, startDate, endDate);
+    }
+
+    /**
+     * 학번과 날짜로 해당 주의 일일 통계들을 가져오는 메소드
+     */
+    public List<DailyStats> getDailyStatsForWeek(String studentNumber, LocalDate date) {
+
+        LocalDate startDate = DatePolicy.getDateOfWeekDay(date, DayOfWeek.MONDAY);
+        LocalDate endDate = DatePolicy.getDateOfWeekDay(date, DayOfWeek.SUNDAY);
+
+        return dailyStatsRepository.findByStudentNumberAndEffectiveDateBetween(studentNumber, startDate, endDate);
+    }
+
+    /**
+     * 학번과 날짜로 해당 주의 일일 통계들을 가져오는 메소드
+     */
+    public List<DailyStats> getDailyStatsForWeek(String studentNumber, LocalDateTime dateTime) {
+
+        LocalDate date = TimePolicy.getLocalDate(dateTime);
+
+        return getDailyStatsForWeek(studentNumber, date);
+    }
+
+    /**
+     * 학번과 날짜로 해당 월의 일일 통계들을 가져오는 메소드
+     */
+    public List<DailyStats> getDailyStatsForMonth(String studentNumber, LocalDate date) {
+
+        LocalDate startDate = DatePolicy.getMonthStartDate(date);
+        LocalDate endDate = DatePolicy.getMonthEndDate(date);
+
+        return dailyStatsRepository.findByStudentNumberAndEffectiveDateBetween(studentNumber, startDate, endDate);
+    }
+
+    /**
+     * 학번과 날짜로 해당 월의 일일 통계들을 가져오는 메소드
+     */
+    public List<DailyStats> getDailyStatsForMonth(String studentNumber, LocalDateTime dateTime) {
+
+        LocalDate date = TimePolicy.getLocalDate(dateTime);
+
+        return getDailyStatsForMonth(studentNumber, date);
+
     }
 
 }
