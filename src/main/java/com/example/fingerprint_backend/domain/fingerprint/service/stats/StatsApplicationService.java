@@ -6,7 +6,7 @@ import com.example.fingerprint_backend.util.TimePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Time;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -85,7 +85,7 @@ public class StatsApplicationService {
      */
     public WeeklyStats getOrCreateWeeklyStats(String studentNumber, LocalDate date) {
 
-        LocalDate weekStartDate = DatePolicy.getWeekStartDate(date);
+        LocalDate weekStartDate = DatePolicy.getDateOfWeekDay(date, DayOfWeek.MONDAY);
 
         return weeklyStatsQueryService.getWeeklyStatsByStudentNumberAndDate(studentNumber, weekStartDate)
                 .orElseGet(() -> weeklyStatsCommandService.createWeeklyStats(studentNumber, weekStartDate));

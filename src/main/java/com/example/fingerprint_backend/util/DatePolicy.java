@@ -10,24 +10,24 @@ import java.time.LocalDateTime;
 public class DatePolicy {
 
     /**
-     * 해당 날짜의 월요일 반환
+     * 해당 날짜의 특정 요일 반환
      *
      * @param date 기준 날짜
      * @return LocalDate (date의 주 시작일)
      */
-    public static LocalDate getWeekStartDate(LocalDate date) {
-        return date.with(DayOfWeek.MONDAY);
+    public static LocalDate getDateOfWeekDay(LocalDate date, DayOfWeek dayOfWeek) {
+        return date.with(dayOfWeek);
     }
 
     /**
-     * 해당 날짜의 월요일 반환 (TimePolicy 적용)
+     * 해당 날짜의 특정 요일 반환 (TimePolicy 적용)
      *
      * @param dateTime 기준 날짜
      * @return LocalDate (dateTime의 주 시작일)
      */
-    public static LocalDate getWeekStartDate(LocalDateTime dateTime) {
+    public static LocalDate getDateOfWeekDay(LocalDateTime dateTime, DayOfWeek dayOfWeek) {
         LocalDate date = TimePolicy.getLocalDate(dateTime);
-        return getWeekStartDate(date);
+        return getDateOfWeekDay(date, dayOfWeek);
     }
 
     /**
@@ -49,6 +49,27 @@ public class DatePolicy {
     public static LocalDate getMonthStartDate(LocalDateTime dateTime) {
         LocalDate date = TimePolicy.getLocalDate(dateTime);
         return getMonthStartDate(date);
+    }
+
+    /**
+     * 해당 날짜의 말일 반환
+     *
+     * @param date 기준 날짜
+     * @return LocalDate (date의 월 마지막 날)
+     */
+    public static LocalDate getMonthEndDate(LocalDate date) {
+        return date.withDayOfMonth(date.lengthOfMonth());
+    }
+
+    /**
+     * 해당 날짜의 말일 반환 (TimePolicy 적용)
+     *
+     * @param dateTime 기준 날짜
+     * @return LocalDate (dateTime의 월 마지막 날)
+     */
+    public static LocalDate getMonthEndDate(LocalDateTime dateTime) {
+        LocalDate date = TimePolicy.getLocalDate(dateTime);
+        return getMonthEndDate(date);
     }
 
     /**

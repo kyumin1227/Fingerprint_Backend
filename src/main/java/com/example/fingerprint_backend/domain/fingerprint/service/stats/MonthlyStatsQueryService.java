@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public class MonthlyStatsQueryService {
      */
     public Optional<MonthlyStats> getMonthlyStatsByStudentNumberAndDate(String studentNumber, LocalDate date) {
 
-        LocalDate weekStartDate = DatePolicy.getWeekStartDate(date);
+        LocalDate weekStartDate = DatePolicy.getDateOfWeekDay(date, DayOfWeek.MONDAY);
 
         return monthlyStatsRepository.findByStudentNumberAndStartDate(studentNumber, weekStartDate);
     }
@@ -41,7 +42,7 @@ public class MonthlyStatsQueryService {
      */
     public Optional<MonthlyStats> getMonthlyStatsByStudentNumberAndDate(String studentNumber, LocalDateTime dateTime) {
 
-        LocalDate weekStartDate = DatePolicy.getWeekStartDate(dateTime);
+        LocalDate weekStartDate = DatePolicy.getDateOfWeekDay(dateTime, DayOfWeek.MONDAY);
 
         return monthlyStatsRepository.findByStudentNumberAndStartDate(studentNumber, weekStartDate);
     }
