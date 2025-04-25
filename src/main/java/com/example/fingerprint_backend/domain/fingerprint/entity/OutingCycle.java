@@ -44,9 +44,18 @@ public class OutingCycle {
         this.reason = reason;
     }
 
+    /**
+     * 외출 종료 시간 설정
+     *
+     * @param outingEndTime 외출 종료 시간
+     * @throws CycleException 외출 종료 시간이 외출 시작 시간보다 이른 경우, 이미 외출 종료 시간이 설정된 경우
+     */
     public void setOutingEndTime(LocalDateTime outingEndTime) {
         if (outingEndTime.isBefore(outingStartTime)) {
             throw new CycleException("외출 종료 시간이 외출 시작 시간보다 이릅니다.");
+        }
+        if (this.outingEndTime != null) {
+            throw new CycleException("이미 외출 종료 시간이 설정되어 있습니다.");
         }
         this.outingEndTime = outingEndTime;
     }

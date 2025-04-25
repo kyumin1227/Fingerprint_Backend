@@ -34,11 +34,14 @@ public class AttendanceCycle {
      * 하교 시간 설정
      *
      * @param leaveTime 하교 시간
-     * @throws CycleException 하교 시간이 등교 시간보다 이른 경우
+     * @throws CycleException 하교 시간이 등교 시간보다 이른 경우, 이미 하교 시간이 설정된 경우
      */
     public void setLeaveTime(LocalDateTime leaveTime) {
         if (leaveTime.isBefore(attendTime)) {
             throw new CycleException("등교 보다 이른 하교 시간입니다.");
+        }
+        if (this.leaveTime != null) {
+            throw new CycleException("이미 하교 시간이 설정되어 있습니다.");
         }
         this.leaveTime = leaveTime;
     }
