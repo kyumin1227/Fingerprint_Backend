@@ -167,15 +167,22 @@ public class CycleApplicationService {
         return outingCycleCommandService.closeOutingCycle(outingCycle, outingEndTime);
     }
 
-    public void classAllCycleByClassId(Long classId) {
-
-        SchoolClass schoolClass = classQueryService.getClassById(classId);
+    /**
+     * 반 객체로 모든 출석 사이클을 종료합니다.
+     *
+     * @param schoolClass 반 객체
+     */
+    public void classAllCycleByClass(SchoolClass schoolClass) {
 
         List<String> studentNumbers = schoolClass.getMembers().stream()
                 .map(MemberEntity::getStudentNumber)
                 .toList();
 
-        List<AttendanceCycle> attendanceCycles = attendanceCycleQueryService.getAllOpenCyclesByStudentNumber(studentNumbers);
+        List<AttendanceCycle> attendanceCycleList = attendanceCycleQueryService.getAllOpenCyclesByStudentNumber(studentNumbers);
+
+        for (AttendanceCycle attendanceCycle : attendanceCycleList) {
+            forceCloseAttendanceCycle(attendanceCycle);
+        }
     }
 
 }

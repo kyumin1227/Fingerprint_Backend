@@ -89,6 +89,9 @@ public class StatsCalculator {
      * @return LocalTime 평균 시간
      */
     public static LocalTime getAvgTime(List<LogEntity> logEntities) {
+        if (logEntities.isEmpty()) {
+            return LocalTime.of(0, 0, 0);
+        }
         long totalSeconds = logEntities.stream()
                 .map(logEntity ->
                         logEntity.getEventTime().toLocalTime()
