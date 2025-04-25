@@ -3,11 +3,12 @@ package com.example.fingerprint_backend;
 import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
 import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
 import com.example.fingerprint_backend.domain.fingerprint.exception.LogException;
+import com.example.fingerprint_backend.domain.fingerprint.service.classClosingTime.ClassClosingTimeApplicationService;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.repository.SchoolClassRepository;
-import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
+import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
 import com.example.fingerprint_backend.types.LogAction;
 import com.example.fingerprint_backend.types.MemberRole;
 import jakarta.transaction.Transactional;
@@ -33,6 +34,8 @@ public class FingerprintTest {
 
     @Autowired
     private SchoolClassRepository schoolClassRepository;
+    @Autowired
+    private ClassClosingTimeApplicationService classClosingTimeApplicationService;
 
 
     @DisplayName("정상적으로 로그 생성")
@@ -114,7 +117,7 @@ public class FingerprintTest {
         LocalDateTime closingTime = LocalDateTime.now();
 
         // when
-        ClassClosingTime classClosingTime = logService.createClosingTime(closingTime, closingMember);
+        ClassClosingTime classClosingTime = classClosingTimeApplicationService.createClosingTime(closingTime, closingMember);
 
         // then
         assertThat(classClosingTime.getClosingMember()).as("문 닫힘 담당자 검증").isEqualTo(closingMember);
@@ -142,7 +145,7 @@ public class FingerprintTest {
 
         // when
         assertThatCode(() -> {
-            logService.createClosingTime(closingTime, closingMember);
+            classClosingTimeApplicationService.createClosingTime(closingTime, closingMember);
         })
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 권한이 없습니다.");
@@ -169,11 +172,11 @@ public class FingerprintTest {
         String closingMember = "20230001";
         LocalDateTime closingTime = LocalDateTime.now();
 
-        logService.createClosingTime(closingTime, closingMember);
+        classClosingTimeApplicationService.createClosingTime(closingTime, closingMember);
 
         // when
         assertThatCode(() -> {
-            logService.createClosingTime(closingTime, closingMember);
+            classClosingTimeApplicationService.createClosingTime(closingTime, closingMember);
         })
                 .isInstanceOf(LogException.class)
                 .hasMessage("이미 문이 닫혀있습니다.");

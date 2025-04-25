@@ -1,14 +1,14 @@
 package com.example.fingerprint_backend.domain.fingerprint.controller;
 
 import com.example.fingerprint_backend.ApiResponse;
-import com.example.fingerprint_backend.domain.fingerprint.service.LogApplicationService;
+import com.example.fingerprint_backend.domain.fingerprint.service.classClosingTime.ClassClosingTimeApplicationService;
+import com.example.fingerprint_backend.domain.fingerprint.service.log.LogApplicationService;
 import com.example.fingerprint_backend.dto.CreateFingerPrintDto;
 import com.example.fingerprint_backend.dto.CreateLogDto;
 import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
 import com.example.fingerprint_backend.domain.fingerprint.entity.FingerPrintEntity;
-import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
 import com.example.fingerprint_backend.domain.fingerprint.service.FingerPrintService;
-import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
+import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +27,7 @@ public class FingerPrintController {
     private final LogService logService;
     private final MemberQueryService memberQueryService;
     private final LogApplicationService logApplicationService;
+    private final ClassClosingTimeApplicationService classClosingTimeApplicationService;
 
     @GetMapping("/api/fingerprint/students/{stdNum}")
     public ResponseEntity<ApiResponse> check(@PathVariable String stdNum) {
@@ -120,7 +121,7 @@ public class FingerPrintController {
     @PostMapping("/api/fingerprint/close")
     public ResponseEntity<ApiResponse> close(@RequestBody String closingMember) {
 
-        ClassClosingTime closingTime = logService.createClosingTime(LocalDateTime.now(), closingMember);
+        ClassClosingTime closingTime = classClosingTimeApplicationService.createClosingTime(LocalDateTime.now(), closingMember);
 
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "성공적으로 문을 닫았습니다.", closingTime));
     }

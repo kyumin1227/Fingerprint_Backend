@@ -4,7 +4,8 @@ import com.example.fingerprint_backend.TestMemberFactory;
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
-import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
+import com.example.fingerprint_backend.domain.fingerprint.service.classClosingTime.ClassClosingTimeApplicationService;
+import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
 import com.example.fingerprint_backend.dto.LoginResponse;
 import com.example.fingerprint_backend.entity.MemberEntity;
@@ -50,6 +51,8 @@ class CycleCreateTest {
     private static LocalDateTime date3;
     private static LocalDateTime date4;
     private static LocalDateTime date5;
+    @Autowired
+    private ClassClosingTimeApplicationService classClosingTimeApplicationService;
 
     @BeforeEach
     void setUp() {
@@ -96,7 +99,7 @@ class CycleCreateTest {
         cycleApplicationService.createAttendanceCycle("2423002", date1);
 
         // when
-        logService.createClosingTime(date2, "2423007");
+        classClosingTimeApplicationService.createClosingTime(date2, "2423007");
         cycleApplicationService.closeAttendanceCycle("2423002", date3);
 
         // then
@@ -108,7 +111,7 @@ class CycleCreateTest {
     void success3() {
         // given
         cycleApplicationService.createAttendanceCycle("2423002", date1);
-        logService.createClosingTime(date2, "2423007");
+        classClosingTimeApplicationService.createClosingTime(date2, "2423007");
         cycleApplicationService.closeAttendanceCycle("2423002", date3);
 
         // when

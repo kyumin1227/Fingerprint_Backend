@@ -1,39 +1,28 @@
-package com.example.fingerprint_backend.domain.fingerprint.service;
+package com.example.fingerprint_backend.domain.fingerprint.service.log;
 
-import com.example.fingerprint_backend.domain.fingerprint.service.cycle.AttendanceCycleCommandService;
-import com.example.fingerprint_backend.domain.fingerprint.service.cycle.AttendanceCycleQueryService;
 import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleApplicationService;
-import com.example.fingerprint_backend.domain.fingerprint.service.cycle.OutingCycleCommandService;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.example.fingerprint_backend.types.LogAction;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class LogApplicationService {
 
-    private final AttendanceCycleQueryService attendanceCycleQueryService;
-    private final AttendanceCycleCommandService attendanceCycleCommandService;
     private final LogService logService;
     private final MemberQueryService memberQueryService;
-    private final OutingCycleCommandService outingCycleCommandService;
     private final CycleApplicationService cycleApplicationService;
-
-    public LogApplicationService(AttendanceCycleQueryService attendanceCycleQueryService, AttendanceCycleCommandService attendanceCycleCommandService, LogService logService, MemberQueryService memberQueryService, OutingCycleCommandService outingCycleCommandService, CycleApplicationService cycleApplicationService) {
-        this.attendanceCycleQueryService = attendanceCycleQueryService;
-        this.attendanceCycleCommandService = attendanceCycleCommandService;
-        this.logService = logService;
-        this.memberQueryService = memberQueryService;
-        this.outingCycleCommandService = outingCycleCommandService;
-        this.cycleApplicationService = cycleApplicationService;
-    }
 
     /**
      * 로그를 등록하면 등교, 하교, 외출 등에 따라 서로 다른 메소드를 호출하는 메소드
      */
     public void routeLog(String studentNumber, LogAction logAction) {
         memberQueryService.getMemberByStudentNumber(studentNumber);
+
+//       TODO - 문자열 반환 (ex - 하교 시 체류 시간)
 
         switch (logAction) {
             case 등교 -> attendanceLog(studentNumber, LocalDateTime.now());
@@ -74,7 +63,7 @@ public class LogApplicationService {
      */
     private void outingLog(String studentNumber, LocalDateTime outingTime, LogAction logAction) {
         logService.createLog(studentNumber, logAction);
-        outingCycleCommandService.createOutingCycle(studentNumber, outingTime, logAction);
+        cycleApplicationService.createOutingCycle(studentNumber, outingTime, logAction);
     }
 
     /**

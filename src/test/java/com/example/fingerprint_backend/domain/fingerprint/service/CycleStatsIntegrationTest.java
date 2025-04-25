@@ -3,8 +3,9 @@ package com.example.fingerprint_backend.domain.fingerprint.service;
 import com.example.fingerprint_backend.TestMemberFactory;
 import com.example.fingerprint_backend.domain.fingerprint.entity.DailyStats;
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
-import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleCommandService;
-import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleQueryService;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.AttendanceCycleCommandService;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.AttendanceCycleQueryService;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.DailyStatsQueryService;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.StatsApplicationService;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
@@ -36,7 +37,9 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 public class CycleStatsIntegrationTest {
 
     @Autowired
-    private CycleQueryService cycleQueryService;
+    private AttendanceCycleQueryService attendanceCycleQueryService;
+    @Autowired
+    private CycleApplicationService cycleApplicationService;
 
     //    단일 쓰레드로 비동기 처리
     @TestConfiguration
@@ -49,7 +52,7 @@ public class CycleStatsIntegrationTest {
     }
 
     @Autowired
-    private CycleCommandService cycleCommandService;
+    private AttendanceCycleCommandService attendanceCycleCommandService;
 
     private final LocalDateTime dateTime1 = LocalDateTime.of(2025, 4, 22, 1, 31, 0);
     @Autowired
@@ -83,8 +86,8 @@ public class CycleStatsIntegrationTest {
         // given
 
         // when
-        cycleCommandService.createAttendanceCycle("2423002", dateTime1);
-        cycleCommandService.closeAttendanceCycle("2423002", dateTime1.plusHours(2));
+        cycleApplicationService.createAttendanceCycle("2423002", dateTime1);
+        cycleApplicationService.closeAttendanceCycle("2423002", dateTime1.plusHours(2));
 
         // then
         DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime1)).get();
@@ -100,8 +103,8 @@ public class CycleStatsIntegrationTest {
         LocalDateTime dateTime = LocalDateTime.of(2025, 4, 22, 15, 0, 0);
 
         // when
-        cycleCommandService.createAttendanceCycle("2423002", dateTime);
-        cycleCommandService.closeAttendanceCycle("2423002", dateTime.plusDays(2).plusHours(3)); // 51시간
+        cycleApplicationService.createAttendanceCycle("2423002", dateTime);
+        cycleApplicationService.closeAttendanceCycle("2423002", dateTime.plusDays(2).plusHours(3)); // 51시간
 
         // then
         DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime)).get();
@@ -120,8 +123,8 @@ public class CycleStatsIntegrationTest {
         LocalDateTime dateTime = LocalDateTime.of(2025, 4, 22, 18, 0, 0);
 
         // when
-        cycleCommandService.createAttendanceCycle("2423002", dateTime);
-        cycleCommandService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
+        cycleApplicationService.createAttendanceCycle("2423002", dateTime);
+        cycleApplicationService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
 
         // then
         DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime)).get();
@@ -139,8 +142,8 @@ public class CycleStatsIntegrationTest {
         LocalDateTime dateTime = LocalDateTime.of(2025, 4, 22, 19, 37, 0);
 
         // when
-        cycleCommandService.createAttendanceCycle("2423002", dateTime);
-        cycleCommandService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
+        cycleApplicationService.createAttendanceCycle("2423002", dateTime);
+        cycleApplicationService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
 
         // then
         DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime)).get();

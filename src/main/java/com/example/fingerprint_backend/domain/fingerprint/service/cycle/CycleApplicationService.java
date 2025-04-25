@@ -5,7 +5,8 @@ import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTim
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
 import com.example.fingerprint_backend.domain.fingerprint.event.DailyStatsUpdateEvent;
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
-import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
+import com.example.fingerprint_backend.domain.fingerprint.service.classClosingTime.ClassClosingTimeQueryService;
+import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
 import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.Member.ClassQueryService;
@@ -33,6 +34,7 @@ public class CycleApplicationService {
     private final ClassQueryService classQueryService;
     private final OutingCycleCommandService outingCycleCommandService;
     private final OutingCycleQueryService outingCycleQueryService;
+    private final ClassClosingTimeQueryService classClosingTimeQueryService;
 
     /**
      * 등교시 학생 번호와 시간을 입력받아 출석 주기를 생성합니다.
@@ -72,14 +74,13 @@ public class CycleApplicationService {
      *
      * @param studentNumber 학생 번호
      * @param leaveTime     하교 시간
-     * @throws CycleException 하교 처리할 등교 기록이 없을 경우
      */
     public AttendanceCycle closeAttendanceCycle(String studentNumber, LocalDateTime leaveTime) {
         MemberEntity member = memberQueryService.getMemberByStudentNumber(studentNumber);
 
         AttendanceCycle openAttendCycle = getOrCreateLatestOpenCycle(studentNumber, leaveTime);
 
-        Optional<ClassClosingTime> classClosingTime = logService.getClassClosingTimeByTimeAfter(member.getSchoolClass().getId(), openAttendCycle.getAttendTime());
+        Optional<ClassClosingTime> classClosingTime = classClosingTimeQueryService.getClassClosingTimeByTimeAfter(member.getSchoolClass().getId(), openAttendCycle.getAttendTime());
 
         if (classClosingTime.isPresent() && leaveTime.isAfter(classClosingTime.get().getClosingTime().plusMinutes(10))) {
             // 등교와 하교 사이에 문이 닫힌 시간이 있고, 하교 시간이 문 닫힌 시간보다 10분 이상 지난 경우
