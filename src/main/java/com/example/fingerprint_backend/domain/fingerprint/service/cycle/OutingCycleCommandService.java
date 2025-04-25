@@ -3,6 +3,7 @@ package com.example.fingerprint_backend.domain.fingerprint.service.cycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
 import com.example.fingerprint_backend.domain.fingerprint.repository.OutingCycleRepository;
+import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import com.example.fingerprint_backend.types.LogAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class OutingCycleCommandService {
     }
 
     /**
-     * 외출 사이클을 종료합니다. (만약 생성된 외출 사이클이 없다면 생성합니다.)
+     * 외출 사이클을 종료합니다.
      *
      * @param outingCycle   외출 사이클
      * @param outingEndTime 외출 종료 시간
@@ -56,14 +57,38 @@ public class OutingCycleCommandService {
     }
 
     /**
-     * 외출 사이클들을 종료 합니다.
+     * 외출 사이클을 강제로 종료합니다. (외출 사이클의 종료 시간을 외출 시작 시간으로 설정합니다.)
      *
-     * @param outingCycleList
+     * <p>외출 사이클이 이미 종료된 경우, 아무런 동작도 하지 않습니다.</p>
+     *
+     * @param outingCycle 외출 사이클
+     * @return 외출 기록
      */
-    private void closeAllOutingCycles(List<OutingCycle> outingCycleList) {
-        for (OutingCycle outingCycle : outingCycleList) {
-            outingCycle.setOutingEndTime(LocalDateTime.now());
+    public OutingCycle forceCloseOutingCycle(OutingCycle outingCycle) {
+
+        if (outingCycle.getOutingEndTime() != null) {
+            return outingCycle;
         }
+
+        return closeOutingCycle(outingCycle, outingCycle.getOutingStartTime());
+    }
+
+    /**
+     * 모든 외출 사이클들을 종료 하고 가장 늦은 외출 종료 시간을 반환합니다.
+     *
+     * @param outingCycleList 외출 사이클 리스트
+     * @return LocalDateTime 가장 늦은 외출 종료 시간 (없는 경우 null)
+     */
+    public LocalDateTime forceCloseAllOutingCycles(List<OutingCycle> outingCycleList) {
+
+        LocalDateTime localDateTime = null;
+
+        for (OutingCycle outingCycle : outingCycleList) {
+            OutingCycle closedOutingCycle = forceCloseOutingCycle(outingCycle);
+            localDateTime = DatePolicy.max(localDateTime, closedOutingCycle.getOutingEndTime());
+        }
+
+        return localDateTime;
     }
 
 }

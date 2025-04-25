@@ -31,28 +31,25 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 class CycleCreateTest {
 
     @Autowired
-    private AttendanceCycleCommandService attendanceCycleCommandService;
-    @Autowired
     private AttendanceCycleQueryService attendanceCycleQueryService;
     @Autowired
     private LogService logService;
     @Autowired
     private CleanManagementService cleanManagementService;
-
     @Autowired
     private AuthService authService;
-
-    private static LocalDateTime date1;
-    private static LocalDateTime date2;
-    private static LocalDateTime date3;
-    private static LocalDateTime date4;
-    private static LocalDateTime date5;
     @Autowired
     private OutingCycleCommandService outingCycleCommandService;
     @Autowired
     private OutingCycleQueryService outingCycleQueryService;
     @Autowired
     private CycleApplicationService cycleApplicationService;
+
+    private static LocalDateTime date1;
+    private static LocalDateTime date2;
+    private static LocalDateTime date3;
+    private static LocalDateTime date4;
+    private static LocalDateTime date5;
 
     @BeforeEach
     void setUp() {
@@ -81,10 +78,10 @@ class CycleCreateTest {
     @DirtiesContext
     void success1() {
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
 
         // when
-        attendanceCycleCommandService.closeAttendanceCycle("2423002", date2);
+        cycleApplicationService.closeAttendanceCycle("2423002", date2);
 
         // then
         AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestCycle("2423002");
@@ -96,11 +93,11 @@ class CycleCreateTest {
     @Test
     void success2() {
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
 
         // when
         logService.createClosingTime(date2, "2423007");
-        attendanceCycleCommandService.closeAttendanceCycle("2423002", date3);
+        cycleApplicationService.closeAttendanceCycle("2423002", date3);
 
         // then
         assertThat(attendanceCycleQueryService.getLatestCycle("2423002").getLeaveTime()).isEqualTo(date3);
@@ -110,12 +107,12 @@ class CycleCreateTest {
     @Test
     void success3() {
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
         logService.createClosingTime(date2, "2423007");
-        attendanceCycleCommandService.closeAttendanceCycle("2423002", date3);
+        cycleApplicationService.closeAttendanceCycle("2423002", date3);
 
         // when
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date4);
+        cycleApplicationService.createAttendanceCycle("2423002", date4);
 
         // then
         AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestCycle("2423002");
@@ -126,11 +123,11 @@ class CycleCreateTest {
     @Test
     void success4() {
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
         AttendanceCycle firstCycle = attendanceCycleQueryService.getLatestCycle("2423002");
 
         // when
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date3);
+        cycleApplicationService.createAttendanceCycle("2423002", date3);
         AttendanceCycle secondCycle = attendanceCycleQueryService.getLatestCycle("2423002");
 
         // then
@@ -145,11 +142,11 @@ class CycleCreateTest {
     void success5() {
 
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
         AttendanceCycle firstCycle = attendanceCycleQueryService.getLatestCycle("2423002");
 
         // when
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1.minusMinutes(1));
+        cycleApplicationService.createAttendanceCycle("2423002", date1.minusMinutes(1));
         AttendanceCycle secondCycle = attendanceCycleQueryService.getLatestOpenCycle("2423002");
 
         // then
@@ -163,7 +160,7 @@ class CycleCreateTest {
     @Test
     void success6() {
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
 
         // when
         AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestOpenCycle("2423003");
@@ -178,7 +175,7 @@ class CycleCreateTest {
     @Test
     void success7() {
         // given
-        attendanceCycleCommandService.closeAttendanceCycle("2423002", date1);
+        cycleApplicationService.closeAttendanceCycle("2423002", date1);
 
         // when
         AttendanceCycle latestCycle = attendanceCycleQueryService.getLatestCycle("2423002");
@@ -225,11 +222,11 @@ class CycleCreateTest {
     @Test
     void success10() {
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
-        attendanceCycleCommandService.closeAttendanceCycle("2423002", date2);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.closeAttendanceCycle("2423002", date2);
 
         // when
-        attendanceCycleCommandService.closeAttendanceCycle("2423002", date3);
+        cycleApplicationService.closeAttendanceCycle("2423002", date3);
 
         // then
         AttendanceCycle latestCycle = attendanceCycleQueryService.getLatestCycle("2423002");
@@ -262,7 +259,7 @@ class CycleCreateTest {
         // given
 
         // when
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
         AttendanceCycle attendanceCycle = cycleApplicationService.closeAttendanceCycle("2423002", date1);
 
         // then
@@ -277,7 +274,7 @@ class CycleCreateTest {
         // given
 
         // when
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
         cycleApplicationService.createOutingCycle("2423002", date1, LogAction.식사);
         cycleApplicationService.closeOutingCycle("2423002", date1);
         AttendanceCycle attendanceCycle = cycleApplicationService.closeAttendanceCycle("2423002", date1);
@@ -311,10 +308,10 @@ class CycleCreateTest {
         // given
 
         // when
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
-        attendanceCycleCommandService.createAttendanceCycle("2423007", date2);
-        AttendanceCycle attendanceCycle1 = attendanceCycleCommandService.closeAttendanceCycle("2423002", date3);
-        AttendanceCycle attendanceCycle2 = attendanceCycleCommandService.closeAttendanceCycle("2423007", date4);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423007", date2);
+        AttendanceCycle attendanceCycle1 = cycleApplicationService.closeAttendanceCycle("2423002", date3);
+        AttendanceCycle attendanceCycle2 = cycleApplicationService.closeAttendanceCycle("2423007", date4);
 
         // then
         assertThat(attendanceCycle1.getAttendTime()).as("첫 사이클 등교 시간").isEqualTo(date1);
@@ -327,10 +324,10 @@ class CycleCreateTest {
     @Test
     void error1() {
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
 
         // when
-        assertThatCode(() -> attendanceCycleCommandService.closeAttendanceCycle("2423002", date1.minusMinutes(1)))
+        assertThatCode(() -> cycleApplicationService.closeAttendanceCycle("2423002", date1.minusMinutes(1)))
                 .isInstanceOf(CycleException.class)
                 .hasMessage("등교 보다 이른 하교 시간입니다.");
 
@@ -340,7 +337,7 @@ class CycleCreateTest {
     @Test
     void error2() {
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createAttendanceCycle("2423002", date1);
 
         // when
         assertThatCode(() -> cycleApplicationService.createOutingCycle("2423002", date1.minusMinutes(1), LogAction.식사))
@@ -352,7 +349,7 @@ class CycleCreateTest {
     @Test
     void error3() {
         // given
-        attendanceCycleCommandService.createAttendanceCycle("2423002", date2);
+        cycleApplicationService.createAttendanceCycle("2423002", date2);
 
         // when
         assertThatCode(() -> cycleApplicationService.closeOutingCycle("2423002", date1.minusMinutes(1)))
@@ -370,7 +367,7 @@ class CycleCreateTest {
         // when
         assertThatCode(() -> cycleApplicationService.closeOutingCycle("2423002", date1.minusMinutes(1)))
                 .isInstanceOf(CycleException.class)
-                .hasMessage("외출 종료 시간이 외출 시작 시간보다 이릅니다.");
+                .hasMessage("외출 종료 시간이 외출 시작 시간보다 빠를 수 없습니다.");
 
     }
 }

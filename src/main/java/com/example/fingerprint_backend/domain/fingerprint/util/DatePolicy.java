@@ -75,22 +75,34 @@ public class DatePolicy {
     /**
      * 늦은 날짜 반환
      *
-     * @param dateTime1 비교 날짜
-     * @param dateTime2 비교 날짜
+     * @param first 비교 날짜
+     * @param second 비교 날짜
      * @return LocalDateTime (더 늦은 날짜)
      */
-    public static LocalDateTime max(LocalDateTime dateTime1, LocalDateTime dateTime2) {
-        return dateTime1.isAfter(dateTime2) ? dateTime1 : dateTime2;
+    public static LocalDateTime max(LocalDateTime first, LocalDateTime second) {
+        if (first == null) {
+            return second;
+        }
+        if (second == null) {
+            return first;
+        }
+        return first.isAfter(second) ? first : second;
     }
 
     /**
      * 빠른 날짜 반환
      *
-     * @param dateTime1 비교 날짜
-     * @param dateTime2 비교 날짜
+     * @param first 비교 날짜
+     * @param second 비교 날짜
      * @return LocalDateTime (더 빠른 날짜)
      */
-    public static LocalDateTime min(LocalDateTime dateTime1, LocalDateTime dateTime2) {
-        return dateTime1.isBefore(dateTime2) ? dateTime1 : dateTime2;
+    public static LocalDateTime min(LocalDateTime first, LocalDateTime second) {
+        if (first == null) {
+            return second;
+        }
+        if (second == null) {
+            return first;
+        }
+        return first.isBefore(second) ? first : second;
     }
 }

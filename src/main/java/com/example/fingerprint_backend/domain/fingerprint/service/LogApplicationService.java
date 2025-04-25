@@ -52,7 +52,7 @@ public class LogApplicationService {
      */
     private void attendanceLog(String studentNumber, LocalDateTime attendTime) {
         logService.createLog(studentNumber, LogAction.등교);
-        attendanceCycleCommandService.createAttendanceCycle(studentNumber, attendTime);
+        cycleApplicationService.createAttendanceCycle(studentNumber, attendTime);
     }
 
     /**
@@ -63,7 +63,7 @@ public class LogApplicationService {
      */
     private void leaveLog(String studentNumber, LocalDateTime leaveTime) {
         logService.createLog(studentNumber, LogAction.하교);
-        attendanceCycleCommandService.closeAttendanceCycle(studentNumber, leaveTime);
+        cycleApplicationService.closeAttendanceCycle(studentNumber, leaveTime);
     }
 
     /**
