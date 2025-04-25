@@ -7,10 +7,13 @@ import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.example.fingerprint_backend.service.Member.MemberValidator;
 import com.example.fingerprint_backend.types.MemberRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
@@ -22,6 +25,8 @@ public class ClassClosingTimeApplicationService {
     private final MemberQueryService memberQueryService;
     private final ClassClosingTimeCommandService classClosingTimeCommandService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    @Qualifier("taskScheduler")
+    private final TaskScheduler taskScheduler;
 
     /**
      * 문 닫힘 시간 등록
@@ -42,9 +47,17 @@ public class ClassClosingTimeApplicationService {
 
         ClassClosingTime closingTimeObject = classClosingTimeCommandService.createClosingTime(closingTime, member.getSchoolClass().getId(), closingMember);
 
-        applicationEventPublisher.publishEvent(new ClassCloseEvent(closingTimeObject));
+        taskScheduler.schedule(
+                () -> publishClassCloseEvent(closingTimeObject),
+//                TODO - 실제 환경에서는 10분 후 이벤트 발행
+                Instant.now().plusSeconds(10) // 10분 후에 이벤트 발행
+        );
 
         return closingTimeObject;
+    }
+
+    private void publishClassCloseEvent(ClassClosingTime closingTime) {
+        applicationEventPublisher.publishEvent(new ClassCloseEvent(closingTime));
     }
 
 }

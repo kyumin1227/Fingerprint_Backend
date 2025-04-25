@@ -1,6 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.controller;
 
 import com.example.fingerprint_backend.ApiResponse;
+import com.example.fingerprint_backend.domain.fingerprint.dto.RequestClassClose;
 import com.example.fingerprint_backend.domain.fingerprint.service.classClosingTime.ClassClosingTimeApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.service.log.LogApplicationService;
 import com.example.fingerprint_backend.dto.CreateFingerPrintDto;
@@ -115,13 +116,13 @@ public class FingerPrintController {
     /**
      * 문 닫힘 API
      *
-     * @param closingMember - 문 닫힘 담당자 학번
+     * @param requestClassClose - 문 닫힘 담당자 학번
      * @throws IllegalArgumentException - 열쇠 담당자가 아닐 경우, 학번이 존재하지 않을 경우
      */
     @PostMapping("/api/fingerprint/close")
-    public ResponseEntity<ApiResponse> close(@RequestBody String closingMember) {
+    public ResponseEntity<ApiResponse> close(@RequestBody RequestClassClose requestClassClose) {
 
-        ClassClosingTime closingTime = classClosingTimeApplicationService.createClosingTime(LocalDateTime.now(), closingMember);
+        ClassClosingTime closingTime = classClosingTimeApplicationService.createClosingTime(LocalDateTime.now(), requestClassClose.closingMember());
 
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "성공적으로 문을 닫았습니다.", closingTime));
     }
