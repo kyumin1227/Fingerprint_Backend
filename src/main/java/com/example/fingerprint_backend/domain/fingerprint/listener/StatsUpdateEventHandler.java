@@ -8,7 +8,6 @@ import com.example.fingerprint_backend.domain.fingerprint.event.WeeklyStatsUpdat
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.StatsApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
@@ -48,7 +47,6 @@ public class StatsUpdateEventHandler {
      *
      * @param event WeeklyStatsUpdateEvent
      */
-    @Async
     @EventListener
     @Transactional
     public void handleWeeklyStatsUpdate(WeeklyStatsUpdateEvent event) {
@@ -64,7 +62,6 @@ public class StatsUpdateEventHandler {
      *
      * @param event MonthlyStatsUpdateEvent
      */
-    @Async
     @EventListener
     @Transactional
     public void handleMonthlyStatsUpdate(MonthlyStatsUpdateEvent event) {
