@@ -1,7 +1,9 @@
 package com.example.fingerprint_backend.domain.fingerprint.service;
 
-import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleCommandService;
-import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleQueryService;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.AttendanceCycleCommandService;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.AttendanceCycleQueryService;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleApplicationService;
+import com.example.fingerprint_backend.domain.fingerprint.service.cycle.OutingCycleCommandService;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.example.fingerprint_backend.types.LogAction;
 import org.springframework.stereotype.Service;
@@ -11,16 +13,20 @@ import java.time.LocalDateTime;
 @Service
 public class LogApplicationService {
 
-    private final CycleQueryService cycleQueryService;
-    private final CycleCommandService cycleCommandService;
+    private final AttendanceCycleQueryService attendanceCycleQueryService;
+    private final AttendanceCycleCommandService attendanceCycleCommandService;
     private final LogService logService;
     private final MemberQueryService memberQueryService;
+    private final OutingCycleCommandService outingCycleCommandService;
+    private final CycleApplicationService cycleApplicationService;
 
-    public LogApplicationService(CycleQueryService cycleQueryService, CycleCommandService cycleCommandService, LogService logService, MemberQueryService memberQueryService) {
-        this.cycleQueryService = cycleQueryService;
-        this.cycleCommandService = cycleCommandService;
+    public LogApplicationService(AttendanceCycleQueryService attendanceCycleQueryService, AttendanceCycleCommandService attendanceCycleCommandService, LogService logService, MemberQueryService memberQueryService, OutingCycleCommandService outingCycleCommandService, CycleApplicationService cycleApplicationService) {
+        this.attendanceCycleQueryService = attendanceCycleQueryService;
+        this.attendanceCycleCommandService = attendanceCycleCommandService;
         this.logService = logService;
         this.memberQueryService = memberQueryService;
+        this.outingCycleCommandService = outingCycleCommandService;
+        this.cycleApplicationService = cycleApplicationService;
     }
 
     /**
@@ -46,7 +52,7 @@ public class LogApplicationService {
      */
     private void attendanceLog(String studentNumber, LocalDateTime attendTime) {
         logService.createLog(studentNumber, LogAction.등교);
-        cycleCommandService.createAttendanceCycle(studentNumber, attendTime);
+        attendanceCycleCommandService.createAttendanceCycle(studentNumber, attendTime);
     }
 
     /**
@@ -57,7 +63,7 @@ public class LogApplicationService {
      */
     private void leaveLog(String studentNumber, LocalDateTime leaveTime) {
         logService.createLog(studentNumber, LogAction.하교);
-        cycleCommandService.closeAttendanceCycle(studentNumber, leaveTime);
+        attendanceCycleCommandService.closeAttendanceCycle(studentNumber, leaveTime);
     }
 
     /**
@@ -68,7 +74,7 @@ public class LogApplicationService {
      */
     private void outingLog(String studentNumber, LocalDateTime outingTime, LogAction logAction) {
         logService.createLog(studentNumber, logAction);
-        cycleCommandService.createOutingCycle(studentNumber, outingTime, logAction);
+        outingCycleCommandService.createOutingCycle(studentNumber, outingTime, logAction);
     }
 
     /**
@@ -79,7 +85,7 @@ public class LogApplicationService {
      */
     private void returnLog(String studentNumber, LocalDateTime returnTime) {
         logService.createLog(studentNumber, LogAction.복귀);
-        cycleCommandService.closeOutingCycle(studentNumber, returnTime);
+        cycleApplicationService.closeOutingCycle(studentNumber, returnTime);
     }
 
 }

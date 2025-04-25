@@ -1,11 +1,10 @@
-package com.example.fingerprint_backend.domain.fingerprint.service;
+package com.example.fingerprint_backend.domain.fingerprint.service.cycle;
 
 import com.example.fingerprint_backend.TestMemberFactory;
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
-import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleCommandService;
-import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleQueryService;
+import com.example.fingerprint_backend.domain.fingerprint.service.LogService;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
 import com.example.fingerprint_backend.dto.LoginResponse;
 import com.example.fingerprint_backend.entity.MemberEntity;
@@ -29,12 +28,12 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 @SpringBootTest
 @Transactional
-class CycleServiceTest {
+class CycleCreateTest {
 
     @Autowired
-    private CycleCommandService cycleCommandService;
+    private AttendanceCycleCommandService attendanceCycleCommandService;
     @Autowired
-    private CycleQueryService cycleQueryService;
+    private AttendanceCycleQueryService attendanceCycleQueryService;
     @Autowired
     private LogService logService;
     @Autowired
@@ -48,6 +47,12 @@ class CycleServiceTest {
     private static LocalDateTime date3;
     private static LocalDateTime date4;
     private static LocalDateTime date5;
+    @Autowired
+    private OutingCycleCommandService outingCycleCommandService;
+    @Autowired
+    private OutingCycleQueryService outingCycleQueryService;
+    @Autowired
+    private CycleApplicationService cycleApplicationService;
 
     @BeforeEach
     void setUp() {
@@ -76,13 +81,13 @@ class CycleServiceTest {
     @DirtiesContext
     void success1() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
 
         // when
-        cycleCommandService.closeAttendanceCycle("2423002", date2);
+        attendanceCycleCommandService.closeAttendanceCycle("2423002", date2);
 
         // then
-        AttendanceCycle latestOpenCycle = cycleQueryService.getLatestCycle("2423002");
+        AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestCycle("2423002");
         assertThat(latestOpenCycle.getAttendTime()).as("등교 시간").isEqualTo(date1);
         assertThat(latestOpenCycle.getLeaveTime()).as("하교 시간").isEqualTo(date2);
     }
@@ -91,29 +96,29 @@ class CycleServiceTest {
     @Test
     void success2() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
 
         // when
         logService.createClosingTime(date2, "2423007");
-        cycleCommandService.closeAttendanceCycle("2423002", date3);
+        attendanceCycleCommandService.closeAttendanceCycle("2423002", date3);
 
         // then
-        assertThat(cycleQueryService.getLatestCycle("2423002").getLeaveTime()).isEqualTo(date3);
+        assertThat(attendanceCycleQueryService.getLatestCycle("2423002").getLeaveTime()).isEqualTo(date3);
     }
 
     @DisplayName("등교 후 문 닫음 이후 재등교 (새 주기 확인)")
     @Test
     void success3() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
         logService.createClosingTime(date2, "2423007");
-        cycleCommandService.closeAttendanceCycle("2423002", date3);
+        attendanceCycleCommandService.closeAttendanceCycle("2423002", date3);
 
         // when
-        cycleCommandService.createAttendanceCycle("2423002", date4);
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date4);
 
         // then
-        AttendanceCycle latestOpenCycle = cycleQueryService.getLatestCycle("2423002");
+        AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestCycle("2423002");
         assertThat(latestOpenCycle.getAttendTime()).isEqualTo(date4);
     }
 
@@ -121,12 +126,12 @@ class CycleServiceTest {
     @Test
     void success4() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
-        AttendanceCycle firstCycle = cycleQueryService.getLatestCycle("2423002");
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        AttendanceCycle firstCycle = attendanceCycleQueryService.getLatestCycle("2423002");
 
         // when
-        cycleCommandService.createAttendanceCycle("2423002", date3);
-        AttendanceCycle secondCycle = cycleQueryService.getLatestCycle("2423002");
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date3);
+        AttendanceCycle secondCycle = attendanceCycleQueryService.getLatestCycle("2423002");
 
         // then
         assertThat(firstCycle.getLeaveTime()).isEqualTo(date1);
@@ -140,12 +145,12 @@ class CycleServiceTest {
     void success5() {
 
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
-        AttendanceCycle firstCycle = cycleQueryService.getLatestCycle("2423002");
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        AttendanceCycle firstCycle = attendanceCycleQueryService.getLatestCycle("2423002");
 
         // when
-        cycleCommandService.createAttendanceCycle("2423002", date1.minusMinutes(1));
-        AttendanceCycle secondCycle = cycleQueryService.getLatestOpenCycle("2423002");
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1.minusMinutes(1));
+        AttendanceCycle secondCycle = attendanceCycleQueryService.getLatestOpenCycle("2423002");
 
         // then
         assertThat(firstCycle.getLeaveTime()).as("첫 사이클 하교 시간").isEqualTo(date1);
@@ -158,11 +163,11 @@ class CycleServiceTest {
     @Test
     void success6() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
 
         // when
-        AttendanceCycle latestOpenCycle = cycleQueryService.getLatestOpenCycle("2423003");
-        AttendanceCycle latestCycle = cycleQueryService.getLatestCycle("2423003");
+        AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestOpenCycle("2423003");
+        AttendanceCycle latestCycle = attendanceCycleQueryService.getLatestCycle("2423003");
 
         // then
         assertThat(latestOpenCycle).isNull();
@@ -173,10 +178,10 @@ class CycleServiceTest {
     @Test
     void success7() {
         // given
-        cycleCommandService.closeAttendanceCycle("2423002", date1);
+        attendanceCycleCommandService.closeAttendanceCycle("2423002", date1);
 
         // when
-        AttendanceCycle latestCycle = cycleQueryService.getLatestCycle("2423002");
+        AttendanceCycle latestCycle = attendanceCycleQueryService.getLatestCycle("2423002");
 
         // then
         assertThat(latestCycle.getAttendTime()).isEqualTo(date1);
@@ -186,11 +191,11 @@ class CycleServiceTest {
     @Test
     void success8() {
         // given
-        cycleCommandService.createOutingCycle("2423002", date1, LogAction.식사);
+        cycleApplicationService.createOutingCycle("2423002", date1, LogAction.식사);
 
         // when
-        AttendanceCycle latestOpenCycle = cycleQueryService.getLatestOpenCycle("2423002");
-        OutingCycle latestOpenOutingCycle = cycleQueryService.getLatestOpenOutingCycle("2423002");
+        AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestOpenCycle("2423002");
+        OutingCycle latestOpenOutingCycle = outingCycleQueryService.getLatestOpenOutingCycle("2423002");
 
         // then
         assertThat(latestOpenCycle.getAttendTime()).as("등교 시간").isEqualTo(date1);
@@ -203,11 +208,11 @@ class CycleServiceTest {
     @Test
     void success9() {
         // given
-        cycleCommandService.closeOutingCycle("2423002", date1);
+        cycleApplicationService.closeOutingCycle("2423002", date1);
 
         // when
-        AttendanceCycle latestCycle = cycleQueryService.getLatestCycle("2423002");
-        OutingCycle latestOutingCycle = cycleQueryService.getLatestOutingCycle("2423002");
+        AttendanceCycle latestCycle = attendanceCycleQueryService.getLatestCycle("2423002");
+        OutingCycle latestOutingCycle = outingCycleQueryService.getLatestOutingCycle("2423002");
 
         // then
         assertThat(latestCycle.getAttendTime()).as("등교 시간").isEqualTo(date1);
@@ -220,14 +225,14 @@ class CycleServiceTest {
     @Test
     void success10() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
-        cycleCommandService.closeAttendanceCycle("2423002", date2);
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        attendanceCycleCommandService.closeAttendanceCycle("2423002", date2);
 
         // when
-        cycleCommandService.closeAttendanceCycle("2423002", date3);
+        attendanceCycleCommandService.closeAttendanceCycle("2423002", date3);
 
         // then
-        AttendanceCycle latestCycle = cycleQueryService.getLatestCycle("2423002");
+        AttendanceCycle latestCycle = attendanceCycleQueryService.getLatestCycle("2423002");
         assertThat(latestCycle.getAttendTime()).as("등교 시간").isEqualTo(date3);
         assertThat(latestCycle.getLeaveTime()).as("하교 시간").isEqualTo(date3);
 
@@ -237,28 +242,95 @@ class CycleServiceTest {
     @Test
     void success11() {
         // given
-        cycleCommandService.createOutingCycle("2423002", date1, LogAction.식사);
-        OutingCycle firstOutingCycle = cycleQueryService.getLatestOutingCycle("2423002");
+        outingCycleCommandService.createOutingCycle("2423002", date1, LogAction.식사);
+        OutingCycle firstOutingCycle = outingCycleQueryService.getLatestOutingCycle("2423002");
 
         // when
-        cycleCommandService.createOutingCycle("2423002", date3, LogAction.식사);
+        outingCycleCommandService.createOutingCycle("2423002", date3, LogAction.식사);
 
         // then
-        OutingCycle latestOpenOutingCycle = cycleQueryService.getLatestOpenOutingCycle("2423002");
+        OutingCycle latestOpenOutingCycle = outingCycleQueryService.getLatestOpenOutingCycle("2423002");
         assertThat(firstOutingCycle.getOutingStartTime()).as("첫 외출 시작 시간").isEqualTo(date1);
         assertThat(firstOutingCycle.getOutingEndTime()).as("첫 외출 종료 시간").isEqualTo(date1);
         assertThat(latestOpenOutingCycle.getOutingStartTime()).as("외출 시작 시간").isEqualTo(date3);
         assertThat(latestOpenOutingCycle.getOutingEndTime()).isNull();
     }
 
+    @DisplayName("등교, 하교 시간 동일")
+    @Test
+    void success12() {
+        // given
+
+        // when
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        AttendanceCycle attendanceCycle = cycleApplicationService.closeAttendanceCycle("2423002", date1);
+
+        // then
+        assertThat(attendanceCycle.getAttendTime()).as("등교 시간").isEqualTo(date1);
+        assertThat(attendanceCycle.getLeaveTime()).as("하교 시간").isEqualTo(date1);
+
+    }
+
+    @DisplayName("등교, 외출, 외출 복귀, 하교 시간 동일")
+    @Test
+    void success13() {
+        // given
+
+        // when
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        cycleApplicationService.createOutingCycle("2423002", date1, LogAction.식사);
+        cycleApplicationService.closeOutingCycle("2423002", date1);
+        AttendanceCycle attendanceCycle = cycleApplicationService.closeAttendanceCycle("2423002", date1);
+
+        // then
+        assertThat(attendanceCycle.getAttendTime()).as("등교 시간").isEqualTo(date1);
+        assertThat(attendanceCycle.getLeaveTime()).as("하교 시간").isEqualTo(date1);
+        assertThat(attendanceCycle.getOutingCycles().get(0).getOutingStartTime()).as("외출 시간").isEqualTo(date1);
+        assertThat(attendanceCycle.getOutingCycles().get(0).getOutingEndTime()).as("복귀 시간").isEqualTo(date1);
+    }
+
+    @DisplayName("복귀 없이 재외출")
+    @Test
+    void success14() {
+        // given
+
+        // when
+        cycleApplicationService.createOutingCycle("2423002", date1, LogAction.식사);
+        OutingCycle outingCycle = outingCycleQueryService.getLatestOpenOutingCycle("2423002");
+        OutingCycle outingCycle2 = outingCycleCommandService.createOutingCycle("2423002", date3, LogAction.식사);
+
+        // then
+        assertThat(outingCycle.getOutingStartTime()).as("첫 외출 시작 시간").isEqualTo(date1);
+        assertThat(outingCycle.getOutingEndTime()).as("첫 외출 종료 시간").isEqualTo(date1);
+        assertThat(outingCycle2.getOutingStartTime()).as("두번째 외출 시작 시간").isEqualTo(date3);
+    }
+
+    @DisplayName("두 명 교차 생성")
+    @Test
+    void success15() {
+        // given
+
+        // when
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
+        attendanceCycleCommandService.createAttendanceCycle("2423007", date2);
+        AttendanceCycle attendanceCycle1 = attendanceCycleCommandService.closeAttendanceCycle("2423002", date3);
+        AttendanceCycle attendanceCycle2 = attendanceCycleCommandService.closeAttendanceCycle("2423007", date4);
+
+        // then
+        assertThat(attendanceCycle1.getAttendTime()).as("첫 사이클 등교 시간").isEqualTo(date1);
+        assertThat(attendanceCycle1.getLeaveTime()).as("첫 사이클 하교 시간").isEqualTo(date3);
+        assertThat(attendanceCycle2.getAttendTime()).as("두번째 사이클 등교 시간").isEqualTo(date2);
+        assertThat(attendanceCycle2.getLeaveTime()).as("두번째 사이클 하교 시간").isEqualTo(date4);
+    }
+
     @DisplayName("등교 시간 보다 빠른 시간에 하교")
     @Test
     void error1() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
 
         // when
-        assertThatCode(() -> cycleCommandService.closeAttendanceCycle("2423002", date1.minusMinutes(1)))
+        assertThatCode(() -> attendanceCycleCommandService.closeAttendanceCycle("2423002", date1.minusMinutes(1)))
                 .isInstanceOf(CycleException.class)
                 .hasMessage("등교 보다 이른 하교 시간입니다.");
 
@@ -268,10 +340,10 @@ class CycleServiceTest {
     @Test
     void error2() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date1);
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date1);
 
         // when
-        assertThatCode(() -> cycleCommandService.createOutingCycle("2423002", date1.minusMinutes(1), LogAction.식사))
+        assertThatCode(() -> cycleApplicationService.createOutingCycle("2423002", date1.minusMinutes(1), LogAction.식사))
                 .isInstanceOf(CycleException.class)
                 .hasMessage("등교 시간보다 이른 외출입니다.");
     }
@@ -280,10 +352,10 @@ class CycleServiceTest {
     @Test
     void error3() {
         // given
-        cycleCommandService.createAttendanceCycle("2423002", date2);
+        attendanceCycleCommandService.createAttendanceCycle("2423002", date2);
 
         // when
-        assertThatCode(() -> cycleCommandService.closeOutingCycle("2423002", date1.minusMinutes(1)))
+        assertThatCode(() -> cycleApplicationService.closeOutingCycle("2423002", date1.minusMinutes(1)))
                 .isInstanceOf(CycleException.class)
                 .hasMessage("등교 시간보다 이른 외출입니다.");
 
@@ -293,10 +365,10 @@ class CycleServiceTest {
     @Test
     void error4() {
         // given
-        cycleCommandService.createOutingCycle("2423002", date1, LogAction.식사);
+        outingCycleCommandService.createOutingCycle("2423002", date1, LogAction.식사);
 
         // when
-        assertThatCode(() -> cycleCommandService.closeOutingCycle("2423002", date1.minusMinutes(1)))
+        assertThatCode(() -> cycleApplicationService.closeOutingCycle("2423002", date1.minusMinutes(1)))
                 .isInstanceOf(CycleException.class)
                 .hasMessage("외출 종료 시간이 외출 시작 시간보다 이릅니다.");
 

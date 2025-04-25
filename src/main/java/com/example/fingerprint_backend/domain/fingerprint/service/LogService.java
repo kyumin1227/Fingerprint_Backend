@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 로그와 문 닫힘을 관리하는 서비스
@@ -135,12 +136,10 @@ public class LogService {
      *
      * @param classId   반 ID
      * @param checkTime 확인할 시간
-     * @return 해당 시간 이후의 문 닫힘 객체
-     * @throws LogException 해당 시간 이후의 문 닫힘 시간이 없을 경우
+     * @return 해당 시간 이후의 문 닫힘 시간
      */
-    public ClassClosingTime getClassClosingTimeByTimeAfter(Long classId, LocalDateTime checkTime) {
-        return classClosingTimeRepository.findBySchoolClassIdAndClosingTimeAfter(classId, checkTime)
-                .orElseThrow(() -> new LogException("해당 시간 이후의 문 닫힘 시간이 없습니다."));
+    public Optional<ClassClosingTime> getClassClosingTimeByTimeAfter(Long classId, LocalDateTime checkTime) {
+        return classClosingTimeRepository.findBySchoolClassIdAndClosingTimeAfter(classId, checkTime);
     }
 
 }
