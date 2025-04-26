@@ -24,6 +24,26 @@ public class TimePolicy {
     }
 
     /**
+     * 날짜의 시간을 초 단위로 변환합니다. (하루의 시작 기준 보정)
+     *
+     * @param localDateTime 날짜
+     * @return Long 보정된 시간 (초 단위)
+     */
+    public static Long getLocalTimeToSecond(LocalDateTime localDateTime) {
+
+        LocalTime localTime = localDateTime.toLocalTime();
+
+        long localTimeToSecond = localTime.isBefore(START_TIME)
+                ? (long) localTime.toSecondOfDay() + 86400
+                : (long) localTime.toSecondOfDay();
+
+        System.out.println("localTime = " + localTime);
+        System.out.println("localTimeToSecond = " + localTimeToSecond);
+
+        return localTimeToSecond;
+    }
+
+    /**
      * 해당 날짜의 시작 시각 (06:00)
      *
      * @param date 기준 날짜
