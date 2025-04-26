@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,5 +46,18 @@ public class WeeklyStatsQueryService {
         LocalDate weekStartDate = DatePolicy.getDateOfWeekDay(dateTime, DayOfWeek.MONDAY);
 
         return getWeeklyStatsByStudentNumberAndDate(studentNumber, weekStartDate);
+    }
+
+    /**
+     * 날짜로 주간 통계 리스트를 가져오는 메소드
+     *
+     * @param date 날짜
+     * @return List<WeeklyStats>
+     */
+    public List<WeeklyStats> getWeeklyStatsByDate(LocalDate date) {
+
+        LocalDate weekStartDate = DatePolicy.getDateOfWeekDay(date, DayOfWeek.MONDAY);
+
+        return weeklyStatsRepository.findAllByEffectiveDate(weekStartDate);
     }
 }

@@ -5,6 +5,7 @@ import com.example.fingerprint_backend.domain.fingerprint.event.MonthlyStatsUpda
 import com.example.fingerprint_backend.domain.fingerprint.event.WeeklyStatsUpdateEvent;
 import com.example.fingerprint_backend.domain.fingerprint.repository.DailyStatsRepository;
 import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
+import com.example.fingerprint_backend.domain.fingerprint.types.PeriodType;
 import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import com.example.fingerprint_backend.domain.fingerprint.util.StatsCalculator;
 import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
@@ -171,6 +172,23 @@ public class StatsApplicationService {
 
         return monthlyStats;
 
+    }
+
+    /**
+     * 랭킹에서 기간 타입으로 통계 리스트를 가져오는 메소드
+     *
+     * @param periodType 기간 타입
+     * @param date       날짜
+     * @return 통계 리스트
+     */
+    public List<? extends BaseStats> getStatsListByPeriodTypeAndDate(PeriodType periodType, LocalDate date) {
+
+        return switch (periodType) {
+            case 일간 -> dailyStatsQueryService.getDailyStatsByDate(date);
+            case 주간 -> weeklyStatsQueryService.getWeeklyStatsByDate(date);
+            case 월간 -> monthlyStatsQueryService.getMonthlyStatsByDate(date);
+            case 전체 -> null;
+        };
     }
 
 }

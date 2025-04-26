@@ -33,14 +33,13 @@ public class DailyStatsQueryService {
     }
 
     /**
-     * 날짜로 일일 통계를 가져오는 메소드
+     * 날짜로 일일 통계 리스트를 가져오는 메소드
      *
      * @param date 날짜
-     * @return DailyStats
+     * @return List<DailyStats>
      */
-    public DailyStats getDailyStatsByDate(LocalDate date) {
-        return dailyStatsRepository.findByEffectiveDate(date)
-                .orElse(null);
+    public List<DailyStats> getDailyStatsByDate(LocalDate date) {
+        return dailyStatsRepository.findAllByEffectiveDate(date);
     }
 
     /**
