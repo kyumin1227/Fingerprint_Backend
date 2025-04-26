@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend.domain.fingerprint.service.ranking;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class RankingQueryService {
      * @return 랭킹 정보
      */
     public Optional<Ranking> getRanking(String studentNumber, RankingType rankingType,
-                                        PeriodType periodType, String startDate) {
+                                        PeriodType periodType, LocalDate startDate) {
 
         return rankingRepository.findByStudentNumberAndRankingTypeAndPeriodTypeAndStartDate(studentNumber,
                 rankingType, periodType, startDate);

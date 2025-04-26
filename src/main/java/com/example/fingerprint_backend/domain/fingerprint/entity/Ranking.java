@@ -18,6 +18,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -41,13 +43,13 @@ public class Ranking {
     private PeriodType periodType;
 
     @Column(nullable = false)
-    private String startDate;
+    private LocalDate startDate;
 
     @Column(nullable = false)
-    private int rank;
+    private int rank_order;
 
     @Builder
-    public Ranking(String studentNumber, RankingType rankingType, PeriodType periodType, String startDate) {
+    public Ranking(String studentNumber, RankingType rankingType, PeriodType periodType, LocalDate startDate) {
         this.studentNumber = studentNumber;
         this.rankingType = rankingType;
         this.periodType = periodType;
@@ -64,7 +66,7 @@ public class Ranking {
             throw new RankException("랭킹은 음수일 수 없습니다.");
         }
 
-        this.rank = rank;
+        this.rank_order = rank;
     }
 
 }

@@ -16,4 +16,6 @@ public interface DailyStatsRepository extends JpaRepository<DailyStats, Long> {
     List<DailyStats> findByStudentNumberAndEffectiveDateBetween(String studentNumber, LocalDate startDate, LocalDate endDate);
 
     List<DailyStats> findAllByEffectiveDate(LocalDate date);
+
+    List<DailyStats> findAllByEffectiveDateOrderByStayDurationDesc(LocalDate date);
 }

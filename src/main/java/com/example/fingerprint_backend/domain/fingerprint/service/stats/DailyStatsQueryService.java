@@ -99,4 +99,15 @@ public class DailyStatsQueryService {
 
     }
 
+    /**
+     * 날짜로 체류 시간 기준으로 정렬된 일일 통계 리스트를 가져오는 메소드
+     *
+     * @param date 날짜
+     * @return List<DailyStats>
+     */
+    public List<DailyStats> getDailyStatsOrderedByStayDuration(LocalDate date) {
+
+        return dailyStatsRepository.findAllByEffectiveDateOrderByStayDurationDesc(date);
+    }
+
 }

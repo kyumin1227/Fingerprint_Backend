@@ -58,4 +58,30 @@ public class MonthlyStatsQueryService {
         return monthlyStatsRepository.findAllByEffectiveDate(monthStartDate);
     }
 
+    /**
+     * 날짜로 체류 시간 기준으로 정렬된 월간 통계 리스트를 가져오는 메소드
+     *
+     * @param date 날짜
+     * @return List<MonthlyStats>
+     */
+    public List<MonthlyStats> getMonthlyStatsOrderedByStayDuration(LocalDate date) {
+
+        LocalDate monthStartDate = DatePolicy.getMonthStartDate(date);
+
+        return monthlyStatsRepository.findAllByEffectiveDateOrderByStayDurationDesc(monthStartDate);
+    }
+
+    /**
+     * 날짜로 등교 시간 기준으로 정렬된 월간 통계 리스트를 가져오는 메소드
+     *
+     * @param date 날짜
+     * @return List<MonthlyStats>
+     */
+    public List<MonthlyStats> getMonthlyStatsOrderedByAttendanceTime(LocalDate date) {
+
+        LocalDate monthStartDate = DatePolicy.getMonthStartDate(date);
+
+        return monthlyStatsRepository.findAllByEffectiveDateOrderByAvgAttendTimeAsc(monthStartDate);
+    }
+
 }

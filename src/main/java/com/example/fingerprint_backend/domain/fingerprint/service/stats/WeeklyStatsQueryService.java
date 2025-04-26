@@ -60,4 +60,32 @@ public class WeeklyStatsQueryService {
 
         return weeklyStatsRepository.findAllByEffectiveDate(weekStartDate);
     }
+
+    /**
+     * 날짜로 체류 시간 기준으로 정렬된 주간 통계 리스트를 가져오는 메소드
+     *
+     * @param date 날짜
+     * @return List<WeeklyStats>
+     */
+    public List<WeeklyStats> getWeeklyStatsOrderedByStayDuration(LocalDate date) {
+
+        LocalDate weekStartDate = DatePolicy.getDateOfWeekDay(date, DayOfWeek.MONDAY);
+
+        return weeklyStatsRepository.findAllByEffectiveDateOrderByStayDurationDesc(weekStartDate);
+    }
+
+    /**
+     * 날짜로 등교 시간 기준으로 정렬된 주간 통계 리스트를 가져오는 메소드
+     *
+     * @param date 날짜
+     * @return List<WeeklyStats>
+     */
+    public List<WeeklyStats> getWeeklyStatsOrderedByAttendanceTime(LocalDate date) {
+
+        LocalDate weekStartDate = DatePolicy.getDateOfWeekDay(date, DayOfWeek.MONDAY);
+
+        return weeklyStatsRepository.findAllByEffectiveDateOrderByAvgAttendTimeAsc(weekStartDate);
+    }
+
+
 }

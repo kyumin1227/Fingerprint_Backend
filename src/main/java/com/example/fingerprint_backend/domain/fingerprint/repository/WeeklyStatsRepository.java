@@ -12,4 +12,8 @@ public interface WeeklyStatsRepository extends JpaRepository<WeeklyStats, Long> 
     Optional<WeeklyStats> findByStudentNumberAndEffectiveDate(String studentNumber, LocalDate effectiveDate);
 
     List<WeeklyStats> findAllByEffectiveDate(LocalDate effectiveDate);
+
+    List<WeeklyStats> findAllByEffectiveDateOrderByStayDurationDesc(LocalDate date);
+
+    List<WeeklyStats> findAllByEffectiveDateOrderByAvgAttendTimeAsc(LocalDate date);
 }

@@ -10,6 +10,8 @@ import com.example.fingerprint_backend.domain.fingerprint.types.RankingType;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -20,16 +22,15 @@ public class RankingCommandService {
 
     /**
      * 랭킹 생성
-     * 
+     *
      * @param studentNumber 학번
      * @param rankingType   랭킹 타입
      * @param periodType    기간 타입
      * @param startDate     시작일
-     * @param rank          등수
      * @return Ranking
      */
     public Ranking createRanking(String studentNumber, RankingType rankingType,
-            PeriodType periodType, String startDate) {
+                                 PeriodType periodType, LocalDate startDate) {
 
         Ranking ranking = Ranking.builder()
                 .studentNumber(studentNumber)
@@ -43,7 +44,7 @@ public class RankingCommandService {
 
     /**
      * 랭킹 조회 또는 생성
-     * 
+     *
      * @param studentNumber 학번
      * @param rankingType   랭킹 타입
      * @param periodType    기간 타입
@@ -51,7 +52,7 @@ public class RankingCommandService {
      * @return Ranking
      */
     public Ranking getOrCreateRanking(String studentNumber, RankingType rankingType,
-            PeriodType periodType, String startDate) {
+                                      PeriodType periodType, LocalDate startDate) {
 
         return rankingQueryService.getRanking(studentNumber, rankingType, periodType, startDate)
                 .orElseGet(() -> createRanking(studentNumber, rankingType, periodType, startDate));
@@ -59,7 +60,7 @@ public class RankingCommandService {
 
     /**
      * 랭킹 업데이트
-     * 
+     *
      * @param ranking 랭킹
      * @return Ranking
      */

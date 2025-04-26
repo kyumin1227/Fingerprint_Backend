@@ -1,13 +1,11 @@
 package com.example.fingerprint_backend.domain.fingerprint.service.ranking;
 
 import java.time.LocalDate;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.BaseStats;
-import com.example.fingerprint_backend.domain.fingerprint.entity.ContinuousStats;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.StatsApplicationService;
-import com.example.fingerprint_backend.domain.fingerprint.util.RankingCalculator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +35,7 @@ public class RankingApplicationService {
      * @return Ranking
      */
     public Ranking createOrUpdateRanking(String studentNumber, RankingType rankingType, PeriodType periodType,
-                                         String startDate,
+                                         LocalDate startDate,
                                          int rank) {
 
         Ranking ranking = rankingCommandService.getOrCreateRanking(studentNumber, rankingType, periodType, startDate);
@@ -54,7 +52,7 @@ public class RankingApplicationService {
      * @param startDate   시작 날짜
      */
     public void updateRankings(List<? extends BaseStats> sortedList, RankingType rankingType, PeriodType periodType,
-                               String startDate) {
+                               LocalDate startDate) {
         for (int i = 0; i < sortedList.size(); i++) {
             BaseStats stats = sortedList.get(i);
             String studentNumber = stats.getStudentNumber();
@@ -74,34 +72,15 @@ public class RankingApplicationService {
      */
     public void recalculateRanking(RankingType rankingType, PeriodType periodType, LocalDate startDate) {
 
-        // 랭킹 계산할 통계 리스트 가져오기
-        List<? extends BaseStats> statsList = statsApplicationService.getStatsListByPeriodTypeAndDate(periodType, startDate);
+        List<? extends BaseStats> orderBy = new ArrayList<>();
 
-        if (rankingType.equals(RankingType.등교_시간)) {
-
-            List<ContinuousStats> continuousStats = RankingCalculator.convertListType(statsList, ContinuousStats.class);
-
-            List<ContinuousStats> sortedList = continuousStats.stream()
-                    .sorted(Comparator
-                            .comparing(BaseStats::getStayDuration))
-                    .toList();
-
-            updateRankings(sortedList, rankingType, periodType, startDate.toString());
-
-        } else if (rankingType.equals(RankingType.체류_시간)) {
-
-            List<BaseStats> baseStats = RankingCalculator.convertListType(statsList, BaseStats.class);
-
-            List<BaseStats> sortedList = baseStats.stream()
-                    .sorted(Comparator
-                            .comparing(BaseStats::getStayDuration))
-                    .toList();
-
-            updateRankings(sortedList, rankingType, periodType, startDate.toString());
-
-        } else {
-            throw new IllegalArgumentException("Invalid ranking type: " + rankingType);
+        if (rankingType == RankingType.체류_시간) {
+             orderBy = statsApplicationService.getStatsOrderedByStayDuration(periodType, startDate);
+        } else if (rankingType == RankingType.등교_시간) {
+            orderBy = statsApplicationService.getStatsOrderedByAttendanceTime(periodType, startDate);
         }
+
+        updateRankings(orderBy, rankingType, periodType, startDate);
 
     }
 
