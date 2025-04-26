@@ -106,7 +106,8 @@ public class FingerPrintController {
 
         logApplicationService.routeLog(
                 createLogDto.getStd_num(),
-                createLogDto.getAction()
+                createLogDto.getAction(),
+                LocalDateTime.now()
         );
 
 //        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, message, savedLog));

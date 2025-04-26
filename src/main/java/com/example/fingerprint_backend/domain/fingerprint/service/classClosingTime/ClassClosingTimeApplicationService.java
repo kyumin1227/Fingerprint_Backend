@@ -50,7 +50,7 @@ public class ClassClosingTimeApplicationService {
         taskScheduler.schedule(
                 () -> publishClassCloseEvent(closingTimeObject),
 //                TODO - 실제 환경에서는 10분 후 이벤트 발행
-                Instant.now().plusSeconds(10) // 10분 후에 이벤트 발행
+                Instant.now().plusSeconds(60) // 10분 후에 이벤트 발행
         );
 
         return closingTimeObject;
