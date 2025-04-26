@@ -1,6 +1,5 @@
 package com.example.fingerprint_backend.domain.fingerprint.service;
 
-import com.example.fingerprint_backend.domain.fingerprint.entity.WeeklyStats;
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.WeeklyStatsCommandService;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.WeeklyStatsQueryService;
@@ -11,10 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 @SpringBootTest
 @Transactional
@@ -39,7 +36,7 @@ public class WeeklyStatsServiceTest {
         weeklyStatsQueryService.getWeeklyStatsByStudentNumberAndDate(studentNumber, date)
                 .ifPresentOrElse(
                         weeklyStats -> {
-                            assertThat(weeklyStats.getStartDate()).as("startDate").isEqualTo(date);
+                            assertThat(weeklyStats.getEffectiveDate()).as("startDate").isEqualTo(date);
                             assertThat(weeklyStats.getStudentNumber()).as("studentNumber").isEqualTo(studentNumber);
                         },
                         () -> {
@@ -62,7 +59,7 @@ public class WeeklyStatsServiceTest {
         weeklyStatsQueryService.getWeeklyStatsByStudentNumberAndDate(studentNumber, date.plusDays(3))
                 .ifPresentOrElse(
                         weeklyStats -> {
-                            assertThat(weeklyStats.getStartDate()).as("startDate").isEqualTo(date);
+                            assertThat(weeklyStats.getEffectiveDate()).as("startDate").isEqualTo(date);
                             assertThat(weeklyStats.getStudentNumber()).as("studentNumber").isEqualTo(studentNumber);
                         },
                         () -> {

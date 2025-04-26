@@ -99,13 +99,13 @@ public class StatsApplicationService {
     /**
      * WeeklyStats, MonthlyStats 업데이트
      *
-     * @param stats            BaseStats
+     * @param stats            ContinuousStats
      * @param statsUpdateValue 업데이트 값 (체류 시간, 외출 시간, 출석 횟수, 평균 등교 시간, 평균 하교 시간)
      */
-    public void setStats(BaseStats stats, StatsUpdateValue statsUpdateValue) {
+    public void setStats(ContinuousStats stats, StatsUpdateValue statsUpdateValue) {
 
-        stats.setTotalStayDuration(statsUpdateValue.stayDuration());
-        stats.setTotalOutDuration(statsUpdateValue.outDuration());
+        stats.setStayDuration(statsUpdateValue.stayDuration());
+        stats.setOutDuration(statsUpdateValue.outDuration());
         stats.setTotalAttendCount(statsUpdateValue.attendCount());
         stats.setAvgAttendTime(statsUpdateValue.averageAttendTime());
         stats.setAvgLeaveTime(statsUpdateValue.averageLeaveTime());
@@ -125,12 +125,12 @@ public class StatsApplicationService {
         List<LogEntity> attendLogs = logService.getLogsInRangeByStudentNumberAndAction(
                 studentNumber,
                 LogAction.등교,
-                TimePolicy.getStartDateTime(weeklyStats.getStartDate()),
+                TimePolicy.getStartDateTime(weeklyStats.getEffectiveDate()),
                 TimePolicy.getEndDateTime(weeklyStats.getEndDate()));
         List<LogEntity> leaveLogs = logService.getLogsInRangeByStudentNumberAndAction(
                 studentNumber,
                 LogAction.하교,
-                TimePolicy.getStartDateTime(weeklyStats.getStartDate()),
+                TimePolicy.getStartDateTime(weeklyStats.getEffectiveDate()),
                 TimePolicy.getEndDateTime(weeklyStats.getEndDate()));
 
         // 업데이트 값 계산
@@ -156,12 +156,12 @@ public class StatsApplicationService {
         List<LogEntity> attendLogs = logService.getLogsInRangeByStudentNumberAndAction(
                 studentNumber,
                 LogAction.등교,
-                TimePolicy.getStartDateTime(monthlyStats.getStartDate()),
+                TimePolicy.getStartDateTime(monthlyStats.getEffectiveDate()),
                 TimePolicy.getEndDateTime(monthlyStats.getEndDate()));
         List<LogEntity> leaveLogs = logService.getLogsInRangeByStudentNumberAndAction(
                 studentNumber,
                 LogAction.하교,
-                TimePolicy.getStartDateTime(monthlyStats.getStartDate()),
+                TimePolicy.getStartDateTime(monthlyStats.getEffectiveDate()),
                 TimePolicy.getEndDateTime(monthlyStats.getEndDate()));
 
         // 업데이트 값 계산

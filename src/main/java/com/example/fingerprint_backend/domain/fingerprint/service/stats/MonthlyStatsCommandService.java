@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Month;
 
 @Service
 @Transactional
@@ -62,7 +61,7 @@ public class MonthlyStatsCommandService {
      * @return 월간 통계
      */
     public MonthlyStats setStayDuration(MonthlyStats monthlyStats, Long stayDuration) {
-        monthlyStats.setTotalStayDuration(stayDuration);
+        monthlyStats.setStayDuration(stayDuration);
         return monthlyStats;
     }
 
@@ -74,7 +73,7 @@ public class MonthlyStatsCommandService {
      * @return 월간 통계
      */
     public MonthlyStats setOutDuration(MonthlyStats monthlyStats, Long outDuration) {
-        monthlyStats.setTotalOutDuration(outDuration);
+        monthlyStats.setOutDuration(outDuration);
         return monthlyStats;
     }
 

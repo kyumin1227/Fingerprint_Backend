@@ -30,7 +30,7 @@ public class WeeklyStatsQueryService {
 
         LocalDate weekStartDate = DatePolicy.getDateOfWeekDay(date, DayOfWeek.MONDAY);
 
-        return weeklyStatsRepository.findByStudentNumberAndStartDate(studentNumber, weekStartDate);
+        return weeklyStatsRepository.findByStudentNumberAndEffectiveDate(studentNumber, weekStartDate);
     }
 
     /**

@@ -19,7 +19,7 @@ import java.time.YearMonth;
 @Table(name = "monthly_stats", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"student_number", "start_date"})
 })
-public class MonthlyStats extends BaseStats {
+public class MonthlyStats extends ContinuousStats {
 
     @Builder
     public MonthlyStats(String studentNumber, LocalDate startDate) {
@@ -35,7 +35,7 @@ public class MonthlyStats extends BaseStats {
      * @return 해당 월의 최대 시간 (밀리초 단위)
      */
     public Integer getMaxDays() {
-        return YearMonth.of(getStartDate().getYear(), getStartDate().getMonthValue()).lengthOfMonth();
+        return YearMonth.of(getEffectiveDate().getYear(), getEffectiveDate().getMonthValue()).lengthOfMonth();
     }
 
     /**
@@ -44,11 +44,11 @@ public class MonthlyStats extends BaseStats {
      * @param stayDuration 총 체류 시간 (밀리초 단위)
      */
     @Override
-    public void setTotalStayDuration(Long stayDuration) {
+    public void setStayDuration(Long stayDuration) {
         if (stayDuration > getMaxDays() * 24 * 60 * 60 * 1000L) {
             throw new StatsException("체류 시간은 해당 월의 최대 시간을 초과할 수 없습니다.");
         }
-        super.setTotalStayDuration(stayDuration);
+        super.setStayDuration(stayDuration);
     }
 
     /**
@@ -57,11 +57,11 @@ public class MonthlyStats extends BaseStats {
      * @param outDuration 총 외출 시간 (밀리초 단위)
      */
     @Override
-    public void setTotalOutDuration(Long outDuration) {
+    public void setOutDuration(Long outDuration) {
         if (outDuration > getMaxDays() * 24 * 60 * 60 * 1000L) {
             throw new StatsException("외출 시간은 해당 월의 최대 시간을 초과할 수 없습니다.");
         }
-        super.setTotalOutDuration(outDuration);
+        super.setOutDuration(outDuration);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class MonthlyStats extends BaseStats {
      */
     @Override
     public LocalDate getEndDate() {
-        LocalDate startDate = super.getStartDate();
+        LocalDate startDate = super.getEffectiveDate();
         return DatePolicy.getMonthEndDate(startDate);
     }
 }

@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @Table(name = "weekly_stats", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"student_number", "start_date"})
 })
-public class WeeklyStats extends BaseStats {
+public class WeeklyStats extends ContinuousStats {
 
     private static final Long MAX_DURATION = 7 * 24 * 60 * 60 * 1000L; // 24시간 * 7일
 
@@ -37,11 +37,11 @@ public class WeeklyStats extends BaseStats {
      * @param stayDuration 총 체류 시간 (밀리초 단위)
      */
     @Override
-    public void setTotalStayDuration(Long stayDuration) {
+    public void setStayDuration(Long stayDuration) {
         if (stayDuration > MAX_DURATION) {
             throw new StatsException("체류 시간은 7일을 초과할 수 없습니다.");
         }
-        super.setTotalStayDuration(stayDuration);
+        super.setStayDuration(stayDuration);
     }
 
     /**
@@ -50,11 +50,11 @@ public class WeeklyStats extends BaseStats {
      * @param outDuration 총 외출 시간 (밀리초 단위)
      */
     @Override
-    public void setTotalOutDuration(Long outDuration) {
+    public void setOutDuration(Long outDuration) {
         if (outDuration > MAX_DURATION) {
             throw new StatsException("외출 시간은 7일을 초과할 수 없습니다.");
         }
-        super.setTotalOutDuration(outDuration);
+        super.setOutDuration(outDuration);
     }
 
     /**
@@ -77,7 +77,7 @@ public class WeeklyStats extends BaseStats {
      */
     @Override
     public LocalDate getEndDate() {
-        LocalDate startDate = super.getStartDate();
+        LocalDate startDate = super.getEffectiveDate();
         return DatePolicy.getDateOfWeekDay(startDate, DayOfWeek.SUNDAY);
     }
 }

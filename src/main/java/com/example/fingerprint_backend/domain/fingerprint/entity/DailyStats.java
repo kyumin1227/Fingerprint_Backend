@@ -16,40 +16,24 @@ import java.time.LocalDate;
 @Table(name = "daily_stats", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "student_number", "effective_date" })
 })
-public class DailyStats {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class DailyStats extends BaseStats {
 
-    @Column(nullable = false)
-    private String studentNumber;
-
-    @Column(nullable = false)
-    private LocalDate effectiveDate;
+    private static final Long MAX_DURATION = 24 * 60 * 60 * 1000L; // 24시간
 
     @Column(nullable = false)
     private DayOfWeek dayOfWeek;
 
-    @Column(nullable = false)
-    private Long stayDuration = 0L;
-
-    @Column(nullable = false)
-    private Long outDuration = 0L;
-
     @Builder
     public DailyStats(String studentNumber, LocalDate effectiveDate) {
+        super(studentNumber, effectiveDate);
         if (studentNumber == null || studentNumber.isEmpty()) {
             throw new StatsException("학생 번호는 비어있을 수 없습니다.");
         }
         if (effectiveDate == null) {
             throw new StatsException("유효한 날짜가 아닙니다.");
         }
-        this.studentNumber = studentNumber;
-        this.effectiveDate = effectiveDate;
         this.dayOfWeek = effectiveDate.getDayOfWeek();
     }
-
-    private static final Long MAX_DURATION = 24 * 60 * 60 * 1000L; // 24시간
 
     /**
      * 체류 시간 업데이트
@@ -79,5 +63,10 @@ public class DailyStats {
             throw new StatsException("외출 시간은 24시간을 초과할 수 없습니다.");
         }
         this.outDuration += outDuration;
+    }
+
+    @Override
+    public LocalDate getEndDate() {
+        return getEffectiveDate();
     }
 }

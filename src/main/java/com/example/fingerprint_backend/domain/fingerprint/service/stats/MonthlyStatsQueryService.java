@@ -27,7 +27,7 @@ public class MonthlyStatsQueryService {
      */
     public Optional<MonthlyStats> getMonthlyStatsByStudentNumberAndDate(String studentNumber, LocalDate date) {
 
-        return monthlyStatsRepository.findByStudentNumberAndStartDate(studentNumber, date);
+        return monthlyStatsRepository.findByStudentNumberAndEffectiveDate(studentNumber, date);
     }
 
     /**

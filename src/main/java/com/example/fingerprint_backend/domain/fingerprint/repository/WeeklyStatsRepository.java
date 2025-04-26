@@ -7,5 +7,5 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface WeeklyStatsRepository extends JpaRepository<WeeklyStats, Long> {
-    Optional<WeeklyStats> findByStudentNumberAndStartDate(String studentNumber, LocalDate startDate);
+    Optional<WeeklyStats> findByStudentNumberAndEffectiveDate(String studentNumber, LocalDate effectiveDate);
 }

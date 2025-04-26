@@ -7,5 +7,5 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface MonthlyStatsRepository extends JpaRepository<MonthlyStats, Long> {
-    Optional<MonthlyStats> findByStudentNumberAndStartDate(String studentNumber, LocalDate startDate);
+    Optional<MonthlyStats> findByStudentNumberAndEffectiveDate(String studentNumber, LocalDate effectiveDate);
 }
