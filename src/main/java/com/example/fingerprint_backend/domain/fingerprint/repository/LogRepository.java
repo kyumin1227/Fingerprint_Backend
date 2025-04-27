@@ -21,4 +21,10 @@ public interface LogRepository extends JpaRepository<LogEntity, Long> {
             LocalDateTime startTime,
             LocalDateTime endTime
     );
+
+    List<LogEntity> findByActionAndEventTimeBetween(
+            LogAction action,
+            LocalDateTime eventTimeAfter,
+            LocalDateTime eventTimeBefore
+    );
 }

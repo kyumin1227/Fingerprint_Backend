@@ -27,8 +27,6 @@ import java.util.Optional;
 public class LogService {
 
     private final LogRepository logRepository;
-    private final ClassClosingTimeRepository classClosingTimeRepository;
-    private final MemberValidator memberValidator;
     private final MemberQueryService memberQueryService;
 
     /**
@@ -68,6 +66,22 @@ public class LogService {
                 .ifPresent(log -> {
                     throw new LogException("이미 등록된 로그입니다.");
                 });
+    }
+
+    /**
+     * 액션, 시작 시간, 종료 시간으로 로그 조회
+     *
+     * @param action    로그 액션
+     * @param startTime 시작 시간
+     * @param endTime   종료 시간
+     * @return 해당 조건에 맞는 로그 리스트
+     */
+    public List<LogEntity> getLogsInRangeByAction(
+            LogAction action,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    ) {
+        return logRepository.findByActionAndEventTimeBetween(action, startTime, endTime);
     }
 
     /**
