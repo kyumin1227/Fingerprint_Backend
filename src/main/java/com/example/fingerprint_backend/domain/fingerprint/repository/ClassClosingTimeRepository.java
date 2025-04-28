@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface ClassClosingTimeRepository extends JpaRepository<ClassClosingTime, Long> {
-    Optional<ClassClosingTime> findBySchoolClassIdAndClosingTimeAfter(Long schoolClassId, LocalDateTime closingTime);
+    Optional<ClassClosingTime> findTopBySchoolClassIdAndClosingTimeBetweenOrderByClosingTimeAsc(Long schoolClassId, LocalDateTime startTime, LocalDateTime endTime);
 }

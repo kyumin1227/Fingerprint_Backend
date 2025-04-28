@@ -43,7 +43,7 @@ public class ClassClosingTimeCommandService {
 
         LocalDateTime checkTime = closingTime.minusMinutes(5);
 
-        classClosingTimeRepository.findBySchoolClassIdAndClosingTimeAfter(classId, checkTime)
+        classClosingTimeRepository.findTopBySchoolClassIdAndClosingTimeBetweenOrderByClosingTimeAsc(classId, checkTime, closingTime)
                 .ifPresent(log -> {
                     throw new LogException("이미 문이 닫혀있습니다.");
                 });

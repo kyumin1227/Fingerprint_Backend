@@ -27,4 +27,9 @@ public interface LogRepository extends JpaRepository<LogEntity, Long> {
             LocalDateTime eventTimeAfter,
             LocalDateTime eventTimeBefore
     );
+
+    List<LogEntity> findByEventTimeBetween(
+            LocalDateTime eventTimeAfter,
+            LocalDateTime eventTimeBefore
+    );
 }

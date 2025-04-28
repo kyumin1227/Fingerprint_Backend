@@ -80,7 +80,7 @@ public class CycleApplicationService {
 
         AttendanceCycle openAttendCycle = getOrCreateLatestOpenCycle(studentNumber, leaveTime);
 
-        Optional<ClassClosingTime> classClosingTime = classClosingTimeQueryService.getClassClosingTimeByTimeAfter(member.getSchoolClass().getId(), openAttendCycle.getAttendTime());
+        Optional<ClassClosingTime> classClosingTime = classClosingTimeQueryService.getClassClosingTimeByTimeRange(member.getSchoolClass().getId(), openAttendCycle.getAttendTime(), leaveTime);
 
         if (classClosingTime.isPresent() && leaveTime.isAfter(classClosingTime.get().getClosingTime().plusMinutes(10))) {
             // 등교와 하교 사이에 문이 닫힌 시간이 있고, 하교 시간이 문 닫힌 시간보다 10분 이상 지난 경우
