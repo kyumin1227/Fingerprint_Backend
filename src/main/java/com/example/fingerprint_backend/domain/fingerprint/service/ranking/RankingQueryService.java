@@ -63,4 +63,24 @@ public class RankingQueryService {
         return rankingRepository.findAllByRankingTypeAndPeriodTypeAndStartDate(rankingType, periodType, date);
     }
 
+    /**
+     * 랭킹 리스트 조회 (기간에 따라 날짜 자동 변환)
+     *
+     * @param rankingType 랭킹 타입
+     * @param periodType  기간 타입
+     * @param startDate   시작 날짜
+     * @return 랭킹 리스트
+     */
+    public List<Ranking> getRankingList(RankingType rankingType, PeriodType periodType,
+                                        LocalDate startDate) {
+
+        if (periodType == PeriodType.주간) {
+            startDate = DatePolicy.getDateOfWeekDay(startDate, DayOfWeek.MONDAY);
+        } else if (periodType == PeriodType.월간) {
+            startDate = DatePolicy.getMonthStartDate(startDate);
+        }
+
+        return rankingRepository.findAllByRankingTypeAndPeriodTypeAndStartDate(rankingType, periodType, startDate);
+    }
+
 }

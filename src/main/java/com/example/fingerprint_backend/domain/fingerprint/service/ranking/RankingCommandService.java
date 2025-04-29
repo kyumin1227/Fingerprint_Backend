@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend.domain.fingerprint.service.ranking;
 
+import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +33,13 @@ public class RankingCommandService {
     public Ranking createRanking(String studentNumber, RankingType rankingType,
                                  PeriodType periodType, LocalDate startDate) {
 
+        LocalDate date = DatePolicy.getDateByPeriodType(startDate, periodType);
+
         Ranking ranking = Ranking.builder()
                 .studentNumber(studentNumber)
                 .rankingType(rankingType)
                 .periodType(periodType)
-                .startDate(startDate)
+                .startDate(date)
                 .build();
 
         return rankingRepository.save(ranking);
@@ -54,8 +57,10 @@ public class RankingCommandService {
     public Ranking getOrCreateRanking(String studentNumber, RankingType rankingType,
                                       PeriodType periodType, LocalDate startDate) {
 
-        return rankingQueryService.getRanking(studentNumber, rankingType, periodType, startDate)
-                .orElseGet(() -> createRanking(studentNumber, rankingType, periodType, startDate));
+        LocalDate date = DatePolicy.getDateByPeriodType(startDate, periodType);
+
+        return rankingQueryService.getRanking(studentNumber, rankingType, periodType, date)
+                .orElseGet(() -> createRanking(studentNumber, rankingType, periodType, date));
     }
 
     /**

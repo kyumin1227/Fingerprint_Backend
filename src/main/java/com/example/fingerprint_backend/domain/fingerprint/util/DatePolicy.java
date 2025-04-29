@@ -1,5 +1,6 @@
 package com.example.fingerprint_backend.domain.fingerprint.util;
 
+import com.example.fingerprint_backend.domain.fingerprint.types.PeriodType;
 import lombok.experimental.UtilityClass;
 
 import java.time.DayOfWeek;
@@ -104,5 +105,22 @@ public class DatePolicy {
             return first;
         }
         return first.isBefore(second) ? first : second;
+    }
+
+    /**
+     * 기간 타입에 따라 해당하는 날짜를 반환합니다.
+     *
+     * @param date       기준 날짜
+     * @param periodType 기간 타입
+     * @return LocalDate (주어진 기간 타입에 따른 날짜)
+     */
+    public LocalDate getDateByPeriodType(LocalDate date, PeriodType periodType) {
+
+        if (periodType == PeriodType.주간) {
+            return getDateOfWeekDay(date, DayOfWeek.MONDAY);
+        } else if (periodType == PeriodType.월간) {
+            return getMonthStartDate(date);
+        }
+        return date;
     }
 }
