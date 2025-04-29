@@ -1,11 +1,14 @@
 package com.example.fingerprint_backend.domain.fingerprint.service.ranking;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.BaseStats;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.StatsApplicationService;
+import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,13 +78,32 @@ public class RankingApplicationService {
         List<? extends BaseStats> orderBy = new ArrayList<>();
 
         if (rankingType == RankingType.체류_시간) {
-             orderBy = statsApplicationService.getStatsOrderedByStayDuration(periodType, startDate);
+            orderBy = statsApplicationService.getStatsOrderedByStayDuration(periodType, startDate);
         } else if (rankingType == RankingType.등교_시간) {
             orderBy = statsApplicationService.getStatsOrderedByAttendanceTime(periodType, startDate);
         }
 
         updateRankings(orderBy, rankingType, periodType, startDate);
 
+    }
+
+    /**
+     * 일일 출석 랭킹 생성
+     *
+     * @param studentNumber  학생 번호
+     * @param attendanceTime 시작 날짜
+     */
+    public Ranking createDailyAttendanceRanking(String studentNumber, LocalDateTime attendanceTime) {
+
+        Optional<Ranking> prevRanking = rankingQueryService.getRanking(studentNumber, RankingType.등교_시간, PeriodType.일간, TimePolicy.getLocalDate(attendanceTime));
+        if (prevRanking.isPresent()) {
+            return prevRanking.get();
+        }
+
+        List<Ranking> rankingList = rankingQueryService.getRankingList(RankingType.등교_시간, PeriodType.일간, attendanceTime);
+        Ranking ranking = rankingCommandService.createRanking(studentNumber, RankingType.등교_시간, PeriodType.일간, TimePolicy.getLocalDate(attendanceTime));
+        ranking.updateRank(rankingList.size() + 1);
+        return ranking;
     }
 
 }

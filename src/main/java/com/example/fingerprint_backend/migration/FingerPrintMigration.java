@@ -1,11 +1,10 @@
 package com.example.fingerprint_backend.migration;
 
-import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
 import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
 import com.example.fingerprint_backend.domain.fingerprint.service.classClosingTime.ClassClosingTimeCommandService;
 import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
-import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
+import com.example.fingerprint_backend.domain.fingerprint.service.ranking.RankingApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
 import com.example.fingerprint_backend.types.LogAction;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,7 @@ public class FingerPrintMigration {
     private final ClassClosingTimeCommandService classClosingTimeCommandService;
     private final LogService logService;
     private final CycleApplicationService cycleApplicationService;
+    private final RankingApplicationService rankingApplicationService;
 
     @ShellMethod("마이그레이션: 특정 날짜의 문 닫은 시간 등록")
     public String migrateClassClosingTime(
@@ -81,6 +81,7 @@ public class FingerPrintMigration {
                 log -> {
                     if (log.getAction() == LogAction.등교) {
                         cycleApplicationService.createAttendanceCycle(log.getStudentNumber(), log.getEventTime());
+                        rankingApplicationService.createDailyAttendanceRanking(log.getStudentNumber(), log.getEventTime());
                     } else if (log.getAction() == LogAction.하교) {
                         cycleApplicationService.closeAttendanceCycle(log.getStudentNumber(), log.getEventTime());
                     } else if (log.getAction() == LogAction.식사 || log.getAction() == LogAction.기타 || log.getAction() == LogAction.도서관) {
@@ -92,7 +93,6 @@ public class FingerPrintMigration {
                     System.out.println("로그 처리 완료: " + log.getId());
                 }
         );
-
 
         return "마이그레이션 완료" + logs.size() + "개 로그 처리됨";
     }

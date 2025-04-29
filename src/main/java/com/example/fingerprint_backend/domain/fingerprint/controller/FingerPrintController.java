@@ -97,13 +97,6 @@ public class FingerPrintController {
     @PostMapping("/api/fingerprint/logs")
     public ResponseEntity<ApiResponse> createLog(@RequestBody CreateLogDto createLogDto) {
 
-//        LogEntity savedLog = logService.createLog(
-//                createLogDto.getStd_num(),
-//                createLogDto.getAction()
-//        );
-//
-//        String message = String.format("학번 %s의 \n\"%s\" 로그가 등록되었습니다.", savedLog.getStudentNumber(), savedLog.getAction());
-
         logApplicationService.routeLog(
                 createLogDto.getStd_num(),
                 createLogDto.getAction(),
