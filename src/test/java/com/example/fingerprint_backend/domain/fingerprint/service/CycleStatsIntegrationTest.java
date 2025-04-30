@@ -1,6 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.service;
 
 import com.example.fingerprint_backend.TestMemberFactory;
+import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.DailyStats;
 import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
 import com.example.fingerprint_backend.domain.fingerprint.service.cycle.AttendanceCycleCommandService;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -87,10 +89,14 @@ public class CycleStatsIntegrationTest {
 
         // when
         cycleApplicationService.createAttendanceCycle("2423002", dateTime1);
-        cycleApplicationService.closeAttendanceCycle("2423002", dateTime1.plusHours(2));
+        AttendanceCycle attendanceCycle = cycleApplicationService.closeAttendanceCycle("2423002", dateTime1.plusHours(2));
+
+        List<DailyStats> dailyStatsList = statsApplicationService.getOrCreateDailyStatsInCycle(attendanceCycle);
+        statsApplicationService.updateDailyStats(attendanceCycle, dailyStatsList);
 
         // then
         DailyStats dailyStats = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime1)).get();
+
 
         assertThat(dailyStats.getStayDuration()).as("체류 시간").isEqualTo(2 * 60 * 60 * 1000L); // 2시간
 
@@ -104,7 +110,10 @@ public class CycleStatsIntegrationTest {
 
         // when
         cycleApplicationService.createAttendanceCycle("2423002", dateTime);
-        cycleApplicationService.closeAttendanceCycle("2423002", dateTime.plusDays(2).plusHours(3)); // 51시간
+        AttendanceCycle attendanceCycle = cycleApplicationService.closeAttendanceCycle("2423002", dateTime.plusDays(2).plusHours(3));// 51시간
+
+        List<DailyStats> dailyStatsList = statsApplicationService.getOrCreateDailyStatsInCycle(attendanceCycle);
+        statsApplicationService.updateDailyStats(attendanceCycle, dailyStatsList);
 
         // then
         DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime)).get();
@@ -124,7 +133,10 @@ public class CycleStatsIntegrationTest {
 
         // when
         cycleApplicationService.createAttendanceCycle("2423002", dateTime);
-        cycleApplicationService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
+        AttendanceCycle attendanceCycle = cycleApplicationService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
+
+        List<DailyStats> dailyStatsList = statsApplicationService.getOrCreateDailyStatsInCycle(attendanceCycle);
+        statsApplicationService.updateDailyStats(attendanceCycle, dailyStatsList);
 
         // then
         DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime)).get();
@@ -143,7 +155,10 @@ public class CycleStatsIntegrationTest {
 
         // when
         cycleApplicationService.createAttendanceCycle("2423002", dateTime);
-        cycleApplicationService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
+        AttendanceCycle attendanceCycle = cycleApplicationService.closeAttendanceCycle("2423002", dateTime.plusHours(18));
+
+        List<DailyStats> dailyStatsList = statsApplicationService.getOrCreateDailyStatsInCycle(attendanceCycle);
+        statsApplicationService.updateDailyStats(attendanceCycle, dailyStatsList);
 
         // then
         DailyStats dailyStats1 = dailyStatsQueryService.getDailyStatsByStudentNumberAndDate("2423002", TimePolicy.getLocalDate(dateTime)).get();

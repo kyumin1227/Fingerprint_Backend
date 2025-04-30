@@ -120,7 +120,7 @@ public class StatsTest {
         WeeklyStats weeklyStats = new WeeklyStats(studentNumber, date);
         assertThatCode(() -> weeklyStats.setStayDuration(stayDuration))
                 .isInstanceOf(StatsException.class)
-                .hasMessageContaining("체류 시간은 음수를 더할 수 없습니다.");
+                .hasMessageContaining("체류 시간은 음수일 수 없습니다.");
     }
 
 }
