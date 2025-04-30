@@ -18,7 +18,7 @@ public class FormatPolicy {
         seconds %= 60;
         minutes %= 60;
 
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        return String.format("%02d시간%02d분", hours, minutes);
     }
 
     /**
@@ -29,7 +29,7 @@ public class FormatPolicy {
      */
     public static String formatTime(LocalTime time) {
 
-        return String.format("%02d:%02d:%02d", time.getHour(), time.getMinute(), time.getSecond());
+        return String.format("%02d시%02d분", time.getHour(), time.getMinute());
     }
 
     public static String formatDate(long ms) {

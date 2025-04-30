@@ -1,15 +1,19 @@
 package com.example.fingerprint_backend.domain.fingerprint.service.log;
 
+import com.example.fingerprint_backend.ApiResponse;
 import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
+import com.example.fingerprint_backend.domain.fingerprint.entity.Ranking;
 import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.service.ranking.RankingApplicationService;
+import com.example.fingerprint_backend.domain.fingerprint.util.FormatPolicy;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import com.example.fingerprint_backend.types.LogAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -20,13 +24,15 @@ public class LogApplicationService {
     private final CycleApplicationService cycleApplicationService;
     private final RankingApplicationService rankingApplicationService;
 
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
     /**
      * 로그를 등록하면 등교, 하교, 외출 등에 따라 서로 다른 메소드를 호출하는 메소드
      */
-    public Object routeLog(String studentNumber, LogAction logAction, LocalDateTime logTime) {
+    public ApiResponse routeLog(String studentNumber, LogAction logAction, LocalDateTime logTime) {
 
         memberQueryService.getMemberByStudentNumber(studentNumber);
-//       TODO - 문자열 반환 (ex - 하교 시 체류 시간)
+
         return switch (logAction) {
             case 등교 -> attendanceLog(studentNumber, logTime);
             case 하교 -> leaveLog(studentNumber, logTime);
@@ -41,11 +47,16 @@ public class LogApplicationService {
      * @param studentNumber 학번
      * @param attendTime    출석 시간
      */
-    private AttendanceCycle attendanceLog(String studentNumber, LocalDateTime attendTime) {
+    private ApiResponse attendanceLog(String studentNumber, LocalDateTime attendTime) {
 
         logService.createLog(studentNumber, LogAction.등교);
-        rankingApplicationService.createDailyAttendanceRanking(studentNumber, attendTime);
-        return cycleApplicationService.createAttendanceCycle(studentNumber, attendTime);
+        Ranking ranking = rankingApplicationService.createDailyAttendanceRanking(studentNumber, attendTime);
+        AttendanceCycle attendanceCycle = cycleApplicationService.createAttendanceCycle(studentNumber, attendTime);
+
+        String message = String.format("%s, 등교 시각: %s (%d등)\n등교 처리 되었습니다.",
+                studentNumber, attendTime.toLocalTime().format(formatter), ranking.getRank_order());
+
+        return new ApiResponse(true, message, attendanceCycle);
     }
 
     /**
@@ -54,10 +65,16 @@ public class LogApplicationService {
      * @param studentNumber 학번
      * @param leaveTime     하교 시간
      */
-    private AttendanceCycle leaveLog(String studentNumber, LocalDateTime leaveTime) {
+    private ApiResponse leaveLog(String studentNumber, LocalDateTime leaveTime) {
 
         logService.createLog(studentNumber, LogAction.하교);
-        return cycleApplicationService.closeAttendanceCycle(studentNumber, leaveTime);
+        AttendanceCycle attendanceCycle = cycleApplicationService.closeAttendanceCycle(studentNumber, leaveTime);
+
+        String message = String.format("%s, 하교 시각: %s\n체류 시간: %s, 외출 시간: %s",
+                studentNumber, leaveTime.toLocalTime().format(formatter), FormatPolicy.formatTime(attendanceCycle.getTotalStayDuration()),
+                FormatPolicy.formatTime(attendanceCycle.getTotalOutingDuration()));
+
+        return new ApiResponse(true, message, attendanceCycle);
     }
 
     /**
@@ -66,10 +83,15 @@ public class LogApplicationService {
      * @param studentNumber 학번
      * @param outingTime    외출 시간
      */
-    private OutingCycle outingLog(String studentNumber, LocalDateTime outingTime, LogAction logAction) {
+    private ApiResponse outingLog(String studentNumber, LocalDateTime outingTime, LogAction logAction) {
 
         logService.createLog(studentNumber, logAction);
-        return cycleApplicationService.createOutingCycle(studentNumber, outingTime, logAction);
+        OutingCycle outingCycle = cycleApplicationService.createOutingCycle(studentNumber, outingTime, logAction);
+
+        String message = String.format("%s, 외출 시각: %s\n사유: %s, 외출 처리 되었습니다.",
+                studentNumber, outingTime.toLocalTime().format(formatter), logAction.toString());
+
+        return new ApiResponse(true, message, outingCycle);
     }
 
     /**
@@ -78,10 +100,15 @@ public class LogApplicationService {
      * @param studentNumber 학번
      * @param returnTime    복귀 시간
      */
-    private OutingCycle returnLog(String studentNumber, LocalDateTime returnTime) {
+    private ApiResponse returnLog(String studentNumber, LocalDateTime returnTime) {
         
         logService.createLog(studentNumber, LogAction.복귀);
-        return cycleApplicationService.closeOutingCycle(studentNumber, returnTime);
+        OutingCycle outingCycle = cycleApplicationService.closeOutingCycle(studentNumber, returnTime);
+
+        String message = String.format("%s, 복귀 시각: %s\n외출 시간: %s, 복귀 처리 되었습니다.",
+                studentNumber, returnTime.toLocalTime().format(formatter), FormatPolicy.formatTime(outingCycle.getTotalOutingDuration()));
+
+        return new ApiResponse(true, message, outingCycle);
     }
 
 }

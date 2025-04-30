@@ -97,14 +97,13 @@ public class FingerPrintController {
     @PostMapping("/api/fingerprint/logs")
     public ResponseEntity<ApiResponse> createLog(@RequestBody CreateLogDto createLogDto) {
 
-        logApplicationService.routeLog(
+        ApiResponse response = logApplicationService.routeLog(
                 createLogDto.getStd_num(),
                 createLogDto.getAction(),
                 LocalDateTime.now()
         );
 
-//        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, message, savedLog));
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "로그 등록에 성공하였습니다.", null));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**

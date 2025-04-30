@@ -2,6 +2,7 @@ package com.example.fingerprint_backend.domain.fingerprint.entity;
 
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
 import com.example.fingerprint_backend.types.LogAction;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class OutingCycle {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @Setter(AccessLevel.PACKAGE)
+    @JsonIgnore
     private AttendanceCycle attendanceCycle;
 
     public OutingCycle(String studentNumber, LocalDateTime outingStartTime, LogAction reason) {
