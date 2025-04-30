@@ -1,5 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.util;
 
+import java.time.LocalTime;
+
 public class FormatPolicy {
 
     /**
@@ -17,6 +19,17 @@ public class FormatPolicy {
         minutes %= 60;
 
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    /**
+     * 시간을 ms로 받아 시:분:초로 포맷합니다.
+     *
+     * @param time LocalTime
+     * @return HH:mm:ss
+     */
+    public static String formatTime(LocalTime time) {
+
+        return String.format("%02d:%02d:%02d", time.getHour(), time.getMinute(), time.getSecond());
     }
 
     public static String formatDate(long ms) {

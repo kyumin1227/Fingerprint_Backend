@@ -9,6 +9,7 @@ import java.util.Optional;
 import com.example.fingerprint_backend.domain.fingerprint.dto.RankEntityDto;
 import com.example.fingerprint_backend.domain.fingerprint.dto.RankingResponseDto;
 import com.example.fingerprint_backend.domain.fingerprint.entity.BaseStats;
+import com.example.fingerprint_backend.domain.fingerprint.entity.ContinuousStats;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.StatsApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
@@ -114,7 +115,7 @@ public class RankingApplicationService {
 
     public RankingResponseDto getRankingResponseDto(RankingType rankingType, PeriodType periodType, LocalDate startDate, Integer limit) {
 
-        // 추후 redis 적용 시 삭제 예정
+        // TODO 추후 redis 적용 및 로직 수정 예정
 
         List<? extends BaseStats> orderBy = new ArrayList<>();
 
@@ -128,23 +129,46 @@ public class RankingApplicationService {
 
         List<RankEntityDto> rankList = new ArrayList<>();
 
-        for (int i = 0; i < orderBy.size(); i++) {
-            BaseStats stats = orderBy.get(i);
-            String studentNumber = stats.getStudentNumber();
-            MemberEntity member = memberQueryService.getMemberByStudentNumber(studentNumber);
-            int rank = i + 1;
+        if (rankingType == RankingType.체류_시간) {
+            for (int i = 0; i < orderBy.size(); i++) {
+                BaseStats stats = orderBy.get(i);
+                String studentNumber = stats.getStudentNumber();
+                MemberEntity member = memberQueryService.getMemberByStudentNumber(studentNumber);
+                int rank = i + 1;
 
-            RankEntityDto rankEntityDto = new RankEntityDto(
-                    studentNumber,
-                    member.getGivenName(),
-                    member.getFamilyName(),
-                    member.getProfileImage(),
-                    rank,
-                    stats.getStayDuration()
-            );
+                RankEntityDto rankEntityDto = new RankEntityDto(
+                        studentNumber,
+                        member.getGivenName(),
+                        member.getFamilyName(),
+                        member.getProfileImage(),
+                        rank,
+                        stats.getStayDuration(),
+                        0
+                );
 
-            rankList.add(rankEntityDto);
+                rankList.add(rankEntityDto);
 
+            }
+        } else if (rankingType == RankingType.등교_시간) {
+            for (int i = 0; i < orderBy.size(); i++) {
+                ContinuousStats stats = (ContinuousStats) orderBy.get(i);
+                String studentNumber = stats.getStudentNumber();
+                MemberEntity member = memberQueryService.getMemberByStudentNumber(studentNumber);
+                int rank = i + 1;
+
+                RankEntityDto rankEntityDto = new RankEntityDto(
+                        studentNumber,
+                        member.getGivenName(),
+                        member.getFamilyName(),
+                        member.getProfileImage(),
+                        rank,
+                        stats.getAvgAttendTime(),
+                        stats.getTotalAttendCount()
+                );
+
+                rankList.add(rankEntityDto);
+
+            }
         }
 
         return new RankingResponseDto(

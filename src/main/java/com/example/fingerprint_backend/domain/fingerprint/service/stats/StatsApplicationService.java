@@ -200,8 +200,10 @@ public class StatsApplicationService {
      */
     public List<? extends BaseStats> getStatsOrderedByAttendanceTime(PeriodType periodType, LocalDate date) {
 
+//        TODO 일간 통계 수정 필요
+
         return switch (periodType) {
-            case 일간 -> null;
+            case 일간 -> List.of();
             case 주간 -> weeklyStatsQueryService.getWeeklyStatsOrderedByAttendanceTime(date);
             case 월간 -> monthlyStatsQueryService.getMonthlyStatsOrderedByAttendanceTime(date);
             case 전체 -> null;

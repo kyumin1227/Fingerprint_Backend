@@ -3,6 +3,8 @@ package com.example.fingerprint_backend.domain.fingerprint.dto;
 import com.example.fingerprint_backend.domain.fingerprint.util.FormatPolicy;
 import lombok.Getter;
 
+import java.time.LocalTime;
+
 @Getter
 public class RankEntityDto {
 
@@ -12,8 +14,12 @@ public class RankEntityDto {
     private String profileImageUrl;
     private int rank;
     private String formattedValue;
+    private Integer attendCount;
 
-    public RankEntityDto(String studentNumber, String givenName, String familyName, String profileImageUrl, int rank, Long ms) {
+    /**
+     * 체류 시간
+     */
+    public RankEntityDto(String studentNumber, String givenName, String familyName, String profileImageUrl, int rank, Long ms, Integer attendCount) {
         this.studentNumber = studentNumber;
         this.givenName = givenName;
         this.familyName = familyName;
@@ -21,5 +27,20 @@ public class RankEntityDto {
         this.rank = rank;
 
         this.formattedValue = FormatPolicy.formatTime(ms);
+        this.attendCount = attendCount;
+    }
+
+    /**
+     * 등교 시간
+     */
+    public RankEntityDto(String studentNumber, String givenName, String familyName, String profileImageUrl, int rank, LocalTime time, Integer attendCount) {
+        this.studentNumber = studentNumber;
+        this.givenName = givenName;
+        this.familyName = familyName;
+        this.profileImageUrl = profileImageUrl;
+        this.rank = rank;
+
+        this.formattedValue = FormatPolicy.formatTime(time);
+        this.attendCount = attendCount;
     }
 }
