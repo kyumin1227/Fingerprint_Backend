@@ -1,2 +1,6 @@
 cors:
   allowed-origins: http://localhost:4200, http://localhost:8080, http://localhost:3000, chrome-extension://*
+
+custom:
+  line:
+    access-token: ${LINE_ACCESS_TOKEN_DEV}

@@ -12,7 +12,10 @@ public enum MessageCommand {
     DISCONNECT(List.of("연결해제", "切断", "disconnect")),
     CLEAN_INFO(List.of("청소정보", "청소일정", "掃除情報", "cleaninfo")),
     HELP(List.of("도움말", "ヘルプ", "help")),
-    USER_INFO(List.of("유저정보", "ユーザー情報", "userinfo"));
+    USER_INFO(List.of("유저정보", "ユーザー情報", "userinfo")),
+    DAILY_RANKING(List.of("일간랭킹", "日間ランキング", "dailyranking")),
+    WEEKLY_RANKING(List.of("주간랭킹", "週間ランキング", "weeklyranking")),
+    MONTHLY_RANKING(List.of("월간랭킹", "月間ランキング", "monthlyranking"));
 
     private final List<String> keywords;
 
