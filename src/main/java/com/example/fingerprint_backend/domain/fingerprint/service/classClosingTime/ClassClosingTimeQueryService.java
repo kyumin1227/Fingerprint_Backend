@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional (readOnly = true)
 @RequiredArgsConstructor
 public class ClassClosingTimeQueryService {
 

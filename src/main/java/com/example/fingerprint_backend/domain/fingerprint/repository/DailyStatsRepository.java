@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface DailyStatsRepository extends JpaRepository<DailyStats, Long> {
 
-    Optional<DailyStats> findByStudentNumber(String studentNumber);
+    List<DailyStats> findByStudentNumber(String studentNumber);
 
     Optional<DailyStats> findByStudentNumberAndEffectiveDate(String studentNumber, LocalDate date);
 

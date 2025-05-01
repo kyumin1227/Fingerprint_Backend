@@ -5,6 +5,7 @@ import com.example.fingerprint_backend.domain.fingerprint.repository.DailyStatsR
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -71,6 +72,10 @@ public class DailyStatsCommandService {
 
         return dailyStatsQueryService.getDailyStatsByStudentNumberAndDate(studentNumber, date)
                 .orElseGet(() -> createDailyStats(studentNumber, date));
+    }
+
+    public void saveAll(List<DailyStats> dailyStatsList) {
+        dailyStatsRepository.saveAllAndFlush(dailyStatsList);
     }
 
 }

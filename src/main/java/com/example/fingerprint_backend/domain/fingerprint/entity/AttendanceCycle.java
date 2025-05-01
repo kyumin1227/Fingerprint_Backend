@@ -55,7 +55,7 @@ public class AttendanceCycle {
         if (outingCycle.getOutingStartTime().isBefore(attendTime)) {
             throw new CycleException("등교 시간보다 이른 외출입니다.");
         }
-        if (outingCycle.getOutingEndTime() != null && outingCycle.getOutingEndTime().isAfter(leaveTime)) {
+        if (outingCycle.getOutingEndTime() != null && leaveTime != null && outingCycle.getOutingEndTime().isAfter(leaveTime)) {
             throw new CycleException("하교 시간보다 늦은 외출입니다.");
         }
         if (!outingCycle.getStudentNumber().equals(this.studentNumber)) {

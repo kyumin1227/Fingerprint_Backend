@@ -9,7 +9,6 @@ import com.example.fingerprint_backend.dto.CreateLogDto;
 import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
 import com.example.fingerprint_backend.domain.fingerprint.entity.FingerPrintEntity;
 import com.example.fingerprint_backend.domain.fingerprint.service.FingerPrintService;
-import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +24,6 @@ import java.util.List;
 public class FingerPrintController {
 
     private final FingerPrintService fingerPrintService;
-    private final LogService logService;
     private final MemberQueryService memberQueryService;
     private final LogApplicationService logApplicationService;
     private final ClassClosingTimeApplicationService classClosingTimeApplicationService;

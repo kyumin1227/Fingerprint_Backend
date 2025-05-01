@@ -34,11 +34,11 @@ public class CycleCloseTest {
     @Autowired
     private CycleApplicationService cycleApplicationService;
 
-    private static LocalDateTime date1;
-    private static LocalDateTime date2;
-    private static LocalDateTime date3;
-    private static LocalDateTime date4;
-    private static LocalDateTime date5;
+    private LocalDateTime date1;
+    private LocalDateTime date2;
+    private LocalDateTime date3;
+    private LocalDateTime date4;
+    private LocalDateTime date5;
 
     @BeforeEach
     void setUp() {

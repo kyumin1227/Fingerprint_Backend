@@ -44,7 +44,7 @@ dependencies {
 	implementation("software.amazon.awssdk:s3:2.31.13")
 
 //	migration 용 쉘
-	implementation("org.springframework.shell:spring-shell-starter:3.4.0")
+	implementation 'org.springframework.shell:spring-shell-starter:3.2.8'
 }
 
 tasks.named('test') {

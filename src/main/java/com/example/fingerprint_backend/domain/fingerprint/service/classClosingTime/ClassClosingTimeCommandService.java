@@ -22,8 +22,6 @@ public class ClassClosingTimeCommandService {
      * @param closingMember 문 닫힘 담당자 학번
      * @param closingTime   문 닫힘 시간
      * @return 문 닫힘 시간 등록된 객체
-     * @throws LogException          열쇠 담당자가 아닐 경우, 학번이 존재하지 않을 경우
-     * @throws IllegalStateException 5분 이내에 문을 닫았을 경우
      */
     public ClassClosingTime createClosingTime(LocalDateTime closingTime, Long classId, String closingMember) {
 

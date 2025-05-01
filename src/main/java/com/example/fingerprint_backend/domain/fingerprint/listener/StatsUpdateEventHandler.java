@@ -28,7 +28,6 @@ public class StatsUpdateEventHandler {
      *
      * @param event AttendanceCycleCloseEvent
      */
-    @EventListener
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleDailyStatsUpdate(DailyStatsUpdateEvent event) {
 

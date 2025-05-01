@@ -98,6 +98,7 @@ public class StatsCalculator {
                 .mapToLong(logEntity -> TimePolicy.getLocalTimeToSecond(logEntity.getEventTime()))
                 .sum();
 
+//        TODO : 추후 원형 평균 시간 구하기 방식 고려
         long avgSeconds = totalSeconds / logEntities.size() % 86400;
         return LocalTime.ofSecondOfDay(avgSeconds);
     }
@@ -121,9 +122,6 @@ public class StatsCalculator {
         Integer totalAttendCount = dailyStatsList.size();
         LocalTime averageAttendTime = getAvgTime(attendanceLogs);
         LocalTime averageLeaveTime = getAvgTime(leaveLogs);
-
-        System.out.println("totalStayDuration = " + totalStayDuration);
-        System.out.println("totalOutDuration = " + totalOutDuration);
 
         return new StatsUpdateValue(
                 totalStayDuration,

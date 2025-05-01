@@ -244,23 +244,4 @@ class StatsCalculatorTest {
 
     }
 
-//    시간 왜곡으로 인한 테스트 실패
-//    @DisplayName("경계값 테스트")
-//    @Test
-//    void getAvgTime6() {
-//        // given
-//        LocalDateTime localDateTime = LocalDateTime.of(2025, 4, 26, 5, 59, 59);
-//        LogEntity logEntity1 = new LogEntity(studentNumber1, localDateTime.minusHours(1).plusMinutes(10), LogAction.등교);
-//        LogEntity logEntity2 = new LogEntity(studentNumber1, localDateTime.plusHours(1).minusMinutes(10), LogAction.등교);
-//        LogEntity logEntity3 = new LogEntity(studentNumber1, localDateTime.minusHours(2).plusSeconds(40), LogAction.등교);
-//        LogEntity logEntity4 = new LogEntity(studentNumber1, localDateTime.plusHours(2).minusSeconds(40), LogAction.등교);
-//
-//        // when
-//        LocalTime avgTime = StatsCalculator.getAvgTime(List.of(logEntity1, logEntity2, logEntity3, logEntity4));
-//
-//        // then
-//        assertThat(avgTime).isEqualTo(LocalTime.of(5, 59, 59));
-//
-//    }
-
 }

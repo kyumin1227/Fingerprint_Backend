@@ -22,14 +22,13 @@ public class DailyStatsQueryService {
     private final DailyStatsRepository dailyStatsRepository;
 
     /**
-     * 학번으로 일일 통계를 가져오는 메소드
+     * 학번으로 일일 통계 리스트를 가져오는 메소드
      *
      * @param studentNumber 학번
      * @return DailyStats
      */
-    public DailyStats getDailyStatsByStudentNumber(String studentNumber) {
-        return dailyStatsRepository.findByStudentNumber(studentNumber)
-                .orElse(null);
+    public List<DailyStats> getDailyStatsByStudentNumber(String studentNumber) {
+        return dailyStatsRepository.findByStudentNumber(studentNumber);
     }
 
     /**

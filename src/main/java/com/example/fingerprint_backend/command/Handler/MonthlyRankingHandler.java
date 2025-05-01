@@ -1,5 +1,7 @@
-package com.example.fingerprint_backend.command;
+package com.example.fingerprint_backend.command.Handler;
 
+import com.example.fingerprint_backend.command.CommandHandler;
+import com.example.fingerprint_backend.command.MessageCommand;
 import com.example.fingerprint_backend.domain.fingerprint.dto.RankEntityDto;
 import com.example.fingerprint_backend.domain.fingerprint.dto.RankingResponseDto;
 import com.example.fingerprint_backend.domain.fingerprint.service.ranking.RankingApplicationService;
@@ -15,24 +17,24 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class WeeklyRankingHandler implements CommandHandler {
+public class MonthlyRankingHandler implements CommandHandler {
 
     private final RankingApplicationService rankingApplicationService;
 
     @Override
     public MessageCommand getCommandType() {
-        return MessageCommand.WEEKLY_RANKING;
+        return MessageCommand.MONTHLY_RANKING;
     }
 
     @Override
     public String handleCommand(LineEntity line) {
         RankingResponseDto rankingResponseDtoByArrival = rankingApplicationService.getRankingResponseDto(
-                RankingType.등교_시간, PeriodType.주간, LocalDate.now(), 5);
+                RankingType.등교_시간, PeriodType.월간, LocalDate.now(), 5);
         RankingResponseDto rankingResponseDtoByStay = rankingApplicationService.getRankingResponseDto(
-                RankingType.체류_시간, PeriodType.주간, LocalDate.now(), 5);
+                RankingType.체류_시간, PeriodType.월간, LocalDate.now(), 5);
 
         StringBuilder response = new StringBuilder();
-        response.append("📊 주간 랭킹\n\n");
+        response.append("📊 월간 랭킹\n\n");
 
         response.append("⏰ 평균 등교 시간 순위\n");
         for (RankEntityDto rankEntityDto : rankingResponseDtoByArrival.rankList()) {
@@ -53,6 +55,6 @@ public class WeeklyRankingHandler implements CommandHandler {
 
     @Override
     public String getHelpMessage() {
-        return "주간 랭킹: 평균 등교 시간과 총 체류 시간 순위를 보여줍니다.";
+        return "월간 랭킹: 평균 등교 시간과 총 체류 시간 순위를 보여줍니다.";
     }
 }

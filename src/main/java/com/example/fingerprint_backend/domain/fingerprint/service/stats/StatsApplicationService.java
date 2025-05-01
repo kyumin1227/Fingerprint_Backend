@@ -3,7 +3,7 @@ package com.example.fingerprint_backend.domain.fingerprint.service.stats;
 import com.example.fingerprint_backend.domain.fingerprint.entity.*;
 import com.example.fingerprint_backend.domain.fingerprint.event.MonthlyStatsUpdateEvent;
 import com.example.fingerprint_backend.domain.fingerprint.event.WeeklyStatsUpdateEvent;
-import com.example.fingerprint_backend.domain.fingerprint.repository.DailyStatsRepository;
+import com.example.fingerprint_backend.domain.fingerprint.exception.StatsException;
 import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
 import com.example.fingerprint_backend.domain.fingerprint.types.PeriodType;
 import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
@@ -14,6 +14,7 @@ import com.example.fingerprint_backend.types.LogAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StatsApplicationService {
 
     private final DailyStatsCommandService dailyStatsCommandService;
@@ -34,7 +36,6 @@ public class StatsApplicationService {
     private final MonthlyStatsCommandService monthlyStatsCommandService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final LogService logService;
-    private final DailyStatsRepository dailyStatsRepository;
 
 
     /**
@@ -60,7 +61,7 @@ public class StatsApplicationService {
         }
 
 //        일일 통계 업데이트 저장
-        dailyStatsRepository.saveAllAndFlush(dailyStatsList);
+        dailyStatsCommandService.saveAll(dailyStatsList);
 
         weeklyDates.forEach(date -> {
                     applicationEventPublisher.publishEvent(new WeeklyStatsUpdateEvent(studentNumber, date));
@@ -105,11 +106,23 @@ public class StatsApplicationService {
      */
     public void setStats(ContinuousStats stats, StatsUpdateValue statsUpdateValue) {
 
-        stats.setStayDuration(statsUpdateValue.stayDuration());
-        stats.setOutDuration(statsUpdateValue.outDuration());
-        stats.setTotalAttendCount(statsUpdateValue.attendCount());
-        stats.setAvgAttendTime(statsUpdateValue.averageAttendTime());
-        stats.setAvgLeaveTime(statsUpdateValue.averageLeaveTime());
+        if (stats instanceof WeeklyStats weeklyStats) {
+            weeklyStatsCommandService.setStayDuration(weeklyStats, statsUpdateValue.stayDuration());
+            weeklyStatsCommandService.setOutDuration(weeklyStats, statsUpdateValue.outDuration());
+            weeklyStatsCommandService.setAttendCount(weeklyStats, statsUpdateValue.attendCount());
+            weeklyStatsCommandService.setAvgAttendTime(weeklyStats, statsUpdateValue.averageAttendTime());
+            weeklyStatsCommandService.setAvgLeaveTime(weeklyStats, statsUpdateValue.averageLeaveTime());
+
+        } else if (stats instanceof MonthlyStats monthlyStats) {
+            monthlyStatsCommandService.setStayDuration(monthlyStats, statsUpdateValue.stayDuration());
+            monthlyStatsCommandService.setOutDuration(monthlyStats, statsUpdateValue.outDuration());
+            monthlyStatsCommandService.setAttendCount(monthlyStats, statsUpdateValue.attendCount());
+            monthlyStatsCommandService.setAvgAttendTime(monthlyStats, statsUpdateValue.averageAttendTime());
+            monthlyStatsCommandService.setAvgLeaveTime(monthlyStats, statsUpdateValue.averageLeaveTime());
+
+        } else {
+            throw new StatsException("지원하지 않는 통계 타입입니다.");
+        }
     }
 
     /**
@@ -187,7 +200,7 @@ public class StatsApplicationService {
             case 일간 -> dailyStatsQueryService.getDailyStatsOrderedByStayDuration(date);
             case 주간 -> weeklyStatsQueryService.getWeeklyStatsOrderedByStayDuration(date);
             case 월간 -> monthlyStatsQueryService.getMonthlyStatsOrderedByStayDuration(date);
-            case 전체 -> null;
+            case 전체 -> List.of();
         };
     }
 

@@ -66,7 +66,7 @@ public class MonthlyStats extends ContinuousStats {
 
     @Override
     public void setTotalAttendCount(Integer totalAttendCount) {
-        if (getTotalAttendCount() > getMaxDays()) {
+        if (totalAttendCount > getMaxDays()) {
             throw new StatsException("출석 횟수는 해당 월의 최대 시간을 초과할 수 없습니다.");
         }
         super.setTotalAttendCount(totalAttendCount);

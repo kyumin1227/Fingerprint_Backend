@@ -33,14 +33,9 @@ public class TimePolicy {
 
         LocalTime localTime = localDateTime.toLocalTime();
 
-        long localTimeToSecond = localTime.isBefore(START_TIME)
+        return localTime.isBefore(START_TIME)
                 ? (long) localTime.toSecondOfDay() + 86400
                 : (long) localTime.toSecondOfDay();
-
-        System.out.println("localTime = " + localTime);
-        System.out.println("localTimeToSecond = " + localTimeToSecond);
-
-        return localTimeToSecond;
     }
 
     /**

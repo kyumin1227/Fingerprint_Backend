@@ -42,7 +42,7 @@ public class CycleApplicationService {
      * @param studentNumber 학생 번호
      * @param attendTime    출석 시간
      */
-    public AttendanceCycle createAttendanceCycle(String studentNumber, LocalDateTime attendTime) {
+    public synchronized AttendanceCycle createAttendanceCycle(String studentNumber, LocalDateTime attendTime) {
 
         // 만약 이전에 하교를 하지 않았다면, 해당 출석 주기는 강제 종료합니다.
         AttendanceCycle latestOpenCycle = attendanceCycleQueryService.getLatestOpenCycle(studentNumber);

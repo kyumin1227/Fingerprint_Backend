@@ -5,12 +5,14 @@ import com.example.fingerprint_backend.domain.fingerprint.repository.WeeklyStats
 import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class WeeklyStatsCommandService {
 
@@ -59,6 +61,8 @@ public class WeeklyStatsCommandService {
      * @return 주간 통계
      */
     public WeeklyStats setStayDuration(WeeklyStats weeklyStats, Long stayDuration) {
+
+        weeklyStats.setStayDuration(stayDuration);
         return weeklyStats;
     }
 
@@ -70,6 +74,8 @@ public class WeeklyStatsCommandService {
      * @return 주간 통계
      */
     public WeeklyStats setOutDuration(WeeklyStats weeklyStats, Long outDuration) {
+
+        weeklyStats.setOutDuration(outDuration);
         return weeklyStats;
     }
 
@@ -81,6 +87,8 @@ public class WeeklyStatsCommandService {
      * @return 주간 통계
      */
     public WeeklyStats setAttendCount(WeeklyStats weeklyStats, Integer attendCount) {
+
+        weeklyStats.setTotalAttendCount(attendCount);
         return weeklyStats;
     }
 
@@ -92,6 +100,8 @@ public class WeeklyStatsCommandService {
      * @return 주간 통계
      */
     public WeeklyStats setAvgAttendTime(WeeklyStats weeklyStats, LocalTime avgAttendTime) {
+
+        weeklyStats.setAvgAttendTime(avgAttendTime);
         return weeklyStats;
     }
 
@@ -103,6 +113,8 @@ public class WeeklyStatsCommandService {
      * @return 주간 통계
      */
     public WeeklyStats setAvgLeaveTime(WeeklyStats weeklyStats, LocalTime avgLeaveTime) {
+
+        weeklyStats.setAvgLeaveTime(avgLeaveTime);
         return weeklyStats;
     }
 

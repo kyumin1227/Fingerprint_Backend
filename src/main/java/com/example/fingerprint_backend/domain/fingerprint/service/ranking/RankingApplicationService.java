@@ -10,6 +10,7 @@ import com.example.fingerprint_backend.domain.fingerprint.dto.RankEntityDto;
 import com.example.fingerprint_backend.domain.fingerprint.dto.RankingResponseDto;
 import com.example.fingerprint_backend.domain.fingerprint.entity.BaseStats;
 import com.example.fingerprint_backend.domain.fingerprint.entity.ContinuousStats;
+import com.example.fingerprint_backend.domain.fingerprint.exception.RankException;
 import com.example.fingerprint_backend.domain.fingerprint.service.stats.StatsApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
@@ -117,15 +118,18 @@ public class RankingApplicationService {
 
         // TODO 추후 redis 적용 및 로직 수정 예정
 
-        List<? extends BaseStats> orderBy = new ArrayList<>();
+        List<? extends BaseStats> orderBy;
 
         if (rankingType == RankingType.체류_시간) {
             orderBy = statsApplicationService.getStatsOrderedByStayDuration(periodType, startDate);
         } else if (rankingType == RankingType.등교_시간) {
             orderBy = statsApplicationService.getStatsOrderedByAttendanceTime(periodType, startDate);
+        } else {
+            throw new RankException("지원하지 않는 랭킹 타입입니다.");
         }
 
-        orderBy = orderBy.subList(0, Math.min(orderBy.size(), limit));
+        int safeLimit = (limit == null || limit <= 0) ? 5 : limit;
+        orderBy = orderBy.subList(0, Math.min(orderBy.size(), safeLimit));
 
         List<RankEntityDto> rankList = new ArrayList<>();
 

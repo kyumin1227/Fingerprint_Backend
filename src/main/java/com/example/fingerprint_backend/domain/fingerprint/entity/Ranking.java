@@ -54,6 +54,7 @@ public class Ranking {
         this.rankingType = rankingType;
         this.periodType = periodType;
         this.startDate = startDate;
+        this.rank_order = Integer.MAX_VALUE;    // 랭킹 초기화
     }
 
     /**

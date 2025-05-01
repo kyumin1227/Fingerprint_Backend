@@ -14,12 +14,12 @@ public class RankEntityDto {
     private String profileImageUrl;
     private int rank;
     private String formattedValue;
-    private Integer attendCount;
+    private int attendCount;
 
     /**
      * 체류 시간
      */
-    public RankEntityDto(String studentNumber, String givenName, String familyName, String profileImageUrl, int rank, Long ms, Integer attendCount) {
+    public RankEntityDto(String studentNumber, String givenName, String familyName, String profileImageUrl, int rank, Long ms, int attendCount) {
         this.studentNumber = studentNumber;
         this.givenName = givenName;
         this.familyName = familyName;
@@ -33,7 +33,7 @@ public class RankEntityDto {
     /**
      * 등교 시간
      */
-    public RankEntityDto(String studentNumber, String givenName, String familyName, String profileImageUrl, int rank, LocalTime time, Integer attendCount) {
+    public RankEntityDto(String studentNumber, String givenName, String familyName, String profileImageUrl, int rank, LocalTime time, int attendCount) {
         this.studentNumber = studentNumber;
         this.givenName = givenName;
         this.familyName = familyName;
