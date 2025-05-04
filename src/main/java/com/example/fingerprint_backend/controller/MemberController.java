@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.controller;
 
-import com.example.fingerprint_backend.ApiResponse;
+import com.example.fingerprint_backend.ApiResult;
 import com.example.fingerprint_backend.jwt.CustomUserDetails;
 import com.example.fingerprint_backend.service.AccountService;
 import com.example.fingerprint_backend.service.FileService;
@@ -30,13 +30,13 @@ public class MemberController {
     }
 
     @PutMapping("/me/profile-image")
-    public ResponseEntity<ApiResponse> UpdateProfileImage(@AuthenticationPrincipal CustomUserDetails user,
-                                                          @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ApiResult> UpdateProfileImage(@AuthenticationPrincipal CustomUserDetails user,
+                                                        @RequestParam("file") MultipartFile file) {
 
         String path = PROFILE_IMAGE_PATH + user.getUsername();
         String url = fileService.storeFile(FileType.IMAGE, file, path, MAX_PROFILE_IMAGE_SIZE, IMAGE_BUCKET_NAME);
         accountService.setProfileImage(user.getUsername(), url);
 
-        return ResponseEntity.ok(new ApiResponse(true, "프로필 이미지 업데이트 성공", url));
+        return ResponseEntity.ok(new ApiResult(true, "프로필 이미지 업데이트 성공", url));
     }
 }

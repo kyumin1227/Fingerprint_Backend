@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.controller;
 
-import com.example.fingerprint_backend.ApiResponse;
+import com.example.fingerprint_backend.ApiResult;
 import com.example.fingerprint_backend.dto.GoogleRegisterDto;
 import com.example.fingerprint_backend.dto.LoginResponse;
 import com.example.fingerprint_backend.entity.MemberEntity;
@@ -24,7 +24,7 @@ public class AuthController {
     private final JWTUtil JWTUtil;
 
     @PostMapping("/api/login")
-    public ResponseEntity<ApiResponse> login(HttpServletRequest request) {
+    public ResponseEntity<ApiResult> login(HttpServletRequest request) {
         String googleIdToken = authService.extractGoogleIdToken(request.getHeader("Authorization"));
         String email = authService.verifyAndExtractGoogleEmail(googleIdToken);
 
@@ -38,12 +38,12 @@ public class AuthController {
 
 //        로그인 성공
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(true, "로그인: 사용자 인증 성공", loginResponse));
+                .body(new ApiResult(true, "로그인: 사용자 인증 성공", loginResponse));
     }
 
     @PostMapping("/api/register")
-    public ResponseEntity<ApiResponse> register(HttpServletRequest request,
-                                                @RequestBody GoogleRegisterDto googleRegisterDto) {
+    public ResponseEntity<ApiResult> register(HttpServletRequest request,
+                                              @RequestBody GoogleRegisterDto googleRegisterDto) {
 
         String googleIdToken = authService.extractGoogleIdToken(request.getHeader("Authorization"));
         authService.verifyAndExtractGoogleEmail(googleIdToken);
@@ -63,6 +63,6 @@ public class AuthController {
 
         LoginResponse loginResponse = new LoginResponse(registered, token);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "회원가입 성공", loginResponse));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "회원가입 성공", loginResponse));
     }
 }
