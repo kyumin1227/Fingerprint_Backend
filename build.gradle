@@ -45,6 +45,9 @@ dependencies {
 
 //	migration 용 쉘
 	implementation 'org.springframework.shell:spring-shell-starter:3.2.8'
+
+//	springdoc
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 }
 
 tasks.named('test') {
