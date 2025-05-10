@@ -25,25 +25,26 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class RankingController {
 
-        private final RankingApplicationService rankingApplicationService;
+    private final RankingApplicationService rankingApplicationService;
 
-        @Operation(summary = "랭킹 조회 / ランキング", description = "랭킹 타입, 기간타입, 시작일를 이용한 랭킹을 조회합니다. / ランキングタイプ、期間タイプ、開始日を使用してランキングを取得します。")
-        @GetMapping("")
-        public ResponseEntity<ApiResult> getRanking(
-                        @Parameter(description = "랭킹 타입 (DAILY: 일간, WEEKLY: 주간, MONTHLY: 월간)", required = true, schema = @Schema(implementation = RankingType.class)) @RequestParam RankingType rankingType,
+    @Operation(summary = "랭킹 조회 / ランキング", description = "랭킹 타입, 기간타입, 시작일를 이용한 랭킹을 조회합니다. / ランキングタイプ、期間タイプ、開始日を使用してランキングを取得します。<br><br>"
+            +
+            "<a href=\"https://documenter.getpostman.com/view/27801312/2sB2cYbKwH\" target=\"_blank\">Response Sample</a>")
+    @GetMapping("")
+    public ResponseEntity<ApiResult> getRanking(
+            @Parameter(description = "랭킹 타입 / ランキングタイプ", schema = @Schema(implementation = RankingType.class), required = true) @RequestParam RankingType rankingType,
+            @Parameter(description = "기간타입 / 期間タイプ", schema = @Schema(implementation = PeriodType.class), required = true) @RequestParam PeriodType periodType,
+            @Parameter(description = "날짜 / 日付 (YYYY-MM-DD)", schema = @Schema(implementation = LocalDate.class), required = true) @RequestParam LocalDate startDate) {
 
-                        @Parameter(description = "기간 타입 (DAY: 일, WEEK: 주, MONTH: 월)", required = true, schema = @Schema(implementation = PeriodType.class)) @RequestParam PeriodType periodType,
+        Integer RANKING_LIMIT = 5;
 
-                        @Parameter(description = "시작일 (YYYY-MM-DD 형식)", required = true, example = "2024-03-01") @RequestParam LocalDate startDate) {
-                Integer RANKING_LIMIT = 5;
+        RankingResponseDto ranking = rankingApplicationService.getRankingResponseDto(
+                rankingType,
+                periodType,
+                startDate,
+                RANKING_LIMIT);
 
-                RankingResponseDto ranking = rankingApplicationService.getRankingResponseDto(
-                                rankingType,
-                                periodType,
-                                startDate,
-                                RANKING_LIMIT);
-
-                return ResponseEntity.status(HttpStatus.OK).body(
-                                new ApiResult(true, "랭킹 조회 성공", ranking));
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ApiResult(true, "랭킹 조회 성공", ranking));
+    }
 }
