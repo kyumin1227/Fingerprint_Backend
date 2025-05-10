@@ -36,8 +36,6 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .sessionManagement((session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/login").permitAll()
-                        .requestMatchers("/api/fingerprint/**").permitAll()
                         .requestMatchers("/api/clean/manager/**").hasRole("MANAGER")
                         .requestMatchers("/api/admin/**").hasAnyRole("PROFESSOR", "ASSISTANT")
                         .anyRequest().permitAll()

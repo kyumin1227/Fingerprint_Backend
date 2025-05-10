@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.domain.fingerprint.controller;
 
-import com.example.fingerprint_backend.ApiResponse;
+import com.example.fingerprint_backend.ApiResult;
 import com.example.fingerprint_backend.domain.fingerprint.dto.RequestClassClose;
 import com.example.fingerprint_backend.domain.fingerprint.service.classClosingTime.ClassClosingTimeApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.service.log.LogApplicationService;
@@ -10,6 +10,7 @@ import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTim
 import com.example.fingerprint_backend.domain.fingerprint.entity.FingerPrintEntity;
 import com.example.fingerprint_backend.domain.fingerprint.service.FingerPrintService;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Tag(name = "Fingerprint - python", description = "지문 등록 및 인식 API / 指紋登録および認識API")
 @RestController
+@RequestMapping("/api/fingerprint")
 @RequiredArgsConstructor
 public class FingerPrintController {
 
@@ -28,8 +31,8 @@ public class FingerPrintController {
     private final LogApplicationService logApplicationService;
     private final ClassClosingTimeApplicationService classClosingTimeApplicationService;
 
-    @GetMapping("/api/fingerprint/students/{stdNum}")
-    public ResponseEntity<ApiResponse> check(@PathVariable String stdNum) {
+    @GetMapping("/students/{stdNum}")
+    public ResponseEntity<ApiResult> check(@PathVariable String stdNum) {
 
         memberQueryService.getMemberByStudentNumber(stdNum);
 
@@ -37,14 +40,14 @@ public class FingerPrintController {
         Boolean fingerPrintExist = fingerPrintService.isFingerPrintExist(stdNum);
 
         if (fingerPrintExist) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "이미 지문 정보가 등록된 학번입니다. \n 재등록은 관리자에게 문의 해주세요", null));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(false, "이미 지문 정보가 등록된 학번입니다. \n 재등록은 관리자에게 문의 해주세요", null));
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 등록이 가능한 학번입니다.", null));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "지문 등록이 가능한 학번입니다.", null));
     }
 
-    @GetMapping("/api/fingerprint/students")
-    public ResponseEntity<ApiResponse> getAllFingerprint(@RequestHeader HttpHeaders headers) {
+    @GetMapping("/students")
+    public ResponseEntity<ApiResult> getAllFingerprint(@RequestHeader HttpHeaders headers) {
 
 //        String key = headers.getFirst("key");
 //
@@ -54,12 +57,12 @@ public class FingerPrintController {
 
         List<FingerPrintEntity> allFingerprint = fingerPrintService.getAllFingerprint();
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "모든 지문 정보를 가져왔습니다.", allFingerprint));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "모든 지문 정보를 가져왔습니다.", allFingerprint));
 
     }
 
-    @PostMapping("/api/fingerprint/students")
-    public ResponseEntity<ApiResponse> create(@RequestBody CreateFingerPrintDto createFingerPrintDto) {
+    @PostMapping("/students")
+    public ResponseEntity<ApiResult> create(@RequestBody CreateFingerPrintDto createFingerPrintDto) {
 
         System.out.println("createFingerPrintDto.getFingerprint1() = " + createFingerPrintDto.getFingerprint1());
         System.out.println("createFingerPrintDto.getFingerprint2() = " + createFingerPrintDto.getFingerprint2());
@@ -68,22 +71,22 @@ public class FingerPrintController {
         FingerPrintEntity fingerPrintEntity = fingerPrintService.create(createFingerPrintDto);
 
         if (fingerPrintEntity.getStudentNumber().equals(createFingerPrintDto.getStd_num())) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 등록에 성공하였습니다.", fingerPrintEntity));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "지문 등록에 성공하였습니다.", fingerPrintEntity));
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body((new ApiResponse(false, "지문 등록에 실패하였습니다. \n다시 시도해주세요.", null)));
+        return ResponseEntity.status(HttpStatus.OK).body((new ApiResult(false, "지문 등록에 실패하였습니다. \n다시 시도해주세요.", null)));
     }
 
-    @DeleteMapping("/api/fingerprint/students/{stdNum}")
-    public ResponseEntity<ApiResponse> delete(@PathVariable String stdNum) {
+    @DeleteMapping("/students/{stdNum}")
+    public ResponseEntity<ApiResult> delete(@PathVariable String stdNum) {
 
         Boolean delete = fingerPrintService.delete(stdNum);
 
         if (!delete) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(false, "지문 데이터 삭제 실패", null));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(false, "지문 데이터 삭제 실패", null));
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "지문 데이터 삭제 완료", null));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "지문 데이터 삭제 완료", null));
     }
 
     /**
@@ -92,10 +95,10 @@ public class FingerPrintController {
      * @param createLogDto - 학번, 행동 (등교, 하교, 외출 등)
      * @throws IllegalArgumentException - 학번이 존재하지 않을 경우, 1분 이내 중복 로그 발생 시
      */
-    @PostMapping("/api/fingerprint/logs")
-    public ResponseEntity<ApiResponse> createLog(@RequestBody CreateLogDto createLogDto) {
+    @PostMapping("/logs")
+    public ResponseEntity<ApiResult> createLog(@RequestBody CreateLogDto createLogDto) {
 
-        ApiResponse response = logApplicationService.routeLog(
+        ApiResult response = logApplicationService.routeLog(
                 createLogDto.getStd_num(),
                 createLogDto.getAction(),
                 LocalDateTime.now()
@@ -110,11 +113,11 @@ public class FingerPrintController {
      * @param requestClassClose - 문 닫힘 담당자 학번
      * @throws IllegalArgumentException - 열쇠 담당자가 아닐 경우, 학번이 존재하지 않을 경우
      */
-    @PostMapping("/api/fingerprint/close")
-    public ResponseEntity<ApiResponse> close(@RequestBody RequestClassClose requestClassClose) {
+    @PostMapping("/close")
+    public ResponseEntity<ApiResult> close(@RequestBody RequestClassClose requestClassClose) {
 
         ClassClosingTime closingTime = classClosingTimeApplicationService.createClosingTime(LocalDateTime.now(), requestClassClose.closingMember());
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "성공적으로 문을 닫았습니다.", closingTime));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "성공적으로 문을 닫았습니다.", closingTime));
     }
 }

@@ -1,0 +1,1275 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Bannote API",
+    "description": "Bannote 백엔드 API 문서",
+    "contact": {
+      "name": "Bannote Team",
+      "url": "https://github.com/Bannote",
+      "email": "kyumin12271227@gmail.com"
+    },
+    "license": {
+      "name": "MIT License",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Fingerprint - python",
+      "description": "지문 등록 및 인식 API / 指紋登録および認識API"
+    },
+    {
+      "name": "Fingerprint - ranking",
+      "description": "랭킹 API / ランキングAPI"
+    }
+  ],
+  "paths": {
+    "/api/members/me/profile-image": {
+      "put": {
+        "tags": [
+          "member-controller"
+        ],
+        "operationId": "UpdateProfileImage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/groups/swap": {
+      "put": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "swapMembersInGroup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwapMembersRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/class": {
+      "post": {
+        "tags": [
+          "admin-controller"
+        ],
+        "operationId": "createClass",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchoolClassRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/register": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleRegisterDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/message/line": {
+      "post": {
+        "tags": [
+          "message-controller"
+        ],
+        "operationId": "receiveLineMessage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LineWebhookRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "login",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/fingerprint/students": {
+      "get": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "getAllFingerprint",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFingerPrintDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/fingerprint/logs": {
+      "post": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "createLog",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLogDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/fingerprint/close": {
+      "post": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "close",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestClassClose"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/schedules": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createSchedule",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/schedules/auto": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createScheduleAuto",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleAutoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/members": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createMember",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/groups/{groupId}/members": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "addMembersToGroup",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "removeMembersToGroup",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/groups/random": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createGroupsByRandom",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/complete": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "completeCleaningSchedule",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/areas": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createArea",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/members/{studentNumber}": {
+      "delete": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "deleteMember",
+        "parameters": [
+          {
+            "name": "studentNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "updateMember",
+        "parameters": [
+          {
+            "name": "studentNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ranking": {
+      "get": {
+        "tags": [
+          "Fingerprint - ranking"
+        ],
+        "summary": "랭킹 조회 / ランキング",
+        "description": "랭킹 타입, 기간타입, 시작일를 이용한 랭킹을 조회합니다. / ランキングタイプ、期間タイプ、開始日を使用してランキングを取得します。\u003Cbr\u003E\u003Cbr\u003E\u003Ca href=\"https://documenter.getpostman.com/view/27801312/2sB2cYbKwH\" target=\"_blank\"\u003EResponse Sample\u003C/a\u003E",
+        "operationId": "getRanking",
+        "parameters": [
+          {
+            "name": "rankingType",
+            "in": "query",
+            "description": "랭킹 타입 / ランキングタイプ",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "등교_시간",
+                "체류_시간",
+                "개근"
+              ]
+            }
+          },
+          {
+            "name": "periodType",
+            "in": "query",
+            "description": "기간타입 / 期間タイプ",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "일간",
+                "주간",
+                "월간",
+                "전체"
+              ]
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "날짜 / 日付 (YYYY-MM-DD)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/time": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "serverTime",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/status": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "fullStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/info": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "info",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/health": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/db": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "dbCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/message": {
+      "get": {
+        "tags": [
+          "message-controller"
+        ],
+        "operationId": "createJwtToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/fingerprint/students/{stdNum}": {
+      "get": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "check",
+        "parameters": [
+          {
+            "name": "stdNum",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "stdNum",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean": {
+      "get": {
+        "tags": [
+          "clean-controller"
+        ],
+        "operationId": "getCleanInfo",
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "areaName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/all": {
+      "get": {
+        "tags": [
+          "clean-controller"
+        ],
+        "operationId": "getCleanInfo_1",
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "SwapMembersRequest": {
+        "type": "object",
+        "properties": {
+          "originStudentNumber": {
+            "type": "string"
+          },
+          "targetStudentNumber": {
+            "type": "string"
+          },
+          "originGroupId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "targetGroupId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "SchoolClassRequest": {
+        "type": "object",
+        "properties": {
+          "className": {
+            "type": "string"
+          }
+        }
+      },
+      "GoogleRegisterDto": {
+        "type": "object",
+        "properties": {
+          "studentNumber": {
+            "type": "string"
+          },
+          "className": {
+            "type": "string"
+          }
+        }
+      },
+      "DeliveryContext": {
+        "type": "object",
+        "properties": {
+          "isRedelivery": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "$ref": "#/components/schemas/Message"
+          },
+          "webhookEventId": {
+            "type": "string"
+          },
+          "deliveryContext": {
+            "$ref": "#/components/schemas/DeliveryContext"
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "replyToken": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          }
+        }
+      },
+      "LineWebhookRequest": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "quotedMessageId": {
+            "type": "string"
+          },
+          "quoteToken": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "Source": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "groupId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateFingerPrintDto": {
+        "type": "object",
+        "properties": {
+          "fingerprint1": {
+            "type": "string"
+          },
+          "fingerprint2": {
+            "type": "string"
+          },
+          "std_num": {
+            "type": "string"
+          },
+          "salt": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateLogDto": {
+        "type": "object",
+        "properties": {
+          "std_num": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "등교",
+              "하교",
+              "식사",
+              "도서관",
+              "기타",
+              "복귀"
+            ]
+          }
+        }
+      },
+      "RequestClassClose": {
+        "type": "object",
+        "properties": {
+          "closingMember": {
+            "type": "string"
+          }
+        }
+      },
+      "ScheduleRequest": {
+        "type": "object",
+        "properties": {
+          "areaName": {
+            "type": "string"
+          },
+          "className": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "ScheduleAutoRequest": {
+        "type": "object",
+        "properties": {
+          "areaName": {
+            "type": "string"
+          },
+          "className": {
+            "type": "string"
+          },
+          "daysOfWeek": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cycle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "MemberRequest": {
+        "type": "object",
+        "properties": {
+          "studentNumber": {
+            "type": "string"
+          },
+          "givenName": {
+            "type": "string"
+          },
+          "familyName": {
+            "type": "string"
+          },
+          "areaName": {
+            "type": "string"
+          }
+        }
+      },
+      "GroupMemberRequest": {
+        "type": "object",
+        "properties": {
+          "studentNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "GroupRequest": {
+        "type": "object",
+        "properties": {
+          "areaName": {
+            "type": "string"
+          },
+          "className": {
+            "type": "string"
+          },
+          "cycle": {
+            "type": "string"
+          },
+          "groupSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AreaRequest": {
+        "type": "object",
+        "properties": {
+          "areaName": {
+            "type": "string"
+          },
+          "daysOfWeek": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY",
+                "SATURDAY",
+                "SUNDAY"
+              ]
+            }
+          },
+          "cycle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "display": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groupSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
+}

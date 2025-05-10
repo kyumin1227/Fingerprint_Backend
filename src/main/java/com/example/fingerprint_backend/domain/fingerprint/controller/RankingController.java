@@ -1,10 +1,14 @@
 package com.example.fingerprint_backend.domain.fingerprint.controller;
 
-import com.example.fingerprint_backend.ApiResponse;
+import com.example.fingerprint_backend.ApiResult;
 import com.example.fingerprint_backend.domain.fingerprint.dto.RankingResponseDto;
 import com.example.fingerprint_backend.domain.fingerprint.service.ranking.RankingApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.types.PeriodType;
 import com.example.fingerprint_backend.domain.fingerprint.types.RankingType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
+@Tag(name = "Fingerprint - ranking", description = "랭킹 API / ランキングAPI")
 @RestController
 @RequestMapping("/api/ranking")
 @RequiredArgsConstructor
@@ -22,24 +27,24 @@ public class RankingController {
 
     private final RankingApplicationService rankingApplicationService;
 
+    @Operation(summary = "랭킹 조회 / ランキング", description = "랭킹 타입, 기간타입, 시작일를 이용한 랭킹을 조회합니다. / ランキングタイプ、期間タイプ、開始日を使用してランキングを取得します。<br><br>"
+            +
+            "<a href=\"https://documenter.getpostman.com/view/27801312/2sB2cYbKwH\" target=\"_blank\">Response Sample</a>")
     @GetMapping("")
-    public ResponseEntity<ApiResponse> getRanking(
-            @RequestParam RankingType rankingType,
-            @RequestParam PeriodType periodType,
-            @RequestParam LocalDate startDate
-    ) {
+    public ResponseEntity<ApiResult> getRanking(
+            @Parameter(description = "랭킹 타입 / ランキングタイプ", schema = @Schema(implementation = RankingType.class), required = true) @RequestParam RankingType rankingType,
+            @Parameter(description = "기간타입 / 期間タイプ", schema = @Schema(implementation = PeriodType.class), required = true) @RequestParam PeriodType periodType,
+            @Parameter(description = "날짜 / 日付 (YYYY-MM-DD)", schema = @Schema(implementation = LocalDate.class), required = true) @RequestParam LocalDate startDate) {
 
-        Integer limit = 5;
+        Integer RANKING_LIMIT = 5;
 
         RankingResponseDto ranking = rankingApplicationService.getRankingResponseDto(
                 rankingType,
                 periodType,
                 startDate,
-                limit
-        );
+                RANKING_LIMIT);
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ApiResponse(true, "랭킹 조회 성공", ranking) // 랭킹 조회 성공
-        );
+                new ApiResult(true, "랭킹 조회 성공", ranking));
     }
 }

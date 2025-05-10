@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.controller;
 
-import com.example.fingerprint_backend.ApiResponse;
+import com.example.fingerprint_backend.ApiResult;
 import com.example.fingerprint_backend.dto.clean.*;
 import com.example.fingerprint_backend.entity.*;
 import com.example.fingerprint_backend.jwt.CustomUserDetails;
@@ -33,8 +33,8 @@ public class CleanManagerController {
     private final CleanScheduled cleanScheduled;
 
     @PostMapping("/members")
-    public ResponseEntity<ApiResponse> createMember(@AuthenticationPrincipal CustomUserDetails user,
-                                                    @RequestBody MemberRequest request) {
+    public ResponseEntity<ApiResult> createMember(@AuthenticationPrincipal CustomUserDetails user,
+                                                  @RequestBody MemberRequest request) {
         CleanArea cleanArea = null;
         if (request.getAreaName() != null) {
             cleanArea = cleanHelperService.getCleanAreaByNameAndClassId(request.getAreaName(), user.getClassId());
@@ -46,13 +46,13 @@ public class CleanManagerController {
                 user.getClassId(),
                 cleanArea
         );
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 추가 성공", member));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "학생 추가 성공", member));
     }
 
     @PatchMapping("/members/{studentNumber}")
-    public ResponseEntity<ApiResponse> updateMember(@AuthenticationPrincipal CustomUserDetails user,
-                                                    @PathVariable String studentNumber,
-                                                    @RequestBody MemberRequest request) {
+    public ResponseEntity<ApiResult> updateMember(@AuthenticationPrincipal CustomUserDetails user,
+                                                  @PathVariable String studentNumber,
+                                                  @RequestBody MemberRequest request) {
         cleanHelperService.validateCleanMemberInSchoolClass(user.getClassId(), studentNumber);
         cleanHelperService.validateCleanMemberExistsByStudentNumber(studentNumber);
         CleanMember member = cleanManagementService.updateMember(
@@ -61,22 +61,22 @@ public class CleanManagerController {
                 request.getFamilyName(),
                 request.getAreaName()
         );
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 수정 성공", member));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "학생 수정 성공", member));
     }
 
     @DeleteMapping("/members/{studentNumber}")
-    public ResponseEntity<ApiResponse> deleteMember(@AuthenticationPrincipal CustomUserDetails user,
-                                                    @PathVariable String studentNumber) {
+    public ResponseEntity<ApiResult> deleteMember(@AuthenticationPrincipal CustomUserDetails user,
+                                                  @PathVariable String studentNumber) {
         cleanHelperService.validateCleanMemberInSchoolClass(user.getClassId(), studentNumber);
         cleanHelperService.validateCleanMemberExistsByStudentNumber(studentNumber);
         cleanManagementService.deleteMember(studentNumber);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "학생 삭제 성공", null));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "학생 삭제 성공", null));
     }
 
     @PostMapping("/areas")
     @Transactional
-    public ResponseEntity<ApiResponse> createArea(@AuthenticationPrincipal CustomUserDetails user,
-                                                  @RequestBody AreaRequest request) {
+    public ResponseEntity<ApiResult> createArea(@AuthenticationPrincipal CustomUserDetails user,
+                                                @RequestBody AreaRequest request) {
         CleanArea area = cleanManagementService.createArea(
                 request.getAreaName(),
                 user.getClassId(),
@@ -96,30 +96,30 @@ public class CleanManagerController {
             area.setGroupSize(request.getGroupSize());
         }
         cleanScheduled.createScheduleIfNeeded();
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 구역 생성 성공", area));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "청소 구역 생성 성공", area));
     }
 
     /**
      * 스케줄을 생성하는 컨트롤러
      */
     @PostMapping("/schedules")
-    public ResponseEntity<ApiResponse> createSchedule(@AuthenticationPrincipal CustomUserDetails user,
-                                                      @RequestBody ScheduleRequest request) {
+    public ResponseEntity<ApiResult> createSchedule(@AuthenticationPrincipal CustomUserDetails user,
+                                                    @RequestBody ScheduleRequest request) {
         cleanScheduleGroupService.createAndRestoreCleanSchedule(
                 request.getDate(),
                 request.getAreaName(),
                 user.getClassId()
         );
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 스케줄 생성 성공", null));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "청소 스케줄 생성 성공", null));
     }
 
     /**
      * 자동으로 스케줄을 생성하는 컨트롤러 (주기, 요일, 갯수)
      */
     @PostMapping("/schedules/auto")
-    public ResponseEntity<ApiResponse> createScheduleAuto(@AuthenticationPrincipal CustomUserDetails user,
-                                                          @RequestBody ScheduleAutoRequest request) {
+    public ResponseEntity<ApiResult> createScheduleAuto(@AuthenticationPrincipal CustomUserDetails user,
+                                                        @RequestBody ScheduleAutoRequest request) {
         Set<DayOfWeek> days = request.getDaysOfWeek().stream().map(DayOfWeek::valueOf).collect(Collectors.toSet());
         cleanScheduleGroupService.createCleanSchedules(
                 request.getDate(),
@@ -129,15 +129,15 @@ public class CleanManagerController {
                 days,
                 request.getCount()
         );
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 스케줄 생성 성공", null));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "청소 스케줄 생성 성공", null));
     }
 
     /**
      * 랜덤으로 그룹을 생성하는 컨트롤러
      */
     @PostMapping("/groups/random")
-    public ResponseEntity<ApiResponse> createGroupsByRandom(@AuthenticationPrincipal CustomUserDetails user,
-                                                            @RequestBody GroupRequest request) {
+    public ResponseEntity<ApiResult> createGroupsByRandom(@AuthenticationPrincipal CustomUserDetails user,
+                                                          @RequestBody GroupRequest request) {
         List<CleanMember> members = cleanManagementService.getMembersByAreaNameAndClassId(
                 request.getAreaName(),
                 user.getClassId()
@@ -148,7 +148,7 @@ public class CleanManagerController {
                 members,
                 (double) request.getGroupSize()
         );
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "그룹 생성 성공", null));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "그룹 생성 성공", null));
     }
 
 //    TODO 그룹이 반에 속하는지 확인 필요
@@ -158,9 +158,9 @@ public class CleanManagerController {
      * 그룹에 학생을 추가하는 컨트롤러
      */
     @PostMapping("/groups/{groupId}/members")
-    public ResponseEntity<ApiResponse> addMembersToGroup(@AuthenticationPrincipal CustomUserDetails user,
-                                                         @PathVariable Long groupId,
-                                                         @RequestBody GroupMemberRequest request) {
+    public ResponseEntity<ApiResult> addMembersToGroup(@AuthenticationPrincipal CustomUserDetails user,
+                                                       @PathVariable Long groupId,
+                                                       @RequestBody GroupMemberRequest request) {
 
         CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(request.getStudentNumber());
 
@@ -170,16 +170,16 @@ public class CleanManagerController {
 
         cleanScheduleGroupService.appendMemberToGroup(groupId, request.getStudentNumber());
         CleanGroup group = cleanHelperService.getCleanGroupById(groupId);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "그룹에 학생 추가 성공", group));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "그룹에 학생 추가 성공", group));
     }
 
     /**
      * 그룹에 학생을 제거하는 컨트롤러
      */
     @DeleteMapping("/groups/{groupId}/members")
-    public ResponseEntity<ApiResponse> removeMembersToGroup(@AuthenticationPrincipal CustomUserDetails user,
-                                                            @PathVariable Long groupId,
-                                                            @RequestBody GroupMemberRequest request) {
+    public ResponseEntity<ApiResult> removeMembersToGroup(@AuthenticationPrincipal CustomUserDetails user,
+                                                          @PathVariable Long groupId,
+                                                          @RequestBody GroupMemberRequest request) {
 
         CleanMember member = cleanHelperService.getCleanMemberByStudentNumber(request.getStudentNumber());
 
@@ -189,7 +189,7 @@ public class CleanManagerController {
 
         cleanScheduleGroupService.removeMemberFromGroup(groupId, member.getStudentNumber());
         CleanGroup group = cleanHelperService.getCleanGroupById(groupId);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "그룹에 학생 삭제 성공", group));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "그룹에 학생 삭제 성공", group));
     }
 
     /**
@@ -197,8 +197,8 @@ public class CleanManagerController {
      */
     @Transactional
     @PutMapping("/groups/swap")
-    public ResponseEntity<ApiResponse> swapMembersInGroup(@AuthenticationPrincipal CustomUserDetails user,
-                                                          @RequestBody SwapMembersRequest request) {
+    public ResponseEntity<ApiResult> swapMembersInGroup(@AuthenticationPrincipal CustomUserDetails user,
+                                                        @RequestBody SwapMembersRequest request) {
 
         CleanMember originMember = cleanHelperService.getCleanMemberByStudentNumber(request.getOriginStudentNumber());
         CleanMember targetMember = cleanHelperService.getCleanMemberByStudentNumber(request.getTargetStudentNumber());
@@ -215,20 +215,20 @@ public class CleanManagerController {
         CleanGroup originGroup = cleanHelperService.getCleanGroupById(request.getOriginGroupId());
         CleanGroup targetGroup = cleanHelperService.getCleanGroupById(request.getTargetGroupId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "그룹의 학생 교환 성공", new CleanGroup[]{originGroup, targetGroup}));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "그룹의 학생 교환 성공", new CleanGroup[]{originGroup, targetGroup}));
     }
 
     /**
      * 청소 스케줄을 완료 처리하는 컨트롤러
      */
     @PostMapping("/complete")
-    public ResponseEntity<ApiResponse> completeCleaningSchedule(@AuthenticationPrincipal CustomUserDetails user,
-                                                                @RequestBody ScheduleRequest request) {
+    public ResponseEntity<ApiResult> completeCleaningSchedule(@AuthenticationPrincipal CustomUserDetails user,
+                                                              @RequestBody ScheduleRequest request) {
         CleanRecord cleanRecord = cleanOperationService.completeCleaning(
                 request.getDate(),
                 request.getAreaName(),
                 user.getClassId()
         );
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "청소 완료 처리 성공", cleanRecord.getCleanGroup()));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResult(true, "청소 완료 처리 성공", cleanRecord.getCleanGroup()));
     }
 }

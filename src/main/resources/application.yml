@@ -26,3 +26,31 @@ management:
   metrics:
     enable:
       processor: false
+
+springdoc:
+  # Swagger UI 기본 경로
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    filter: true
+
+  # API 문서 경로
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+
+  # 스캔할 패키지 설정
+  packages-to-scan: com.example.fingerprint_backend
+  # 매칭할 경로 설정
+  paths-to-match: /**
+
+  # 보안 관련 설정
+  show-login-endpoint: true
+  enable-spring-security: true
+
+  # 캐시 비활성화 (개발 환경에서 유용)
+  cache:
+    disabled: true

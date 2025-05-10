@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.controller;
 
-import com.example.fingerprint_backend.ApiResponse;
+import com.example.fingerprint_backend.ApiResult;
 import com.example.fingerprint_backend.dto.message.LineWebhookRequest;
 import com.example.fingerprint_backend.jwt.CustomUserDetails;
 import com.example.fingerprint_backend.jwt.JWTUtil;
@@ -19,10 +19,10 @@ public class MessageController {
     private final LineService lineService;
 
     @GetMapping("")
-    public ResponseEntity<ApiResponse> createJwtToken(@AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<ApiResult> createJwtToken(@AuthenticationPrincipal CustomUserDetails user) {
 
         String token = jwtUtil.generateToken(user.getUsername(), null, 600000);
-        return ResponseEntity.ok(new ApiResponse(true, "Token created", token));
+        return ResponseEntity.ok(new ApiResult(true, "Token created", token));
     }
 
     @PostMapping("/line")

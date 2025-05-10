@@ -7,9 +7,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record RankingResponseDto(
-        RankingType rankingType,
-        PeriodType periodType,
-        LocalDate startDate,
-        List<RankEntityDto> rankList
-) {
+                RankingType rankingType,
+                PeriodType periodType,
+                LocalDate startDate,
+                List<RankEntityDto> rankList) {
 }
