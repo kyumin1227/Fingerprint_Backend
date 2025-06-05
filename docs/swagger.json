@@ -1,1 +1,1275 @@
-{"openapi":"3.0.1","info":{"title":"Bannote API","description":"Bannote 백엔드 API 문서","contact":{"name":"Bannote Team","url":"https://github.com/Bannote","email":"kyumin12271227@gmail.com"},"license":{"name":"MIT License","url":"https://opensource.org/licenses/MIT"},"version":"v1.0.0"},"servers":[{"url":"http://localhost:8080","description":"Generated server url"}],"tags":[{"name":"Messaging","description":"메시징 및 챗봇 API / メッセージングおよびチャットボットAPI"},{"name":"Admin","description":"관리자 API / 管理者API<br>Admin 권한이 필요합니다。/ 管理者権限が必要です。"},{"name":"Clean Manager","description":"청소 관리 API / 清掃管理API<br>MANAGER 권한이 필요합니다。/ MANAGER権限が必要です。"},{"name":"Fingerprint - python","description":"지문 등록 및 인식 API / 指紋登録および認識API"},{"name":"Fingerprint - ranking","description":"랭킹 API / ランキングAPI"},{"name":"Clean Info","description":"청소 정보 API / 清掃情報API"},{"name":"Authentication","description":"인증 API / 認証API<br>Authorization 헤더에 Google ID 토큰을 포함해야 합니다。/ AuthorizationヘッダーにGoogle IDトークンを含める必要があります。"},{"name":"Member","description":"회원 관리 API / 会員管理API"},{"name":"Monitoring","description":"모니터링 API / モニタリングAPI"}],"paths":{"/api/members/me/profile-image":{"put":{"tags":["Member"],"summary":"프로필 이미지 업데이트 / プロフィール画像更新","description":"사용자의 프로필 이미지를 업데이트합니다。/ ユーザーのプロフィール画像を更新します。<br>파일은 최대 5MB까지 업로드 가능합니다。/ ファイルは最大5MBまでアップロード可能です。","operationId":"updateProfileImage","requestBody":{"content":{"application/json":{"schema":{"required":["file"],"type":"object","properties":{"file":{"type":"string","format":"binary"}}}}}},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/manager/groups/swap":{"put":{"tags":["Clean Manager"],"summary":"그룹의 학생 교환 / グループの学生交換","description":"그룹의 학생을 교환합니다。/ グループの学生を交換します。","operationId":"swapMembersInGroup","requestBody":{"description":"그룹의 학생 교환 요청 본문 / グループの学生交換リクエストボディ<br><br>• `originStudentNumber` - 원본 학생 학번 / 元の学生の学籍番号<br>• `targetStudentNumber` - 대상 학생 학번 / 対象の学生の学籍番号<br>• `originGroupId` - 원본 그룹 ID / 元のグループID<br>• `targetGroupId` - 대상 그룹 ID / 対象のグループID","content":{"application/json":{"schema":{"$ref":"#/components/schemas/SwapMembersRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/class":{"post":{"tags":["Admin"],"summary":"반 생성 / クラス生成","description":"새로운 반이 시스템을 도입할 때 반을 추가하는 API입니다。<br>新しいクラスがシステムを導入する際にクラスを追加するAPIです。","operationId":"createClass","requestBody":{"description":"반 생성 요청 본문 / クラス生成リクエストボディ<br><br>• `className` - 생성할 반의 이름 / 生成するクラスの名前","content":{"application/json":{"schema":{"$ref":"#/components/schemas/SchoolClassRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/register":{"post":{"tags":["Authentication"],"summary":"회원가입 / 会員登録","description":"추가 정보를 사용하여 새로운 사용자를 등록합니다。<br>追加情報を使用して新しいユーザーを登録します。","operationId":"register","requestBody":{"description":"회원가입 요청 본문 / 会員登録リクエストボディ<br><br>• `studentNumber` - 학번 / 学籍番号<br>• `className` - 반 이름 / クラス名","content":{"application/json":{"schema":{"$ref":"#/components/schemas/GoogleRegisterDto"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/message/line":{"post":{"tags":["Messaging"],"summary":"LINE 메시지 수신 / LINEメッセージ受信","description":"LINE 웹훅 요청을 처리합니다。/ LINEウェブフックリクエストを処理します。","operationId":"receiveLineMessage","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/LineWebhookRequest"}}},"required":true},"responses":{"200":{"description":"OK"}}}},"/api/login":{"post":{"tags":["Authentication"],"summary":"로그인 / ログイン","description":"사용자를 인증하고 로그인합니다。<br>ユーザーを認証し、ログインします。","operationId":"login","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/fingerprint/students":{"get":{"tags":["Fingerprint - python"],"summary":"모든 지문 정보 조회 / 全指紋情報の取得","description":"등록된 모든 지문 정보를 조회합니다.<br>登録されているすべての指紋情報を取得します。","operationId":"getAllFingerprints","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}},"post":{"tags":["Fingerprint - python"],"summary":"지문 등록 / 指紋登録","description":"지문 인식기에서 전달된 학번과 지문 데이터를 이용해 지문을 등록합니다。<br>指紋認識機から送信された学籍番号と指紋データを使って登録を行います。","operationId":"registerFingerprint","requestBody":{"description":"지문 등록 요청 본문 / 指紋登録リクエストボディ<br><br>• `fingerprint1` - 첫 번째 지문 데이터 (Base64 인코딩) / 最初の指紋データ (Base64エンコーディング)<br>• `fingerprint2` - 두 번째 지문 데이터 (Base64 인코딩) / 二番目の指紋データ (Base64エンコーディング)<br>• `std_num` - 학번 / 学籍番号<br>• `salt` - 암호화에 사용된 salt 값 / 暗号化に使用されたsalt値","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateFingerPrintDto"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/fingerprint/logs":{"post":{"tags":["Fingerprint - python"],"summary":"지문 인식 시 로그 생성 / 指紋認識時のログ生成","description":"지문 인식 시 발생하는 로그를 생성합니다。<br>指紋認識時に発生するログを生成します。","operationId":"createLog","requestBody":{"description":"로그 생성 요청 본문 / ログ生成リクエストボディ<br><br>• `std_num` - 학번 / 学籍番号<br>• `action` - 행동 (등교, 하교, 외출 등) / 行動 (登校、下校、外出など)","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateLogDto"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/fingerprint/close":{"post":{"tags":["Fingerprint - python"],"summary":"문 닫힘 / 門閉め","description":"문 닫힘을 담당하는 학번을 기반으로 문을 닫습니다。<br>門閉めを担当する学籍番号に基づいて門を閉めます。","operationId":"closeClass","requestBody":{"description":"문 닫힘 요청 본문 / 門閉めリクエストボディ<br><br>• `closingMember` - 문 닫힘 담당자 학번 / 門閉め担当者の学籍番号","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RequestClassClose"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/manager/schedules":{"post":{"tags":["Clean Manager"],"summary":"청소 스케줄 생성 / 清掃スケジュール生成","description":"청소 스케줄을 생성합니다。/ 清掃スケジュールを生成します。","operationId":"createSchedule","requestBody":{"description":"청소 스케줄 생성 요청 본문 / 清掃スケジュール生成リクエストボディ<br><br>• `date` - 청소 스케줄 날짜 / 清掃スケジュールの日付<br>• `areaName` - 청소 구역 이름 / 清掃区域の名前","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ScheduleRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/manager/schedules/auto":{"post":{"tags":["Clean Manager"],"summary":"자동 청소 스케줄 생성 / 自動清掃スケジュール生成","description":"자동으로 청소 스케줄을 생성합니다。/ 自動で清掃スケジュールを生成します。","operationId":"createScheduleAuto","requestBody":{"description":"자동 청소 스케줄 생성 요청 본문 / 自動清掃スケジュール生成リクエストボディ<br><br>• `date` - 청소 스케줄 날짜 / 清掃スケジュールの日付<br>• `areaName` - 청소 구역 이름 / 清掃区域の名前<br>• `cycle` - 주기 / 周期<br>• `daysOfWeek` - 요일 / 曜日<br>• `count` - 갯수 / 個数","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ScheduleAutoRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/manager/members":{"post":{"tags":["Clean Manager"],"summary":"학생 추가 / 学生追加","description":"청소 구역에 학생을 추가합니다。/ 清掃区域に学生を追加します。","operationId":"createMember","requestBody":{"description":"학생 추가 요청 본문 / 学生追加リクエストボディ<br><br>• `studentNumber` - 학번 / 学籍番号<br>• `givenName` - 이름 / 名前<br>• `familyName` - 성 / 姓<br>• `areaName` - 청소 구역 이름 / 清掃区域の名前","content":{"application/json":{"schema":{"$ref":"#/components/schemas/MemberRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/manager/groups/{groupId}/members":{"post":{"tags":["Clean Manager"],"summary":"그룹에 학생 추가 / グループに学生追加","description":"그룹에 학생을 추가합니다。/ グループに学生を追加します。","operationId":"addMembersToGroup","parameters":[{"name":"groupId","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"requestBody":{"description":"그룹에 학생 추가 요청 본문 / グループに学生追加リクエストボディ<br><br>• `studentNumber` - 학번 / 学籍番号","content":{"application/json":{"schema":{"$ref":"#/components/schemas/GroupMemberRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}},"delete":{"tags":["Clean Manager"],"summary":"그룹에서 학생 삭제 / グループから学生削除","description":"그룹에서 학생을 삭제합니다。/ グループから学生を削除します。","operationId":"removeMembersToGroup","parameters":[{"name":"groupId","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"requestBody":{"description":"그룹에 학생 삭제 요청 본문 / グループから学生削除リクエストボディ<br><br>• `studentNumber` - 학번 / 学籍番号","content":{"application/json":{"schema":{"$ref":"#/components/schemas/GroupMemberRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/manager/groups/random":{"post":{"tags":["Clean Manager"],"summary":"랜덤 그룹 생성 / ランダムグループ生成","description":"랜덤으로 청소 그룹을 생성합니다。/ ランダムで清掃グループを生成します。","operationId":"createGroupsByRandom","requestBody":{"description":"랜덤 그룹 생성 요청 본문 / ランダムグループ生成リクエストボディ<br><br>• `areaName` - 청소 구역 이름 / 清掃区域の名前<br>• `groupSize` - 그룹 당 인원수 / グループ当たりの人数","content":{"application/json":{"schema":{"$ref":"#/components/schemas/GroupRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/manager/complete":{"post":{"tags":["Clean Manager"],"summary":"청소 스케줄 완료 / 清掃スケジュール完了","description":"청소 스케줄을 완료 처리합니다。/ 清掃スケジュールを完了処理します。","operationId":"completeCleaningSchedule","requestBody":{"description":"청소 스케줄 완료 요청 본문 / 清掃スケジュール完了リクエストボディ<br><br>• `date` - 청소 스케줄 날짜 / 清掃スケジュールの日付<br>• `areaName` - 청소 구역 이름 / 清掃区域の名前","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ScheduleRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/manager/areas":{"post":{"tags":["Clean Manager"],"summary":"청소 구역 생성 / 清掃区域生成","description":"새로운 청소 구역을 생성합니다。/ 新しい清掃区域を生成します。","operationId":"createArea","requestBody":{"description":"청소 구역 생성 요청 본문 / 清掃区域生成リクエストボディ<br><br>• `areaName` - 청소 구역 이름 / 清掃区域の名前<br>• `daysOfWeek` - 청소 요일 / 清掃曜日<br>• `cycle` - 청소 주기 / 清掃周期<br>• `isDefault` - 반의 기본 구역 여부 / クラスのデフォルトの区域かどうか<br>• `startDate` - 시작 날짜 / 開始日","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AreaRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/manager/members/{studentNumber}":{"delete":{"tags":["Clean Manager"],"summary":"학생 삭제 / 学生削除","description":"청소 구역에서 학생을 삭제합니다。/ 清掃区域から学生を削除します。","operationId":"deleteMember","parameters":[{"name":"studentNumber","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}},"patch":{"tags":["Clean Manager"],"summary":"학생 수정 / 学生修正","description":"청소 구역의 학생 정보를 수정합니다。/ 清掃区域の学生情報を修正します。","operationId":"updateMember","parameters":[{"name":"studentNumber","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"description":"학생 수정 요청 본문 / 学生修正リクエストボディ<br><br>• `givenName` - 이름 / 名前<br>• `familyName` - 성 / 姓<br>• `areaName` - 청소 구역 이름 / 清掃区域の名前","content":{"application/json":{"schema":{"$ref":"#/components/schemas/MemberRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/ranking":{"get":{"tags":["Fingerprint - ranking"],"summary":"랭킹 조회 / ランキング取得","description":"랭킹 타입, 기간타입, 시작일를 이용한 랭킹을 조회합니다.<br>ランキングタイプ、期間タイプ、開始日を使用してランキングを取得します。<br><br><a href=\"https://documenter.getpostman.com/view/27801312/2sB2cYbKwH\" target=\"_blank\">Response Sample</a>","operationId":"getRanking","parameters":[{"name":"rankingType","in":"query","description":"랭킹 타입 / ランキングタイプ<br><br>• `등교_시간` - 登校時間<br>• `체류_시간` - 滞在時間<br>• `개근` - 皆勤","required":true,"schema":{"type":"string","enum":["등교_시간","체류_시간","개근"]}},{"name":"periodType","in":"query","description":"기간 타입 / 期間タイプ<br><br>• `일간` - 日間<br>• `주간` - 週間（月曜日〜日曜日）<br>• `월간` - 月間（今月）<br>• `전체` - 全体（すべての期間）","required":true,"schema":{"type":"string","enum":["일간","주간","월간","전체"]}},{"name":"startDate","in":"query","description":"날짜 / 日付 (YYYY-MM-DD)","required":true,"schema":{"type":"string","format":"date"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/monitor/time":{"get":{"tags":["Monitoring"],"summary":"서버 시간 조회 / サーバー時間確認","description":"현재 서버 시간을 조회합니다。/ 現在のサーバー時間を確認します。","operationId":"serverTime","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"string"}}}}}}},"/api/monitor/status":{"get":{"tags":["Monitoring"],"summary":"전체 상태 조회 / 全体状態確認","description":"서버의 전체 상태를 조회합니다。/ サーバーの全体状態を確認します。","operationId":"fullStatus","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"object","additionalProperties":{"type":"object"}}}}}}}},"/api/monitor/info":{"get":{"tags":["Monitoring"],"summary":"서버 정보 조회 / サーバー情報確認","description":"서버의 정보를 조회합니다。/ サーバーの情報を確認します。","operationId":"info","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"object","additionalProperties":{"type":"string"}}}}}}}},"/api/monitor/health":{"get":{"tags":["Monitoring"],"summary":"헬스 체크 / ヘルスチェック","description":"서버의 헬스 상태를 확인합니다。/ サーバーのヘルス状態を確認します。","operationId":"healthCheck","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"string"}}}}}}},"/api/monitor/db":{"get":{"tags":["Monitoring"],"summary":"DB 상태 확인 / DB状態確認","description":"데이터베이스의 상태를 확인합니다。/ データベースの状態を確認します。","operationId":"dbCheck","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"string"}}}}}}},"/api/message":{"get":{"tags":["Messaging"],"summary":"JWT 토큰 생성 / JWTトークン生成","description":"사용자 인증을 위한 JWT 토큰을 생성합니다。/ ユーザー認証のためのJWTトークンを生成します。","operationId":"createJwtToken","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/fingerprint/students/{stdNum}":{"get":{"tags":["Fingerprint - python"],"summary":"지문 등록 가능 여부 조회 / 指紋登録可否の確認","description":"입력한 학번에 대해 지문 등록이 가능한지 여부를 조회합니다。<br>すでに登録されている場合は再登録不可です。<br><br>","operationId":"checkFingerprintAvailability","parameters":[{"name":"stdNum","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}},"delete":{"tags":["Fingerprint - python"],"summary":"지문 삭제 / 指紋削除","description":"학번을 기반으로 등록된 지문 데이터를 삭제합니다。<br>学籍番号に基づいて登録された指紋データを削除します。","operationId":"deleteFingerprint","parameters":[{"name":"stdNum","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean":{"get":{"tags":["Clean Info"],"summary":"청소 정보 조회 (구역별) / 清掃情報取得 (区域別)","description":"특정 반의 특정 구역에 대한 청소 정보를 조회합니다。/ 特定のクラスの特定の区域に関する清掃情報を取得します。","operationId":"getCleanInfoByArea","parameters":[{"name":"classId","in":"query","required":true,"schema":{"type":"integer","format":"int64"}},{"name":"areaName","in":"query","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}},"/api/clean/all":{"get":{"tags":["Clean Info"],"summary":"모든 청소 정보 조회 / 全ての清掃情報取得","description":"특정 반에 대한 모든 청소 정보를 조회합니다。/ 特定のクラスに関する全ての清掃情報を取得します。","operationId":"getAllCleanInfo","parameters":[{"name":"classId","in":"query","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResult"}}}}}}}},"components":{"schemas":{"ApiResult":{"type":"object","properties":{"success":{"type":"boolean"},"message":{"type":"string"},"data":{"type":"object"}}},"SwapMembersRequest":{"type":"object","properties":{"originStudentNumber":{"type":"string"},"targetStudentNumber":{"type":"string"},"originGroupId":{"type":"integer","format":"int64"},"targetGroupId":{"type":"integer","format":"int64"}}},"SchoolClassRequest":{"type":"object","properties":{"className":{"type":"string"}}},"GoogleRegisterDto":{"type":"object","properties":{"studentNumber":{"type":"string"},"className":{"type":"string"}}},"DeliveryContext":{"type":"object","properties":{"isRedelivery":{"type":"boolean"}}},"Event":{"type":"object","properties":{"type":{"type":"string"},"message":{"$ref":"#/components/schemas/Message"},"webhookEventId":{"type":"string"},"deliveryContext":{"$ref":"#/components/schemas/DeliveryContext"},"timestamp":{"type":"integer","format":"int64"},"source":{"$ref":"#/components/schemas/Source"},"replyToken":{"type":"string"},"mode":{"type":"string"}}},"LineWebhookRequest":{"type":"object","properties":{"destination":{"type":"string"},"events":{"type":"array","items":{"$ref":"#/components/schemas/Event"}}}},"Message":{"type":"object","properties":{"type":{"type":"string"},"id":{"type":"string"},"quotedMessageId":{"type":"string"},"quoteToken":{"type":"string"},"text":{"type":"string"}}},"Source":{"type":"object","properties":{"type":{"type":"string"},"groupId":{"type":"string"},"userId":{"type":"string"}}},"CreateFingerPrintDto":{"type":"object","properties":{"fingerprint1":{"type":"string"},"fingerprint2":{"type":"string"},"std_num":{"type":"string"},"salt":{"type":"string"}}},"CreateLogDto":{"type":"object","properties":{"std_num":{"type":"string"},"action":{"type":"string","enum":["등교","하교","식사","도서관","기타","복귀"]}}},"RequestClassClose":{"type":"object","properties":{"closingMember":{"type":"string"}}},"ScheduleRequest":{"type":"object","properties":{"areaName":{"type":"string"},"className":{"type":"string"},"date":{"type":"string","format":"date"}}},"ScheduleAutoRequest":{"type":"object","properties":{"areaName":{"type":"string"},"className":{"type":"string"},"daysOfWeek":{"type":"array","items":{"type":"string"}},"cycle":{"type":"integer","format":"int32"},"count":{"type":"integer","format":"int32"},"date":{"type":"string","format":"date"}}},"MemberRequest":{"type":"object","properties":{"studentNumber":{"type":"string"},"givenName":{"type":"string"},"familyName":{"type":"string"},"areaName":{"type":"string"}}},"GroupMemberRequest":{"type":"object","properties":{"studentNumber":{"type":"string"}}},"GroupRequest":{"type":"object","properties":{"areaName":{"type":"string"},"className":{"type":"string"},"cycle":{"type":"string"},"groupSize":{"type":"integer","format":"int32"}}},"AreaRequest":{"type":"object","properties":{"areaName":{"type":"string"},"daysOfWeek":{"uniqueItems":true,"type":"array","items":{"type":"string","enum":["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"]}},"cycle":{"type":"integer","format":"int32"},"isDefault":{"type":"boolean"},"startDate":{"type":"string","format":"date"},"display":{"type":"integer","format":"int32"},"groupSize":{"type":"integer","format":"int32"}}}}}}
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Bannote API",
+    "description": "Bannote 백엔드 API 문서",
+    "contact": {
+      "name": "Bannote Team",
+      "url": "https://github.com/Bannote",
+      "email": "kyumin12271227@gmail.com"
+    },
+    "license": {
+      "name": "MIT License",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Fingerprint - python",
+      "description": "지문 등록 및 인식 API / 指紋登録および認識API"
+    },
+    {
+      "name": "Fingerprint - ranking",
+      "description": "랭킹 API / ランキングAPI"
+    }
+  ],
+  "paths": {
+    "/api/members/me/profile-image": {
+      "put": {
+        "tags": [
+          "member-controller"
+        ],
+        "operationId": "UpdateProfileImage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/groups/swap": {
+      "put": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "swapMembersInGroup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwapMembersRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/class": {
+      "post": {
+        "tags": [
+          "admin-controller"
+        ],
+        "operationId": "createClass",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchoolClassRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/register": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleRegisterDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/message/line": {
+      "post": {
+        "tags": [
+          "message-controller"
+        ],
+        "operationId": "receiveLineMessage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LineWebhookRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "login",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/fingerprint/students": {
+      "get": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "getAllFingerprint",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFingerPrintDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/fingerprint/logs": {
+      "post": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "createLog",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLogDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/fingerprint/close": {
+      "post": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "close",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestClassClose"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/schedules": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createSchedule",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/schedules/auto": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createScheduleAuto",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleAutoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/members": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createMember",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/groups/{groupId}/members": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "addMembersToGroup",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "removeMembersToGroup",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/groups/random": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createGroupsByRandom",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/complete": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "completeCleaningSchedule",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/areas": {
+      "post": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "createArea",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/manager/members/{studentNumber}": {
+      "delete": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "deleteMember",
+        "parameters": [
+          {
+            "name": "studentNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "clean-manager-controller"
+        ],
+        "operationId": "updateMember",
+        "parameters": [
+          {
+            "name": "studentNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ranking": {
+      "get": {
+        "tags": [
+          "Fingerprint - ranking"
+        ],
+        "summary": "랭킹 조회 / ランキング",
+        "description": "랭킹 타입, 기간타입, 시작일를 이용한 랭킹을 조회합니다. / ランキングタイプ、期間タイプ、開始日を使用してランキングを取得します。\u003Cbr\u003E\u003Cbr\u003E\u003Ca href=\"https://documenter.getpostman.com/view/27801312/2sB2cYbKwH\" target=\"_blank\"\u003EResponse Sample\u003C/a\u003E",
+        "operationId": "getRanking",
+        "parameters": [
+          {
+            "name": "rankingType",
+            "in": "query",
+            "description": "랭킹 타입 / ランキングタイプ",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "등교_시간",
+                "체류_시간",
+                "개근"
+              ]
+            }
+          },
+          {
+            "name": "periodType",
+            "in": "query",
+            "description": "기간타입 / 期間タイプ",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "일간",
+                "주간",
+                "월간",
+                "전체"
+              ]
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "날짜 / 日付 (YYYY-MM-DD)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/time": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "serverTime",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/status": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "fullStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/info": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "info",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/health": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/db": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "dbCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/message": {
+      "get": {
+        "tags": [
+          "message-controller"
+        ],
+        "operationId": "createJwtToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/fingerprint/students/{stdNum}": {
+      "get": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "check",
+        "parameters": [
+          {
+            "name": "stdNum",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Fingerprint - python"
+        ],
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "stdNum",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean": {
+      "get": {
+        "tags": [
+          "clean-controller"
+        ],
+        "operationId": "getCleanInfo",
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "areaName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clean/all": {
+      "get": {
+        "tags": [
+          "clean-controller"
+        ],
+        "operationId": "getCleanInfo_1",
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "SwapMembersRequest": {
+        "type": "object",
+        "properties": {
+          "originStudentNumber": {
+            "type": "string"
+          },
+          "targetStudentNumber": {
+            "type": "string"
+          },
+          "originGroupId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "targetGroupId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "SchoolClassRequest": {
+        "type": "object",
+        "properties": {
+          "className": {
+            "type": "string"
+          }
+        }
+      },
+      "GoogleRegisterDto": {
+        "type": "object",
+        "properties": {
+          "studentNumber": {
+            "type": "string"
+          },
+          "className": {
+            "type": "string"
+          }
+        }
+      },
+      "DeliveryContext": {
+        "type": "object",
+        "properties": {
+          "isRedelivery": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "$ref": "#/components/schemas/Message"
+          },
+          "webhookEventId": {
+            "type": "string"
+          },
+          "deliveryContext": {
+            "$ref": "#/components/schemas/DeliveryContext"
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          },
+          "replyToken": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          }
+        }
+      },
+      "LineWebhookRequest": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "quotedMessageId": {
+            "type": "string"
+          },
+          "quoteToken": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "Source": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "groupId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateFingerPrintDto": {
+        "type": "object",
+        "properties": {
+          "fingerprint1": {
+            "type": "string"
+          },
+          "fingerprint2": {
+            "type": "string"
+          },
+          "std_num": {
+            "type": "string"
+          },
+          "salt": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateLogDto": {
+        "type": "object",
+        "properties": {
+          "std_num": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "등교",
+              "하교",
+              "식사",
+              "도서관",
+              "기타",
+              "복귀"
+            ]
+          }
+        }
+      },
+      "RequestClassClose": {
+        "type": "object",
+        "properties": {
+          "closingMember": {
+            "type": "string"
+          }
+        }
+      },
+      "ScheduleRequest": {
+        "type": "object",
+        "properties": {
+          "areaName": {
+            "type": "string"
+          },
+          "className": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "ScheduleAutoRequest": {
+        "type": "object",
+        "properties": {
+          "areaName": {
+            "type": "string"
+          },
+          "className": {
+            "type": "string"
+          },
+          "daysOfWeek": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cycle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "MemberRequest": {
+        "type": "object",
+        "properties": {
+          "studentNumber": {
+            "type": "string"
+          },
+          "givenName": {
+            "type": "string"
+          },
+          "familyName": {
+            "type": "string"
+          },
+          "areaName": {
+            "type": "string"
+          }
+        }
+      },
+      "GroupMemberRequest": {
+        "type": "object",
+        "properties": {
+          "studentNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "GroupRequest": {
+        "type": "object",
+        "properties": {
+          "areaName": {
+            "type": "string"
+          },
+          "className": {
+            "type": "string"
+          },
+          "cycle": {
+            "type": "string"
+          },
+          "groupSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AreaRequest": {
+        "type": "object",
+        "properties": {
+          "areaName": {
+            "type": "string"
+          },
+          "daysOfWeek": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY",
+                "SATURDAY",
+                "SUNDAY"
+              ]
+            }
+          },
+          "cycle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "display": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groupSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
+}
