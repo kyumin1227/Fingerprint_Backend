@@ -27,13 +27,22 @@ public class RankingController {
 
     private final RankingApplicationService rankingApplicationService;
 
-    @Operation(summary = "랭킹 조회 / ランキング", description = "랭킹 타입, 기간타입, 시작일를 이용한 랭킹을 조회합니다. / ランキングタイプ、期間タイプ、開始日を使用してランキングを取得します。<br><br>"
-            +
-            "<a href=\"https://documenter.getpostman.com/view/27801312/2sB2cYbKwH\" target=\"_blank\">Response Sample</a>")
+    @Operation(operationId = "getRanking",
+            summary = "랭킹 조회 / ランキング取得",
+            description = "랭킹 타입, 기간타입, 시작일를 이용한 랭킹을 조회합니다.<br>" +
+                    "ランキングタイプ、期間タイプ、開始日を使用してランキングを取得します。<br><br>" +
+                    "<a href=\"https://documenter.getpostman.com/view/27801312/2sB2cYbKwH\" target=\"_blank\">Response Sample</a>")
     @GetMapping("")
     public ResponseEntity<ApiResult> getRanking(
-            @Parameter(description = "랭킹 타입 / ランキングタイプ", schema = @Schema(implementation = RankingType.class), required = true) @RequestParam RankingType rankingType,
-            @Parameter(description = "기간타입 / 期間タイプ", schema = @Schema(implementation = PeriodType.class), required = true) @RequestParam PeriodType periodType,
+            @Parameter(description = "랭킹 타입 / ランキングタイプ<br><br>" +
+                    "• `등교_시간` - 登校時間<br>" +
+                    "• `체류_시간` - 滞在時間<br>" +
+                    "• `개근` - 皆勤", schema = @Schema(implementation = RankingType.class), required = true) @RequestParam RankingType rankingType,
+            @Parameter(description = "기간 타입 / 期間タイプ<br><br>" +
+                    "• `일간` - 日間<br>" +
+                    "• `주간` - 週間（月曜日〜日曜日）<br>" +
+                    "• `월간` - 月間（今月）<br>" +
+                    "• `전체` - 全体（すべての期間）", schema = @Schema(implementation = PeriodType.class), required = true) @RequestParam PeriodType periodType,
             @Parameter(description = "날짜 / 日付 (YYYY-MM-DD)", schema = @Schema(implementation = LocalDate.class), required = true) @RequestParam LocalDate startDate) {
 
         Integer RANKING_LIMIT = 5;
