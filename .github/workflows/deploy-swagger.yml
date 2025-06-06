@@ -1,0 +1,48 @@
+name: Generate Swagger and Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  generate-swagger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build Spring Boot
+        run: ./gradlew bootJar
+
+      - name: Run Spring Boot in background
+        run: java -jar build/libs/*.jar &
+
+      - name: Wait for server
+        run: |
+          echo "Waiting for Spring Boot to start..."
+          until curl -s http://localhost:8080/actuator/health | grep UP; do sleep 3; done
+
+      - name: Download Swagger JSON
+        run: |
+          mkdir -p docs
+          curl http://localhost:8080/v3/api-docs -o docs/swagger.json
+
+      - name: Copy Swagger UI template
+        run: |
+          curl https://raw.githubusercontent.com/swagger-api/swagger-ui/master/dist/index.html -o docs/index.html
+          sed -i 's|https://petstore.swagger.io/v2/swagger.json|swagger.json|' docs/index.html
+
+      - name: Commit & Push docs
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'actions@github.com'
+          git add docs
+          git commit -m "Update Swagger UI"
+          git push
