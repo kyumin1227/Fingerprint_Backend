@@ -7,9 +7,37 @@ on:
       - 'docs/**'
       - '.github/workflows/deploy-swagger.yml'
 
+env:
+    DB_URL: jdbc:mysql://localhost:3306/fingerprint?useSSL=false&allowPublicKeyRetrieval=true
+    DB_USER: root
+    DB_PASSWORD: root
+    AWS_S3_IMAGE_BUCKET_NAME: test-bucket
+    AWS_REGION: ap-northeast-1
+    AWS_ACCESS_KEY_ID: dummy-access-key
+    AWS_SECRET_ACCESS_KEY: dummy-secret-key
+    JWT_SECRET: dummy-jwt
+    JWT_EXPIRATION: 3600
+    LINE_ACCESS_TOKEN: dummy-line-token
+    LINE_ACCESS_TOKEN_DEV: dummy-line-token-dev
+    GOOGLE_CLIENT_ID: dummy-google-client-id
+
 jobs:
   generate-swagger:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: fingerprint
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+        ports:
+          - 3306:3306
 
     steps:
       - name: Checkout
@@ -26,18 +54,38 @@ jobs:
       - name: Build Spring Boot
         run: ./gradlew bootJar
 
+      - name: Wait for MySQL to be healthy
+        run: |
+          for i in {1..10}; do
+            status=$(docker inspect --format='{{.State.Health.Status}}' $(docker ps -qf "ancestor=mysql:8"))
+            echo "MySQL container status: $status"
+            if [ "$status" == "healthy" ]; then
+              echo "MySQL is healthy!"
+              break
+            fi
+            sleep 5
+          done
+          
+          if [ "$status" != "healthy" ]; then
+            echo "MySQL did not become healthy in time." >&2
+            exit 1
+          fi
+
       - name: Run Spring Boot in background
-        run: java -jar build/libs/*.jar &
+        run: |
+          nohup java -jar build/libs/*.jar \
+            --server.port=8080 \
+            --spring.profiles.active=aws,dev,ci > spring.log 2>&1 &
 
       - name: Wait for server
         run: |
           echo "Waiting for Spring Boot to start..."
-          timeout 60s bash -c 'until curl -f http://127.0.0.1:8080/actuator/health | grep -q UP; do sleep 3; done'
+          timeout 60s bash -c 'until curl -f http://localhost:8080/actuator/health | grep -q UP; do sleep 3; done'
 
       - name: Download Swagger JSON
         run: |
           mkdir -p docs
-          curl http://127.0.0.1:8080/v3/api-docs -o docs/swagger.json
+          curl http://localhost:8080/v3/api-docs -o docs/swagger.json
 
       - name: Copy Swagger UI template
         run: |
@@ -59,4 +107,4 @@ jobs:
             exit 0
           fi
           git commit -m "Update Swagger UI"
-          git push origin swagger-docs
+          git push --force origin swagger-docs

@@ -1,0 +1,9 @@
+# CI/CD 환경에서 Spring Shell의 대화형 및 비대화형 모드를 비활성화
+spring:
+  shell:
+    interactive:
+      enabled: false
+    noninteractive:
+      enabled: false
+    script:
+      enabled: false
