@@ -1,3 +1,4 @@
+
 name: Build and Push Docker Image
 
 permissions:
@@ -33,8 +34,41 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Run MySQL container for tests
+        run: |
+          docker run -d \
+            --name mysql-test \
+            -e MYSQL_ROOT_PASSWORD=root \
+            -e MYSQL_DATABASE=fingerprint_db_test \
+            -e MYSQL_USER=test \
+            -e MYSQL_PASSWORD=test \
+            -p 3306:3306 \
+            --health-cmd="mysqladmin ping --silent" \
+            --health-interval=10s \
+            --health-timeout=5s \
+            --health-retries=5 \
+            mysql:latest
+
+      - name: Wait for MySQL to be healthy
+        run: |
+          for i in {1..10}; do
+            status=$(docker inspect --format='{{.State.Health.Status}}' mysql-test)
+            echo "MySQL container status: $status"
+            if [ "$status" == "healthy" ]; then
+              echo "MySQL is healthy!"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "MySQL did not become healthy in time." >&2
+          exit 1
+
       - name: Build with Gradle (workflow profile)
         run: ./gradlew build
+
+      - name: Cleanup MySQL container
+        if: always()
+        run: docker rm -f mysql-test
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -61,7 +95,6 @@ jobs:
           else
             echo "TAG_NAME=latest" >> $GITHUB_OUTPUT
           fi
-
       - name: Extract metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@v5
@@ -71,7 +104,6 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw, value=${{ steps.tag.outputs.TAG_NAME }}
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
