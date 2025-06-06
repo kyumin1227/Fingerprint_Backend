@@ -1,10 +1,9 @@
 package com.example.fingerprint_backend.domain.fingerprint.service.cycle;
 
-import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle;
 import com.example.fingerprint_backend.domain.fingerprint.entity.OutingCycle;
 import com.example.fingerprint_backend.domain.fingerprint.repository.OutingCycleRepository;
 import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

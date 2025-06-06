@@ -1,22 +1,16 @@
 package com.example.fingerprint_backend.domain.fingerprint.service.log;
 
-import com.example.fingerprint_backend.domain.fingerprint.entity.ClassClosingTime;
 import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
 import com.example.fingerprint_backend.domain.fingerprint.exception.LogException;
-import com.example.fingerprint_backend.entity.MemberEntity;
-import com.example.fingerprint_backend.domain.fingerprint.repository.ClassClosingTimeRepository;
 import com.example.fingerprint_backend.domain.fingerprint.repository.LogRepository;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
-import com.example.fingerprint_backend.service.Member.MemberValidator;
-import com.example.fingerprint_backend.types.LogAction;
-import com.example.fingerprint_backend.types.MemberRole;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 로그와 문 닫힘을 관리하는 서비스

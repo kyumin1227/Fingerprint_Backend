@@ -9,7 +9,7 @@ import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.repository.MemberRepository;
 import com.example.fingerprint_backend.repository.SchoolClassRepository;
 import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import com.example.fingerprint_backend.types.MemberRole;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;

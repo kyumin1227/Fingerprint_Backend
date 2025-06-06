@@ -1,7 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.repository;
 
 import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

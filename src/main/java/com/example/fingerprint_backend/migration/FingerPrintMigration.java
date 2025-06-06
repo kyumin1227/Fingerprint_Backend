@@ -6,7 +6,7 @@ import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleApp
 import com.example.fingerprint_backend.domain.fingerprint.service.log.LogService;
 import com.example.fingerprint_backend.domain.fingerprint.service.ranking.RankingApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;

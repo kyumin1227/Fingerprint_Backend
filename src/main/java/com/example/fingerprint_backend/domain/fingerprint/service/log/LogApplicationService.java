@@ -8,7 +8,7 @@ import com.example.fingerprint_backend.domain.fingerprint.service.cycle.CycleApp
 import com.example.fingerprint_backend.domain.fingerprint.service.ranking.RankingApplicationService;
 import com.example.fingerprint_backend.domain.fingerprint.util.FormatPolicy;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +37,7 @@ public class LogApplicationService {
             case 등교 -> attendanceLog(studentNumber, logTime);
             case 하교 -> leaveLog(studentNumber, logTime);
             case 복귀 -> returnLog(studentNumber, logTime);
-            case 식사, 기타, 도서관 -> outingLog(studentNumber, logTime, logAction);
+            case 식사, 기타, 도서관, 편의점, 운동 -> outingLog(studentNumber, logTime, logAction);
         };
     }
 

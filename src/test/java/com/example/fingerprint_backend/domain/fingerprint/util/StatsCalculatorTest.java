@@ -4,7 +4,7 @@ import com.example.fingerprint_backend.domain.fingerprint.entity.AttendanceCycle
 import com.example.fingerprint_backend.domain.fingerprint.entity.DailyStats;
 import com.example.fingerprint_backend.domain.fingerprint.entity.LogEntity;
 import com.example.fingerprint_backend.domain.fingerprint.service.cycle.AttendanceCycleCommandService;
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

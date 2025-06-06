@@ -1,6 +1,6 @@
 package com.example.fingerprint_backend.domain.fingerprint.entity;
 
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

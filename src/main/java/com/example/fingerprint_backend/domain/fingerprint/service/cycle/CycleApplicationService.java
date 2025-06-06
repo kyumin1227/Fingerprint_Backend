@@ -11,7 +11,7 @@ import com.example.fingerprint_backend.entity.MemberEntity;
 import com.example.fingerprint_backend.entity.SchoolClass;
 import com.example.fingerprint_backend.service.Member.ClassQueryService;
 import com.example.fingerprint_backend.service.Member.MemberQueryService;
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;

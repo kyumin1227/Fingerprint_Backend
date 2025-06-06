@@ -1,7 +1,7 @@
 package com.example.fingerprint_backend.domain.fingerprint.entity;
 
 import com.example.fingerprint_backend.domain.fingerprint.exception.CycleException;
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

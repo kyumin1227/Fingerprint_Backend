@@ -10,7 +10,7 @@ import com.example.fingerprint_backend.domain.fingerprint.util.DatePolicy;
 import com.example.fingerprint_backend.domain.fingerprint.util.StatsCalculator;
 import com.example.fingerprint_backend.domain.fingerprint.util.TimePolicy;
 import com.example.fingerprint_backend.domain.fingerprint.vo.StatsUpdateValue;
-import com.example.fingerprint_backend.types.LogAction;
+import com.example.fingerprint_backend.domain.fingerprint.types.LogAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
