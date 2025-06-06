@@ -32,17 +32,22 @@ jobs:
       - name: Wait for server
         run: |
           echo "Waiting for Spring Boot to start..."
-          timeout 60s bash -c 'until curl -f http://localhost:8080/actuator/health | grep -q UP; do sleep 3; done'
+          timeout 60s bash -c 'until curl -f http://127.0.0.1:8080/actuator/health | grep -q UP; do sleep 3; done'
 
       - name: Download Swagger JSON
         run: |
           mkdir -p docs
-          curl http://localhost:8080/v3/api-docs -o docs/swagger.json
+          curl http://127.0.0.1:8080/v3/api-docs -o docs/swagger.json
 
       - name: Copy Swagger UI template
         run: |
           curl https://raw.githubusercontent.com/swagger-api/swagger-ui/master/dist/index.html -o docs/index.html
           sed -i 's|https://petstore.swagger.io/v2/swagger.json|swagger.json|' docs/index.html
+
+      - name: Switch to swagger-docs branch
+        run: |
+          git fetch origin
+          git checkout -B swagger-docs origin/swagger-docs || git checkout -b swagger-docs
 
       - name: Commit & Push docs
         run: |
@@ -54,4 +59,4 @@ jobs:
             exit 0
           fi
           git commit -m "Update Swagger UI"
-          git push
+          git push origin swagger-docs
