@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: fingerprint-config
+data:
+  AWS_REGION: "ap-northeast-1"
+  AWS_S3_IMAGE_BUCKET_NAME: "bannote.org-images"
+  JWT_EXPIRATION: "3600000"
+  SPRING_DATASOURCE_DRIVER_CLASS_NAME: "com.mysql.cj.jdbc.Driver"
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/fingerprint_db"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.MySQL8Dialect"
+  SPRING_PROFILES_ACTIVE: "dev,custom"
+  TZ: "Asia/Seoul"

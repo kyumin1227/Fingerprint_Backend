@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: fingerprint
+  name: fingerprint
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fingerprint
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: fingerprint
+    spec:
+      containers:
+      - image: kyumin1227/fingerprint_backend_spring:dev
+        name: fingerprint-backend-spring-792ln
+        resources: {}
+        envFrom:
+          - configMapRef:
+              name: fingerprint-config
+          - secretRef:
+              name: fingerprint-secret
+status: {}
