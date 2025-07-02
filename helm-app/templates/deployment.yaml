@@ -27,7 +27,7 @@ spec:
       initContainers:
         - name: wait-for-mysql
           image: busybox
-          command: [ 'sh', '-c', 'until nc -z helm-app-mysql 3306; do echo waiting for mysql...; sleep 2; done' ]
+          command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-mysql 3306; do echo waiting for mysql...; sleep 2; done' ]
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
