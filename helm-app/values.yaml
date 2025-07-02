@@ -54,7 +54,8 @@ ingress:
   className: traefik
   annotations: {}
   hosts:
-    - paths:
+    - host: "fingerprint.bannote.org"
+      paths:
         - path: /
           pathType: Prefix
   tls: []
