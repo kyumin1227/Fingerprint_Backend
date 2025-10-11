@@ -5,7 +5,6 @@ on:
     branches: [ main ]
     paths-ignore:
       - 'docs/**'
-      - '.github/workflows/deploy-swagger.yml'
 
 env:
     DB_URL: jdbc:mysql://localhost:3306/fingerprint?useSSL=false&allowPublicKeyRetrieval=true
@@ -86,11 +85,6 @@ jobs:
         run: |
           mkdir -p docs
           curl http://localhost:8080/v3/api-docs -o docs/swagger.json
-
-      - name: Copy Swagger UI template
-        run: |
-          curl https://raw.githubusercontent.com/swagger-api/swagger-ui/master/dist/index.html -o docs/index.html
-          sed -i 's|https://petstore.swagger.io/v2/swagger.json|swagger.json|' docs/index.html
 
       - name: Switch to swagger-docs branch
         run: |
